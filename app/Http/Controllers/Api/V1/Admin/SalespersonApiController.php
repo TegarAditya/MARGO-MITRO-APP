@@ -17,12 +17,13 @@ class SalespersonApiController extends Controller
     {
         abort_if(Gate::denies('salesperson_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return new SalespersonResource(Salesperson::all());
+        return new SalespersonResource(Salesperson::with(['area_pemasarans'])->get());
     }
 
     public function store(StoreSalespersonRequest $request)
     {
         $salesperson = Salesperson::create($request->all());
+        $salesperson->area_pemasarans()->sync($request->input('area_pemasarans', []));
 
         return (new SalespersonResource($salesperson))
             ->response()
@@ -33,12 +34,13 @@ class SalespersonApiController extends Controller
     {
         abort_if(Gate::denies('salesperson_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return new SalespersonResource($salesperson);
+        return new SalespersonResource($salesperson->load(['area_pemasarans']));
     }
 
     public function update(UpdateSalespersonRequest $request, Salesperson $salesperson)
     {
         $salesperson->update($request->all());
+        $salesperson->area_pemasarans()->sync($request->input('area_pemasarans', []));
 
         return (new SalespersonResource($salesperson))
             ->response()

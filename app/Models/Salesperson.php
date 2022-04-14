@@ -30,6 +30,11 @@ class Salesperson extends Model
         'deleted_at',
     ];
 
+    public function area_pemasarans()
+    {
+        return $this->belongsToMany(City::class);
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
