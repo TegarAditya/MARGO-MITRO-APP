@@ -32,6 +32,9 @@
                         {{ trans('cruds.salesperson.fields.name') }}
                     </th>
                     <th>
+                        {{ trans('cruds.salesperson.fields.area_pemasaran') }}
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -89,6 +92,7 @@
       { data: 'placeholder', name: 'placeholder' },
 { data: 'code', name: 'code' },
 { data: 'name', name: 'name' },
+{ data: 'area_pemasaran', name: 'area_pemasarans.name' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,

@@ -31,6 +31,16 @@
                             {{ $salesperson->name }}
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.salesperson.fields.area_pemasaran') }}
+                        </th>
+                        <td>
+                            @foreach($salesperson->area_pemasarans as $key => $area_pemasaran)
+                                <span class="label label-info">{{ $area_pemasaran->name }}</span>
+                            @endforeach
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">
