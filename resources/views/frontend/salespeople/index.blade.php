@@ -33,6 +33,9 @@
                                         {{ trans('cruds.salesperson.fields.name') }}
                                     </th>
                                     <th>
+                                        {{ trans('cruds.salesperson.fields.area_pemasaran') }}
+                                    </th>
+                                    <th>
                                         &nbsp;
                                     </th>
                                 </tr>
@@ -45,6 +48,11 @@
                                         </td>
                                         <td>
                                             {{ $salesperson->name ?? '' }}
+                                        </td>
+                                        <td>
+                                            @foreach($salesperson->area_pemasarans as $key => $item)
+                                                <span>{{ $item->name }}</span>
+                                            @endforeach
                                         </td>
                                         <td>
                                             @can('salesperson_show')

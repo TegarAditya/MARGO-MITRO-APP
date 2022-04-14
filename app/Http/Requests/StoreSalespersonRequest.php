@@ -21,6 +21,12 @@ class StoreSalespersonRequest extends FormRequest
                 'string',
                 'required',
             ],
+            'area_pemasarans.*' => [
+                'integer',
+            ],
+            'area_pemasarans' => [
+                'array',
+            ],
         ];
     }
 }

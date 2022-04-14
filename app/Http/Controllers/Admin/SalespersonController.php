@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroySalespersonRequest;
 use App\Http\Requests\StoreSalespersonRequest;
 use App\Http\Requests\UpdateSalespersonRequest;
+use App\Models\City;
 use App\Models\Salesperson;
 use Gate;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class SalespersonController extends Controller
         abort_if(Gate::denies('salesperson_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Salesperson::query()->select(sprintf('%s.*', (new Salesperson())->table));
+            $query = Salesperson::with(['area_pemasarans'])->select(sprintf('%s.*', (new Salesperson())->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -49,8 +50,16 @@ class SalespersonController extends Controller
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });
+            $table->editColumn('area_pemasaran', function ($row) {
+                $labels = [];
+                foreach ($row->area_pemasarans as $area_pemasaran) {
+                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
+                }
 
-            $table->rawColumns(['actions', 'placeholder']);
+                return implode(' ', $labels);
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'area_pemasaran']);
 
             return $table->make(true);
         }
@@ -62,12 +71,15 @@ class SalespersonController extends Controller
     {
         abort_if(Gate::denies('salesperson_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.salespeople.create');
+        $area_pemasarans = City::pluck('name', 'id');
+
+        return view('admin.salespeople.create', compact('area_pemasarans'));
     }
 
     public function store(StoreSalespersonRequest $request)
     {
         $salesperson = Salesperson::create($request->all());
+        $salesperson->area_pemasarans()->sync($request->input('area_pemasarans', []));
 
         return redirect()->route('admin.salespeople.index');
     }
@@ -76,12 +88,17 @@ class SalespersonController extends Controller
     {
         abort_if(Gate::denies('salesperson_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.salespeople.edit', compact('salesperson'));
+        $area_pemasarans = City::pluck('name', 'id');
+
+        $salesperson->load('area_pemasarans');
+
+        return view('admin.salespeople.edit', compact('area_pemasarans', 'salesperson'));
     }
 
     public function update(UpdateSalespersonRequest $request, Salesperson $salesperson)
     {
         $salesperson->update($request->all());
+        $salesperson->area_pemasarans()->sync($request->input('area_pemasarans', []));
 
         return redirect()->route('admin.salespeople.index');
     }
@@ -89,6 +106,8 @@ class SalespersonController extends Controller
     public function show(Salesperson $salesperson)
     {
         abort_if(Gate::denies('salesperson_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $salesperson->load('area_pemasarans');
 
         return view('admin.salespeople.show', compact('salesperson'));
     }
