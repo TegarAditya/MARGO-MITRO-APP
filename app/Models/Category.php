@@ -31,6 +31,15 @@ class Category extends Model
         'deleted_at',
     ];
 
+    public function sluggable()
+    {
+        return [
+            'slug' => [
+                'source' => 'name'
+            ]
+        ];
+    }
+
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');

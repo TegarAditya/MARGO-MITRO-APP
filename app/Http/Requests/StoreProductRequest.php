@@ -21,11 +21,6 @@ class StoreProductRequest extends FormRequest
                 'string',
                 'required',
             ],
-            'slug' => [
-                'string',
-                'required',
-                'unique:products',
-            ],
             'category_id' => [
                 'required',
                 'integer',

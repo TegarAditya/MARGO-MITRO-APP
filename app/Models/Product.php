@@ -38,6 +38,15 @@ class Product extends Model
         'deleted_at',
     ];
 
+    public function sluggable()
+    {
+        return [
+            'slug' => [
+                'source' => 'name'
+            ]
+        ];
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
