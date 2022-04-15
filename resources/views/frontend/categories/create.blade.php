@@ -24,16 +24,6 @@
                             <span class="help-block">{{ trans('cruds.category.fields.name_helper') }}</span>
                         </div>
                         <div class="form-group">
-                            <label class="required" for="slug">{{ trans('cruds.category.fields.slug') }}</label>
-                            <input class="form-control" type="text" name="slug" id="slug" value="{{ old('slug', '') }}" required>
-                            @if($errors->has('slug'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('slug') }}
-                                </div>
-                            @endif
-                            <span class="help-block">{{ trans('cruds.category.fields.slug_helper') }}</span>
-                        </div>
-                        <div class="form-group">
                             <label for="parent_id">{{ trans('cruds.category.fields.parent') }}</label>
                             <select class="form-control select2" name="parent_id" id="parent_id">
                                 @foreach($parents as $id => $entry)

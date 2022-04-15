@@ -20,7 +20,7 @@ class StoreBrandRequest extends FormRequest
             'name' => [
                 'string',
                 'required',
-            ]
+            ],
         ];
     }
 }
