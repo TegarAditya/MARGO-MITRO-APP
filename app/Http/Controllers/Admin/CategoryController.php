@@ -12,7 +12,6 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Cviebrock\EloquentSluggable\Services\SlugService;
 
 class CategoryController extends Controller
 {
@@ -91,7 +90,6 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $request->request->add(['slug' => SlugService::createSlug(Category::class, 'slug', $request->name)]);
         $category->update($request->all());
 
         return redirect()->route('admin.categories.index');

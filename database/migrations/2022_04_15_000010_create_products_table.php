@@ -13,6 +13,7 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->string('slug')->nullable();
             $table->longText('description')->nullable();
+            $table->decimal('hpp', 15, 2)->nullable();
             $table->decimal('price', 15, 2);
             $table->integer('stock');
             $table->integer('min_stock')->nullable();

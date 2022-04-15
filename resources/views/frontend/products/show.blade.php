@@ -68,6 +68,14 @@
                                 </tr>
                                 <tr>
                                     <th>
+                                        {{ trans('cruds.product.fields.hpp') }}
+                                    </th>
+                                    <td>
+                                        {{ $product->hpp }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
                                         {{ trans('cruds.product.fields.price') }}
                                     </th>
                                     <td>

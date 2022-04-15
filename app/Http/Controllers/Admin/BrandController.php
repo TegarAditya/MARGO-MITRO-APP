@@ -12,7 +12,6 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Cviebrock\EloquentSluggable\Services\SlugService;
 
 class BrandController extends Controller
 {
@@ -82,7 +81,6 @@ class BrandController extends Controller
 
     public function update(UpdateBrandRequest $request, Brand $brand)
     {
-        $request->request->add(['slug' => SlugService::createSlug(Brand::class, 'slug', $request->name)]);
         $brand->update($request->all());
 
         return redirect()->route('admin.brands.index');
