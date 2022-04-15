@@ -62,6 +62,14 @@
                 <span class="help-block">{{ trans('cruds.product.fields.unit_helper') }}</span>
             </div>
             <div class="form-group">
+                <label for="hpp">{{ trans('cruds.product.fields.hpp') }}</label>
+                <input class="form-control {{ $errors->has('hpp') ? 'is-invalid' : '' }}" type="number" name="hpp" id="hpp" value="{{ old('hpp', '') }}" step="0.01">
+                @if($errors->has('hpp'))
+                    <span class="text-danger">{{ $errors->first('hpp') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.product.fields.hpp_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label class="required" for="price">{{ trans('cruds.product.fields.price') }}</label>
                 <input class="form-control {{ $errors->has('price') ? 'is-invalid' : '' }}" type="number" name="price" id="price" value="{{ old('price', '0') }}" step="0.01" required>
                 @if($errors->has('price'))

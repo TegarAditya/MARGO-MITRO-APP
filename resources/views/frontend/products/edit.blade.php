@@ -76,6 +76,16 @@
                             <span class="help-block">{{ trans('cruds.product.fields.unit_helper') }}</span>
                         </div>
                         <div class="form-group">
+                            <label for="hpp">{{ trans('cruds.product.fields.hpp') }}</label>
+                            <input class="form-control" type="number" name="hpp" id="hpp" value="{{ old('hpp', $product->hpp) }}" step="0.01">
+                            @if($errors->has('hpp'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('hpp') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.product.fields.hpp_helper') }}</span>
+                        </div>
+                        <div class="form-group">
                             <label class="required" for="price">{{ trans('cruds.product.fields.price') }}</label>
                             <input class="form-control" type="number" name="price" id="price" value="{{ old('price', $product->price) }}" step="0.01" required>
                             @if($errors->has('price'))

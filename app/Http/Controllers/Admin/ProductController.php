@@ -15,7 +15,6 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Cviebrock\EloquentSluggable\Services\SlugService;
 
 class ProductController extends Controller
 {
@@ -67,6 +66,9 @@ class ProductController extends Controller
             $table->editColumn('status', function ($row) {
                 return '<input type="checkbox" disabled ' . ($row->status ? 'checked' : null) . '>';
             });
+            $table->editColumn('hpp', function ($row) {
+                return $row->hpp ? $row->hpp : '';
+            });
 
             $table->rawColumns(['actions', 'placeholder', 'category', 'brand', 'status']);
 
@@ -95,7 +97,6 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        $request->request->add(['slug' => SlugService::createSlug(Product::class, 'slug', $request->name)]);
         $product = Product::create($request->all());
 
         return redirect()->route('admin.products.index');
@@ -118,7 +119,6 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $request->request->add(['slug' => SlugService::createSlug(Product::class, 'slug', $request->name)]);
         $product->update($request->all());
 
         return redirect()->route('admin.products.index');
