@@ -34,42 +34,42 @@ class CategoryTableSeeder extends Seeder
             [
                 'name'  => 'SD K13',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'SD K13'),
-                'parent' => 1,
+                'parent_id' => 1,
             ],
             [
                 'name'  => 'MI K13',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'MI K13'),
-                'parent' => 1,
+                'parent_id' => 1,
             ],
             [
                 'name'  => 'SMP K13',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'SMP K13'),
-                'parent' => 1,
+                'parent_id' => 1,
             ],
             [
                 'name'  => 'MTS K13',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'MTS K13'),
-                'parent' => 1,
+                'parent_id' => 1,
             ],
             [
                 'name'  => 'SMA K13',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'SMA K13'),
-                'parent' => 1,
+                'parent_id' => 1,
             ],
             [
                 'name'  => 'SMK K13',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'SMK K13'),
-                'parent' => 1,
+                'parent_id' => 1,
             ],
             [
                 'name'  => 'PLATE',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'PLATE'),
-                'parent' => 3,
+                'parent_id' => 3,
             ],
             [
                 'name'  => 'CHECMICAL FLUID',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'CHECMICAL FLUID'),
-                'parent' => 3,
+                'parent_id' => 3,
             ],
         ];
 

@@ -8,12 +8,15 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Cviebrock\EloquentSluggable\Sluggable;
+
 
 class Order extends Model
 {
     use SoftDeletes;
     use Auditable;
     use HasFactory;
+    use Sluggable;
 
     public $table = 'orders';
 
