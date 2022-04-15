@@ -21,11 +21,6 @@ class StoreBrandRequest extends FormRequest
                 'string',
                 'required',
             ],
-            'slug' => [
-                'string',
-                'required',
-                'unique:brands',
-            ],
         ];
     }
 }

@@ -21,11 +21,6 @@ class UpdateBrandRequest extends FormRequest
                 'string',
                 'required',
             ],
-            'slug' => [
-                'string',
-                'required',
-                'unique:brands,slug,' . request()->route('brand')->id,
-            ],
         ];
     }
 }
