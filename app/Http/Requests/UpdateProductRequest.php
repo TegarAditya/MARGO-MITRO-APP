@@ -21,11 +21,6 @@ class UpdateProductRequest extends FormRequest
                 'string',
                 'required',
             ],
-            'slug' => [
-                'string',
-                'required',
-                'unique:products,slug,' . request()->route('product')->id,
-            ],
             'category_id' => [
                 'required',
                 'integer',

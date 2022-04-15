@@ -21,11 +21,6 @@ class UpdateCategoryRequest extends FormRequest
                 'string',
                 'required',
             ],
-            'slug' => [
-                'string',
-                'required',
-                'unique:categories,slug,' . request()->route('category')->id,
-            ],
         ];
     }
 }
