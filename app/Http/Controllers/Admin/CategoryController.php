@@ -73,7 +73,6 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        $request->request->add(['slug' => SlugService::createSlug(Category::class, 'slug', $request->name)]);
         $category = Category::create($request->all());
 
         return redirect()->route('admin.categories.index');

@@ -32,7 +32,12 @@ class Brand extends Model
         'deleted_at',
     ];
 
-    public function sluggable()
+     /**
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
+     */
+    public function sluggable(): array
     {
         return [
             'slug' => [

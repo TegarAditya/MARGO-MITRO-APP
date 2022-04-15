@@ -68,7 +68,6 @@ class BrandController extends Controller
 
     public function store(StoreBrandRequest $request)
     {
-        $request->request->add(['slug' => SlugService::createSlug(Brand::class, 'slug', $request->name)]);
         $brand = Brand::create($request->all());
 
         return redirect()->route('admin.brands.index');

@@ -95,7 +95,6 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        $request->request->add(['slug' => SlugService::createSlug(Product::class, 'slug', $request->name)]);
         $product = Product::create($request->all());
 
         return redirect()->route('admin.products.index');
