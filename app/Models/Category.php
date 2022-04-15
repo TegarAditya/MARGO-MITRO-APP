@@ -7,14 +7,12 @@ use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Cviebrock\EloquentSluggable\Sluggable;
 
 class Category extends Model
 {
     use SoftDeletes;
     use Auditable;
     use HasFactory;
-    use Sluggable;
 
     public $table = 'categories';
 
@@ -32,15 +30,6 @@ class Category extends Model
         'updated_at',
         'deleted_at',
     ];
-
-    public function sluggable()
-    {
-        return [
-            'slug' => [
-                'source' => 'name'
-            ]
-        ];
-    }
 
     public function parent()
     {

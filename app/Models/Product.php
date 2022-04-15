@@ -33,19 +33,11 @@ class Product extends Model
         'stock',
         'min_stock',
         'status',
+        'hpp',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
-
-    public function sluggable()
-    {
-        return [
-            'slug' => [
-                'source' => 'name'
-            ]
-        ];
-    }
 
     public function category()
     {
