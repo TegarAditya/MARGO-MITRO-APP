@@ -119,6 +119,7 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
+        $request->request->add(['slug' => SlugService::createSlug(Product::class, 'slug', $request->name)]);
         $product->update($request->all());
 
         return redirect()->route('admin.products.index');

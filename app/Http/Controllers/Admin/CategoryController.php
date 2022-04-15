@@ -90,6 +90,7 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
+        $request->request->add(['slug' => SlugService::createSlug(Category::class, 'slug', $request->name)]);
         $category->update($request->all());
 
         return redirect()->route('admin.categories.index');
