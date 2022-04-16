@@ -170,6 +170,18 @@
                         </a>
                     </li>
                 @endcan
+                @can('productionperson_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.productionpeople.index") }}" class="nav-link {{ request()->is("admin/productionpeople") || request()->is("admin/productionpeople/*") ? "active" : "" }}">
+                            <i class="fa-fw nav-icon fas fa-user">
+
+                            </i>
+                            <p>
+                                {{ trans('cruds.productionperson.title') }}
+                            </p>
+                        </a>
+                    </li>
+                @endcan
                 @can('product_access')
                     <li class="nav-item">
                         <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is("admin/products") || request()->is("admin/products/*") ? "active" : "" }}">
@@ -370,6 +382,45 @@
                                         </i>
                                         <p>
                                             {{ trans('cruds.pembayaran.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
+                @can('production_access')
+                    <li class="nav-item has-treeview {{ request()->is("admin/production-orders*") ? "menu-open" : "" }} {{ request()->is("admin/production-order-details*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
+                            <i class="fa-fw nav-icon fas fa-print">
+
+                            </i>
+                            <p>
+                                {{ trans('cruds.production.title') }}
+                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('production_order_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.production-orders.index") }}" class="nav-link {{ request()->is("admin/production-orders") || request()->is("admin/production-orders/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-print">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.productionOrder.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('production_order_detail_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.production-order-details.index") }}" class="nav-link {{ request()->is("admin/production-order-details") || request()->is("admin/production-order-details/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-cogs">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.productionOrderDetail.title') }}
                                         </p>
                                     </a>
                                 </li>

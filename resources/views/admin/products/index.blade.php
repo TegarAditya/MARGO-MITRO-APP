@@ -35,9 +35,6 @@
                         {{ trans('cruds.product.fields.brand') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.hpp') }}
-                    </th>
-                    <th>
                         {{ trans('cruds.product.fields.price') }}
                     </th>
                     <th>
@@ -71,9 +68,6 @@
                                 <option value="{{ $item->name }}">{{ $item->name }}</option>
                             @endforeach
                         </select>
-                    </td>
-                    <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
                     </td>
                     <td>
                         <input class="search" type="text" placeholder="{{ trans('global.search') }}">
@@ -141,7 +135,6 @@
 { data: 'name', name: 'name' },
 { data: 'category_name', name: 'category.name' },
 { data: 'brand_name', name: 'brand.name' },
-{ data: 'hpp', name: 'hpp' },
 { data: 'price', name: 'price' },
 { data: 'stock', name: 'stock' },
 { data: 'status', name: 'status' },

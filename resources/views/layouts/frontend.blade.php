@@ -132,6 +132,11 @@
                                             {{ trans('cruds.salesperson.title') }}
                                         </a>
                                     @endcan
+                                    @can('productionperson_access')
+                                        <a class="dropdown-item" href="{{ route('frontend.productionpeople.index') }}">
+                                            {{ trans('cruds.productionperson.title') }}
+                                        </a>
+                                    @endcan
                                     @can('product_access')
                                         <a class="dropdown-item" href="{{ route('frontend.products.index') }}">
                                             {{ trans('cruds.product.title') }}
@@ -205,6 +210,21 @@
                                     @can('pembayaran_access')
                                         <a class="dropdown-item ml-3" href="{{ route('frontend.pembayarans.index') }}">
                                             {{ trans('cruds.pembayaran.title') }}
+                                        </a>
+                                    @endcan
+                                    @can('production_access')
+                                        <a class="dropdown-item disabled" href="#">
+                                            {{ trans('cruds.production.title') }}
+                                        </a>
+                                    @endcan
+                                    @can('production_order_access')
+                                        <a class="dropdown-item ml-3" href="{{ route('frontend.production-orders.index') }}">
+                                            {{ trans('cruds.productionOrder.title') }}
+                                        </a>
+                                    @endcan
+                                    @can('production_order_detail_access')
+                                        <a class="dropdown-item ml-3" href="{{ route('frontend.production-order-details.index') }}">
+                                            {{ trans('cruds.productionOrderDetail.title') }}
                                         </a>
                                     @endcan
 

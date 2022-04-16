@@ -41,6 +41,18 @@
                             @endforeach
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.salesperson.fields.foto') }}
+                        </th>
+                        <td>
+                            @if($salesperson->foto)
+                                <a href="{{ $salesperson->foto->getUrl() }}" target="_blank" style="display: inline-block">
+                                    <img src="{{ $salesperson->foto->getUrl('thumb') }}">
+                                </a>
+                            @endif
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">
