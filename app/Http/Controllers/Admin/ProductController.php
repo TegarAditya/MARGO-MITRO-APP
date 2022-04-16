@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Cviebrock\EloquentSluggable\Services\SlugService;
 
 class ProductController extends Controller
 {
@@ -127,6 +128,7 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
+        $request->request->add(['slug' => SlugService::createSlug(Product::class, 'slug', $request->name)]);
         $product->update($request->all());
 
         if (count($product->foto) > 0) {

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Cviebrock\EloquentSluggable\Sluggable;
 
 class Product extends Model implements HasMedia
 {
@@ -46,6 +47,16 @@ class Product extends Model implements HasMedia
         'updated_at',
         'deleted_at',
     ];
+
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'name'
+            ]
+        ];
+    }
+
 
     public function registerMediaConversions(Media $media = null): void
     {
