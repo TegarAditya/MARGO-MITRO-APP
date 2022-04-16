@@ -18,6 +18,7 @@ class Product extends Model implements HasMedia
     use InteractsWithMedia;
     use Auditable;
     use HasFactory;
+    use Sluggable;
 
     public $table = 'products';
 

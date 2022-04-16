@@ -14,6 +14,7 @@ class Category extends Model
     use SoftDeletes;
     use Auditable;
     use HasFactory;
+    use Sluggable;
 
     public $table = 'categories';
 

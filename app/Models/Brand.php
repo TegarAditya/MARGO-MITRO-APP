@@ -14,6 +14,7 @@ class Brand extends Model
     use SoftDeletes;
     use Auditable;
     use HasFactory;
+    use Sluggable;
 
     public $table = 'brands';
 
