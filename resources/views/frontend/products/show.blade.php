@@ -100,6 +100,18 @@
                                 </tr>
                                 <tr>
                                     <th>
+                                        {{ trans('cruds.product.fields.foto') }}
+                                    </th>
+                                    <td>
+                                        @foreach($product->foto as $key => $media)
+                                            <a href="{{ $media->getUrl() }}" target="_blank" style="display: inline-block">
+                                                <img src="{{ $media->getUrl('thumb') }}">
+                                            </a>
+                                        @endforeach
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
                                         {{ trans('cruds.product.fields.status') }}
                                     </th>
                                     <td>

@@ -36,9 +36,6 @@
                                         {{ trans('cruds.product.fields.brand') }}
                                     </th>
                                     <th>
-                                        {{ trans('cruds.product.fields.hpp') }}
-                                    </th>
-                                    <th>
                                         {{ trans('cruds.product.fields.price') }}
                                     </th>
                                     <th>
@@ -80,9 +77,6 @@
                                         <input class="search" type="text" placeholder="{{ trans('global.search') }}">
                                     </td>
                                     <td>
-                                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
-                                    </td>
-                                    <td>
                                     </td>
                                     <td>
                                     </td>
@@ -99,9 +93,6 @@
                                         </td>
                                         <td>
                                             {{ $product->brand->name ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $product->hpp ?? '' }}
                                         </td>
                                         <td>
                                             {{ $product->price ?? '' }}

@@ -51,12 +51,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Product
     Route::delete('products/destroy', 'ProductController@massDestroy')->name('products.massDestroy');
+    Route::post('products/media', 'ProductController@storeMedia')->name('products.storeMedia');
+    Route::post('products/ckmedia', 'ProductController@storeCKEditorImages')->name('products.storeCKEditorImages');
     Route::post('products/parse-csv-import', 'ProductController@parseCsvImport')->name('products.parseCsvImport');
     Route::post('products/process-csv-import', 'ProductController@processCsvImport')->name('products.processCsvImport');
     Route::resource('products', 'ProductController');
 
     // Salesperson
     Route::delete('salespeople/destroy', 'SalespersonController@massDestroy')->name('salespeople.massDestroy');
+    Route::post('salespeople/media', 'SalespersonController@storeMedia')->name('salespeople.storeMedia');
+    Route::post('salespeople/ckmedia', 'SalespersonController@storeCKEditorImages')->name('salespeople.storeCKEditorImages');
     Route::post('salespeople/parse-csv-import', 'SalespersonController@parseCsvImport')->name('salespeople.parseCsvImport');
     Route::post('salespeople/process-csv-import', 'SalespersonController@processCsvImport')->name('salespeople.processCsvImport');
     Route::resource('salespeople', 'SalespersonController');
@@ -96,6 +100,22 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Stock Opname
     Route::delete('stock-opnames/destroy', 'StockOpnameController@massDestroy')->name('stock-opnames.massDestroy');
     Route::resource('stock-opnames', 'StockOpnameController');
+
+    // Productionperson
+    Route::delete('productionpeople/destroy', 'ProductionpersonController@massDestroy')->name('productionpeople.massDestroy');
+    Route::post('productionpeople/parse-csv-import', 'ProductionpersonController@parseCsvImport')->name('productionpeople.parseCsvImport');
+    Route::post('productionpeople/process-csv-import', 'ProductionpersonController@processCsvImport')->name('productionpeople.processCsvImport');
+    Route::resource('productionpeople', 'ProductionpersonController');
+
+    // Production Order
+    Route::delete('production-orders/destroy', 'ProductionOrderController@massDestroy')->name('production-orders.massDestroy');
+    Route::post('production-orders/parse-csv-import', 'ProductionOrderController@parseCsvImport')->name('production-orders.parseCsvImport');
+    Route::post('production-orders/process-csv-import', 'ProductionOrderController@processCsvImport')->name('production-orders.processCsvImport');
+    Route::resource('production-orders', 'ProductionOrderController');
+
+    // Production Order Detail
+    Route::delete('production-order-details/destroy', 'ProductionOrderDetailController@massDestroy')->name('production-order-details.massDestroy');
+    Route::resource('production-order-details', 'ProductionOrderDetailController');
 
     Route::get('system-calendar', 'SystemCalendarController@index')->name('systemCalendar');
     Route::get('messenger', 'MessengerController@index')->name('messenger.index');
@@ -154,10 +174,14 @@ Route::group(['as' => 'frontend.', 'namespace' => 'Frontend', 'middleware' => ['
 
     // Product
     Route::delete('products/destroy', 'ProductController@massDestroy')->name('products.massDestroy');
+    Route::post('products/media', 'ProductController@storeMedia')->name('products.storeMedia');
+    Route::post('products/ckmedia', 'ProductController@storeCKEditorImages')->name('products.storeCKEditorImages');
     Route::resource('products', 'ProductController');
 
     // Salesperson
     Route::delete('salespeople/destroy', 'SalespersonController@massDestroy')->name('salespeople.massDestroy');
+    Route::post('salespeople/media', 'SalespersonController@storeMedia')->name('salespeople.storeMedia');
+    Route::post('salespeople/ckmedia', 'SalespersonController@storeCKEditorImages')->name('salespeople.storeCKEditorImages');
     Route::resource('salespeople', 'SalespersonController');
 
     // Order
@@ -195,6 +219,18 @@ Route::group(['as' => 'frontend.', 'namespace' => 'Frontend', 'middleware' => ['
     // Stock Opname
     Route::delete('stock-opnames/destroy', 'StockOpnameController@massDestroy')->name('stock-opnames.massDestroy');
     Route::resource('stock-opnames', 'StockOpnameController');
+
+    // Productionperson
+    Route::delete('productionpeople/destroy', 'ProductionpersonController@massDestroy')->name('productionpeople.massDestroy');
+    Route::resource('productionpeople', 'ProductionpersonController');
+
+    // Production Order
+    Route::delete('production-orders/destroy', 'ProductionOrderController@massDestroy')->name('production-orders.massDestroy');
+    Route::resource('production-orders', 'ProductionOrderController');
+
+    // Production Order Detail
+    Route::delete('production-order-details/destroy', 'ProductionOrderDetailController@massDestroy')->name('production-order-details.massDestroy');
+    Route::resource('production-order-details', 'ProductionOrderDetailController');
 
     Route::get('frontend/profile', 'ProfileController@index')->name('profile.index');
     Route::post('frontend/profile', 'ProfileController@update')->name('profile.update');

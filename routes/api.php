@@ -14,9 +14,11 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
     Route::apiResource('categories', 'CategoryApiController');
 
     // Product
+    Route::post('products/media', 'ProductApiController@storeMedia')->name('products.storeMedia');
     Route::apiResource('products', 'ProductApiController');
 
     // Salesperson
+    Route::post('salespeople/media', 'SalespersonApiController@storeMedia')->name('salespeople.storeMedia');
     Route::apiResource('salespeople', 'SalespersonApiController');
 
     // Order
@@ -36,4 +38,10 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
 
     // Tagihan Movement
     Route::apiResource('tagihan-movements', 'TagihanMovementApiController', ['except' => ['store', 'update', 'destroy']]);
+
+    // Productionperson
+    Route::apiResource('productionpeople', 'ProductionpersonApiController');
+
+    // Production Order
+    Route::apiResource('production-orders', 'ProductionOrderApiController');
 });

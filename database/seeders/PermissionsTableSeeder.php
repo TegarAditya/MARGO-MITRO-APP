@@ -396,6 +396,70 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 97,
+                'title' => 'productionperson_create',
+            ],
+            [
+                'id'    => 98,
+                'title' => 'productionperson_edit',
+            ],
+            [
+                'id'    => 99,
+                'title' => 'productionperson_show',
+            ],
+            [
+                'id'    => 100,
+                'title' => 'productionperson_delete',
+            ],
+            [
+                'id'    => 101,
+                'title' => 'productionperson_access',
+            ],
+            [
+                'id'    => 102,
+                'title' => 'production_order_create',
+            ],
+            [
+                'id'    => 103,
+                'title' => 'production_order_edit',
+            ],
+            [
+                'id'    => 104,
+                'title' => 'production_order_show',
+            ],
+            [
+                'id'    => 105,
+                'title' => 'production_order_delete',
+            ],
+            [
+                'id'    => 106,
+                'title' => 'production_order_access',
+            ],
+            [
+                'id'    => 107,
+                'title' => 'production_access',
+            ],
+            [
+                'id'    => 108,
+                'title' => 'production_order_detail_create',
+            ],
+            [
+                'id'    => 109,
+                'title' => 'production_order_detail_edit',
+            ],
+            [
+                'id'    => 110,
+                'title' => 'production_order_detail_show',
+            ],
+            [
+                'id'    => 111,
+                'title' => 'production_order_detail_delete',
+            ],
+            [
+                'id'    => 112,
+                'title' => 'production_order_detail_access',
+            ],
+            [
+                'id'    => 113,
                 'title' => 'profile_password_edit',
             ],
         ];

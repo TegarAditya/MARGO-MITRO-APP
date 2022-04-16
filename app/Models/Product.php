@@ -7,17 +7,22 @@ use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Cviebrock\EloquentSluggable\Sluggable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Product extends Model
+class Product extends Model implements HasMedia
 {
     use SoftDeletes;
+    use InteractsWithMedia;
     use Auditable;
     use HasFactory;
-    use Sluggable;
-
 
     public $table = 'products';
+
+    protected $appends = [
+        'foto',
+    ];
 
     protected $dates = [
         'created_at',
@@ -32,28 +37,20 @@ class Product extends Model
         'category_id',
         'brand_id',
         'unit_id',
+        'hpp',
         'price',
         'stock',
         'min_stock',
         'status',
-        'hpp',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
 
-     /**
-     * Return the sluggable configuration array for this model.
-     *
-     * @return array
-     */
-    public function sluggable(): array
+    public function registerMediaConversions(Media $media = null): void
     {
-        return [
-            'slug' => [
-                'source' => 'name'
-            ]
-        ];
+        $this->addMediaConversion('thumb')->fit('crop', 50, 50);
+        $this->addMediaConversion('preview')->fit('crop', 120, 120);
     }
 
     public function category()
@@ -69,6 +66,18 @@ class Product extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'unit_id');
+    }
+
+    public function getFotoAttribute()
+    {
+        $files = $this->getMedia('foto');
+        $files->each(function ($item) {
+            $item->url = $item->getUrl();
+            $item->thumbnail = $item->getUrl('thumb');
+            $item->preview = $item->getUrl('preview');
+        });
+
+        return $files;
     }
 
     protected function serializeDate(DateTimeInterface $date)
