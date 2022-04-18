@@ -6,10 +6,14 @@
             <a class="btn btn-success" href="{{ route('admin.products.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.product.title_singular') }}
             </a>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
+            </button>
             <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
                 {{ trans('global.app_csvImport') }}
             </button>
             @include('csvImport.modal', ['model' => 'Product', 'route' => 'admin.products.parseCsvImport'])
+            @include('csvImport.import_modal', ['model' => 'Product', 'route' => 'admin.products.import'])
         </div>
     </div>
 @endcan
@@ -149,7 +153,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 let visibleColumnsIndexes = null;
 $('.datatable thead').on('input', '.search', function () {
       let strict = $(this).attr('strict') || false

@@ -18,6 +18,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Cviebrock\EloquentSluggable\Services\SlugService;
+use Excel;
+use App\Imports\ProductImport;
+use Alert;
 
 class ProductController extends Controller
 {
@@ -183,5 +186,18 @@ class ProductController extends Controller
         $media         = $model->addMediaFromRequest('upload')->toMediaCollection('ck-media');
 
         return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('import_file');
+        $request->validate([
+            'import_file' => 'mimes:csv,txt,xls,xlsx',
+        ]);
+
+        Excel::import(new ProductImport(), $file);
+
+        Alert::success('Success', 'Produk berhasil di import');
+        return redirect()->back();
     }
 }

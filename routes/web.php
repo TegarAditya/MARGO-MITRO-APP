@@ -55,6 +55,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('products/ckmedia', 'ProductController@storeCKEditorImages')->name('products.storeCKEditorImages');
     Route::post('products/parse-csv-import', 'ProductController@parseCsvImport')->name('products.parseCsvImport');
     Route::post('products/process-csv-import', 'ProductController@processCsvImport')->name('products.processCsvImport');
+    Route::post('products/import', 'ProductController@import')->name('products.import');
     Route::resource('products', 'ProductController');
 
     // Salesperson
