@@ -1,0 +1,20 @@
+/** Menu scrollbar **/
+.sidebar::-webkit-scrollbar {
+  width: .75rem;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #ccc; 
+}
+ 
+.sidebar::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #909090; 
+}
+
+.sidebar::-webkit-scrollbar-thumb:active {
+  background: #767676; 
+}

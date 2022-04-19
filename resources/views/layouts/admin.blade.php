@@ -19,8 +19,10 @@
     <link href="https://cdn.datatables.net/select/1.3.0/css/select.dataTables.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" rel="stylesheet" />
+    <link href="{{ asset('css/admin.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet" />
     @yield('styles')
+    @stack('styles')
 </head>
 
 <body class="sidebar-mini layout-fixed" style="height: auto;">
@@ -272,6 +274,7 @@
 
     </script>
     @yield('scripts')
+    @stack('scripts')
 </body>
 
 </html>
