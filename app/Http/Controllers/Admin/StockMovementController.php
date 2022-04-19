@@ -40,6 +40,12 @@ class StockMovementController extends Controller
             });
 
             $table->editColumn('reference', function ($row) {
+                if ($row->type == 'adjustment') {
+                    return '<a href="stock-adjustments/'.$row->reference.'">Reference</a>';
+                } else if ($row->type == 'faktur') {
+                    return '<a href="stock-adjustments/'.$row->reference.'">Reference</a>';
+                }
+
                 return $row->reference ? $row->reference : '';
             });
             $table->editColumn('type', function ($row) {
@@ -53,36 +59,13 @@ class StockMovementController extends Controller
                 return $row->quantity ? $row->quantity : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'product']);
+            $table->rawColumns(['actions', 'placeholder', 'product', 'reference']);
 
             return $table->make(true);
         }
 
-        return view('admin.stockMovements.index');
-    }
+        $products = Product::get();
 
-    public function create()
-    {
-        abort_if(Gate::denies('stock_movement_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        return view('admin.stockMovements.create', compact('products'));
-    }
-
-    public function store(StoreStockMovementRequest $request)
-    {
-        $stockMovement = StockMovement::create($request->all());
-
-        return redirect()->route('admin.stock-movements.index');
-    }
-
-    public function show(StockMovement $stockMovement)
-    {
-        abort_if(Gate::denies('stock_movement_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $stockMovement->load('product');
-
-        return view('admin.stockMovements.show', compact('stockMovement'));
+        return view('admin.stockMovements.index', compact('products'));
     }
 }

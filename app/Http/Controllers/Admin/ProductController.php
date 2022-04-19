@@ -53,6 +53,10 @@ class ProductController extends Controller
             ));
             });
 
+            $table->editColumn('slug', function ($row) {
+                return $row->slug ? $row->slug : '';
+            });
+
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });

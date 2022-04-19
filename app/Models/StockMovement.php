@@ -16,7 +16,7 @@ class StockMovement extends Model
 
     public const TYPE_SELECT = [
         'faktur'    => 'Sales',
-        'adjusment' => 'Adjustment',
+        'adjustment' => 'Adjustment',
     ];
 
     public $table = 'stock_movements';

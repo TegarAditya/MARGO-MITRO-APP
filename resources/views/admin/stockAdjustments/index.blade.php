@@ -6,6 +6,10 @@
             <a class="btn btn-success" href="{{ route('admin.stock-adjustments.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.stockAdjustment.title_singular') }}
             </a>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
+            </button>
+            @include('csvImport.import_modal', ['model' => 'StockAdjustment', 'route' => 'admin.stock-adjustments.import'])
         </div>
     </div>
 @endcan
@@ -51,38 +55,8 @@
 @section('scripts')
 @parent
 <script>
-    $(function () {
-  let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('stock_adjustment_delete')
-  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
-  let deleteButton = {
-    text: deleteButtonTrans,
-    url: "{{ route('admin.stock-adjustments.massDestroy') }}",
-    className: 'btn-danger',
-    action: function (e, dt, node, config) {
-      var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
-          return entry.id
-      });
-
-      if (ids.length === 0) {
-        alert('{{ trans('global.datatables.zero_selected') }}')
-
-        return
-      }
-
-      if (confirm('{{ trans('global.areYouSure') }}')) {
-        $.ajax({
-          headers: {'x-csrf-token': _token},
-          method: 'POST',
-          url: config.url,
-          data: { ids: ids, _method: 'DELETE' }})
-          .done(function () { location.reload() })
-      }
-    }
-  }
-  dtButtons.push(deleteButton)
-@endcan
-
+$(function () {
+let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
   let dtOverrideGlobals = {
     buttons: dtButtons,
     processing: true,
@@ -91,13 +65,13 @@
     aaSorting: [],
     ajax: "{{ route('admin.stock-adjustments.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'date', name: 'date' },
-{ data: 'operation', name: 'operation' },
-{ data: 'product_name', name: 'product.name' },
-{ data: 'quantity', name: 'quantity' },
-{ data: 'note', name: 'note' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'date', name: 'date' },
+        { data: 'operation', name: 'operation' },
+        { data: 'product_name', name: 'product.name' },
+        { data: 'quantity', name: 'quantity' },
+        { data: 'note', name: 'note' },
+        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
@@ -108,7 +82,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

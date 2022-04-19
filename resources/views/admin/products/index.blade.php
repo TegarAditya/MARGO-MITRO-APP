@@ -30,6 +30,9 @@
 
                     </th>
                     <th>
+                        {{ trans('cruds.product.fields.slug') }}
+                    </th>
+                    <th>
                         {{ trans('cruds.product.fields.name') }}
                     </th>
                     <th>
@@ -53,6 +56,9 @@
                 </tr>
                 <tr>
                     <td>
+                    </td>
+                    <td>
+                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
                     </td>
                     <td>
                         <input class="search" type="text" placeholder="{{ trans('global.search') }}">
@@ -136,6 +142,7 @@
     ajax: "{{ route('admin.products.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
+{ data: 'slug', name: 'slug' },
 { data: 'name', name: 'name' },
 { data: 'category_name', name: 'category.name' },
 { data: 'brand_name', name: 'brand.name' },

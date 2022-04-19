@@ -83,9 +83,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Stock Adjustment
     Route::delete('stock-adjustments/destroy', 'StockAdjustmentController@massDestroy')->name('stock-adjustments.massDestroy');
     Route::resource('stock-adjustments', 'StockAdjustmentController');
+    Route::post('stock-adjustments/import', 'StockAdjustmentController@import')->name('stock-adjustments.import');
+
 
     // Stock Movement
-    Route::resource('stock-movements', 'StockMovementController', ['except' => ['edit', 'update', 'show', 'destroy']]);
+    Route::resource('stock-movements', 'StockMovementController', ['only' => ['index']]);
 
     // Tagihan
     Route::delete('tagihans/destroy', 'TagihanController@massDestroy')->name('tagihans.massDestroy');

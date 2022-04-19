@@ -31,7 +31,7 @@ class StoreStockAdjustmentRequest extends FormRequest
             'quantity' => [
                 'required',
                 'integer',
-                'min:-2147483648',
+                'min:1',
                 'max:2147483647',
             ],
         ];
