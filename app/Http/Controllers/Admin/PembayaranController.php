@@ -8,8 +8,10 @@ use App\Http\Requests\StorePembayaranRequest;
 use App\Http\Requests\UpdatePembayaranRequest;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
+use App\Models\TagihanMovement;
 use Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class PembayaranController extends Controller
@@ -27,23 +29,61 @@ class PembayaranController extends Controller
     {
         abort_if(Gate::denies('pembayaran_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $tagihans = Tagihan::pluck('saldo', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $tagihans = Tagihan::with('order')->get();
+        $tagihans = $tagihans->mapWithKeys(function($item) {
+            return [
+                $item->id => $item->order->no_order.' - Rp'.number_format($item->total),
+            ];
+        })->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.pembayarans.create', compact('tagihans'));
     }
 
     public function store(StorePembayaranRequest $request)
     {
-        $pembayaran = Pembayaran::create($request->all());
+        $tagihan = Tagihan::findOrFail($request->tagihan_id);
 
-        return redirect()->route('admin.pembayarans.index');
+        DB::beginTransaction();
+        try {
+            $pembayaran = Pembayaran::create($request->merge([
+                'no_kwitansi' => Pembayaran::generateNoKwitansi(),
+                'order_id' => $tagihan->order_id,
+            ])->all());
+
+            $tagihan->tagihan_movements()->create([
+                'tagihan_id' => $tagihan->id,
+                'reference' => $pembayaran->id,
+                'type' => 'pembayaran',
+                'nominal' => -1 * (float) $request->bayar,
+            ]);
+            $tagihan->update([
+                'saldo' => $tagihan->saldo - (float) $request->nominal,
+            ]);
+
+            DB::commit();
+
+            if ($request->redirect) {
+                return redirect($request->redirect);
+            }
+
+            return redirect()->route('admin.pembayarans.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function edit(Pembayaran $pembayaran)
     {
         abort_if(Gate::denies('pembayaran_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $tagihans = Tagihan::pluck('saldo', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $tagihans = Tagihan::with('order')->get();
+        $tagihans = $tagihans->mapWithKeys(function($item) {
+            return [
+                $item->id => $item->order->no_order.' - Rp'.number_format($item->total),
+            ];
+        })->prepend(trans('global.pleaseSelect'), '');
 
         $pembayaran->load('tagihan');
 

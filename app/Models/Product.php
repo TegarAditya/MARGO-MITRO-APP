@@ -47,6 +47,11 @@ class Product extends Model implements HasMedia
         'deleted_at',
     ];
 
+    protected $casts = [
+        'hpp' => 'double',
+        'price' => 'double',
+    ];
+
     public function registerMediaConversions(Media $media = null): void
     {
         $this->addMediaConversion('thumb')->fit('crop', 50, 50);
@@ -66,6 +71,11 @@ class Product extends Model implements HasMedia
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'unit_id');
+    }
+
+    public function stock_movements()
+    {
+        return $this->hasMany(StockMovement::class);
     }
 
     public function getFotoAttribute()

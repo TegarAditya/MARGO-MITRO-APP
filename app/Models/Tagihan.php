@@ -24,6 +24,7 @@ class Tagihan extends Model
 
     protected $fillable = [
         'order_id',
+        'total',
         'saldo',
         'salesperson_id',
         'created_at',
@@ -39,6 +40,11 @@ class Tagihan extends Model
     public function salesperson()
     {
         return $this->belongsTo(Salesperson::class, 'salesperson_id');
+    }
+
+    public function tagihan_movements()
+    {
+        return $this->hasMany(TagihanMovement::class, 'reference')->where('type', 'tagihan');
     }
 
     protected function serializeDate(DateTimeInterface $date)

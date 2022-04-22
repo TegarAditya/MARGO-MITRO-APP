@@ -9,9 +9,14 @@
     <div class="card-body">
         <form method="POST" action="{{ route("admin.pembayarans.store") }}" enctype="multipart/form-data">
             @csrf
+
+            @if (request('tagihan_id'))
+                <input type="hidden" name="redirect" value="{{ url()->previous() }}" />
+            @endif
+
             <div class="form-group">
                 <label for="no_kwitansi">{{ trans('cruds.pembayaran.fields.no_kwitansi') }}</label>
-                <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', '') }}">
+                <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', '') }}" readonly placeholder="(Otomatis)">
                 @if($errors->has('no_kwitansi'))
                     <span class="text-danger">{{ $errors->first('no_kwitansi') }}</span>
                 @endif
@@ -21,7 +26,9 @@
                 <label class="required" for="tagihan_id">{{ trans('cruds.pembayaran.fields.tagihan') }}</label>
                 <select class="form-control select2 {{ $errors->has('tagihan') ? 'is-invalid' : '' }}" name="tagihan_id" id="tagihan_id" required>
                     @foreach($tagihans as $id => $entry)
-                        <option value="{{ $id }}" {{ old('tagihan_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        <option value="{{ $id }}" {{ old('tagihan_id') == $id ? 'selected' : (
+                            request('tagihan_id') == $id ? 'selected' : ''
+                        ) }}>{{ $entry }}</option>
                     @endforeach
                 </select>
                 @if($errors->has('tagihan'))

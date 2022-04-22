@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class Order extends Model
 {
@@ -48,8 +49,35 @@ class Order extends Model
         return $this->belongsTo(Salesperson::class, 'salesperson_id');
     }
 
+    public function order_details()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
+    public function tagihan()
+    {
+        return $this->hasOne(Tagihan::class);
+    }
+
+    public function pembayarans()
+    {
+        return $this->hasMany(Pembayaran::class);
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public static function generateNoOrder()
+    {
+        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+
+        $order_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'ORD'.Date::now()->format('dm');
+        $code = $prefix.sprintf("%04d", $order_number);
+
+        return $code;
     }
 }

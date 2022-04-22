@@ -24,6 +24,7 @@ class StorePembayaranRequest extends FormRequest
             'tagihan_id' => [
                 'required',
                 'integer',
+                'exists:tagihans,id'
             ],
             'nominal' => [
                 'required',
