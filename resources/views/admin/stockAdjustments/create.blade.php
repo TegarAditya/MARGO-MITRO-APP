@@ -44,7 +44,7 @@
             </div>
             <div class="form-group">
                 <label class="required" for="quantity">{{ trans('cruds.stockAdjustment.fields.quantity') }}</label>
-                <input class="form-control {{ $errors->has('quantity') ? 'is-invalid' : '' }}" type="number" name="quantity" id="quantity" value="{{ old('quantity', '0') }}" step="1" required>
+                <input class="form-control {{ $errors->has('quantity') ? 'is-invalid' : '' }}" type="number" name="quantity" id="quantity" value="{{ old('quantity', '0') }}" min="1" step="1" required>
                 @if($errors->has('quantity'))
                     <span class="text-danger">{{ $errors->first('quantity') }}</span>
                 @endif

@@ -1,14 +1,5 @@
 @extends('layouts.admin')
 @section('content')
-@can('stock_movement_create')
-    <div style="margin-bottom: 10px;" class="row">
-        <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.stock-movements.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.stockMovement.title_singular') }}
-            </a>
-        </div>
-    </div>
-@endcan
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.stockMovement.title_singular') }} {{ trans('global.list') }}
@@ -40,6 +31,37 @@
                         &nbsp;
                     </th>
                 </tr>
+                <tr>
+                    <td>
+
+                    </td>
+                    <td>
+
+                    </td>
+                    <td>
+                        <select class="search">
+                            <option value>{{ trans('global.all') }}</option>
+                            <option value="adjustment">Adjustment</option>
+                            <option value="faktur">Sales</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="search">
+                            <option value>{{ trans('global.all') }}</option>
+                            @foreach($products as $key => $item)
+                                <option value="{{ $item->name }}">{{ $item->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td>
+                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                        &nbsp;
+                    </td>
+                </tr>
             </thead>
         </table>
     </div>
@@ -53,7 +75,7 @@
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-  
+
   let dtOverrideGlobals = {
     buttons: dtButtons,
     processing: true,
@@ -62,13 +84,13 @@
     aaSorting: [],
     ajax: "{{ route('admin.stock-movements.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'reference', name: 'reference' },
-{ data: 'type', name: 'type' },
-{ data: 'product_name', name: 'product.name' },
-{ data: 'quantity', name: 'quantity' },
-{ data: 'created_at', name: 'created_at' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'reference', name: 'reference' },
+        { data: 'type', name: 'type' },
+        { data: 'product_name', name: 'product.name' },
+        { data: 'quantity', name: 'quantity' },
+        { data: 'created_at', name: 'created_at' },
+        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 5, 'desc' ]],
@@ -79,7 +101,28 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+  let visibleColumnsIndexes = null;
+$('.datatable thead').on('input', '.search', function () {
+      let strict = $(this).attr('strict') || false
+      let value = strict && this.value ? "^" + this.value + "$" : this.value
+
+      let index = $(this).parent().index()
+      if (visibleColumnsIndexes !== null) {
+        index = visibleColumnsIndexes[index]
+      }
+
+      table
+        .column(index)
+        .search(value, strict)
+        .draw()
+  });
+table.on('column-visibility.dt', function(e, settings, column, state) {
+      visibleColumnsIndexes = []
+      table.columns(":visible").every(function(colIdx) {
+          visibleColumnsIndexes.push(colIdx);
+      });
+  })
+
 });
 
 </script>

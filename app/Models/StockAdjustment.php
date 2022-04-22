@@ -42,6 +42,10 @@ class StockAdjustment extends Model
         'deleted_at',
     ];
 
+    protected $appends = [
+        'is_increase',
+    ];
+
     public function getDateAttribute($value)
     {
         return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
@@ -60,5 +64,14 @@ class StockAdjustment extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function getIsIncreaseAttribute()
+    {
+        if (in_array($this->attributes['operation'], array('add'))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -8,10 +8,15 @@ use App\Http\Requests\StoreStockAdjustmentRequest;
 use App\Http\Requests\UpdateStockAdjustmentRequest;
 use App\Models\Product;
 use App\Models\StockAdjustment;
+use App\Models\StockMovement;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use DB;
+use Excel;
+use App\Imports\StockAdjustmentImport;
+use Alert;
 
 class StockAdjustmentController extends Controller
 {
@@ -28,7 +33,8 @@ class StockAdjustmentController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 $viewGate = 'stock_adjustment_show';
-                $editGate = 'stock_adjustment_edit';
+                // $editGate = 'stock_adjustment_edit';
+                $editGate = 'stock_adjustment_random';
                 $deleteGate = 'stock_adjustment_delete';
                 $crudRoutePart = 'stock-adjustments';
 
@@ -74,7 +80,33 @@ class StockAdjustmentController extends Controller
 
     public function store(StoreStockAdjustmentRequest $request)
     {
-        $stockAdjustment = StockAdjustment::create($request->all());
+        DB::beginTransaction();
+        try {
+            $stockAdjustment = StockAdjustment::create($request->all());
+
+            StockMovement::create([
+                'reference' => $stockAdjustment->id,
+                'type' => 'adjustment',
+                'product_id' => $request->product_id,
+                'quantity' => $request->quantity
+            ]);
+
+            $product = Product::find($request->product_id);
+
+            if ($stockAdjustment->is_increase) {
+                $newStock = $product->stock + (int) $request->quantity;
+            } else {
+                $newStock = $product->stock - (int) $request->quantity;
+            }
+
+            $product->update(['stock' => $newStock]);
+
+            DB::commit();
+        }  catch (Exception $e) {
+            DB::rollback();
+            Alert::error('Error', 'Something wrong !');
+            return redirect()->back();
+        }
 
         return redirect()->route('admin.stock-adjustments.index');
     }
@@ -110,7 +142,27 @@ class StockAdjustmentController extends Controller
     {
         abort_if(Gate::denies('stock_adjustment_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $stockAdjustment->delete();
+        DB::beginTransaction();
+        try {
+            $product = Product::find($stockAdjustment->product_id);
+            if ($stockAdjustment->is_increase) {
+                $newStock = $product->stock - (int) $stockAdjustment->quantity;
+            } else {
+                $newStock = $product->stock + (int) $stockAdjustment->quantity;
+            }
+            $product->update(['stock' => $newStock]);
+
+            $stockMovement = StockMovement::where('reference', $stockAdjustment->id)->where('type', 'adjustment')->first();
+            $stockMovement->delete();
+
+            $stockAdjustment->delete();
+
+            DB::commit();
+        }  catch (Exception $e) {
+            DB::rollback();
+            Alert::error('Error', 'Something wrong !');
+            return redirect()->back();
+        }
 
         return back();
     }
@@ -120,5 +172,18 @@ class StockAdjustmentController extends Controller
         StockAdjustment::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('import_file');
+        $request->validate([
+            'import_file' => 'mimes:csv,txt,xls,xlsx',
+        ]);
+
+        Excel::import(new StockAdjustmentImport(), $file);
+
+        Alert::success('Success', 'Stock Adjustment berhasil di import');
+        return redirect()->back();
     }
 }
