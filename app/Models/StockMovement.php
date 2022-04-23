@@ -15,6 +15,7 @@ class StockMovement extends Model
     use HasFactory;
 
     public const TYPE_SELECT = [
+        'order'    => 'Order',
         'faktur'    => 'Sales',
         'adjustment' => 'Adjustment',
     ];

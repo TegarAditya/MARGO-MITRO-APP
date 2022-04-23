@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class Pembayaran extends Model
 {
@@ -25,6 +26,7 @@ class Pembayaran extends Model
     protected $fillable = [
         'no_kwitansi',
         'tagihan_id',
+        'order_id',
         'nominal',
         'diskon',
         'bayar',
@@ -52,5 +54,17 @@ class Pembayaran extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public static function generateNoKwitansi()
+    {
+        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+
+        $order_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'KWI'.Date::now()->format('dm');
+        $code = $prefix.sprintf("%04d", $order_number);
+
+        return $code;
     }
 }

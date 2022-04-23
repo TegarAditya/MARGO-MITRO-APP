@@ -26,6 +26,7 @@ class TagihanMovement extends Model
     ];
 
     protected $fillable = [
+        'tagihan_id',
         'reference',
         'type',
         'nominal',
