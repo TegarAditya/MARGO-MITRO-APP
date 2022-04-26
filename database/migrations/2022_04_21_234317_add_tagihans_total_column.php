@@ -14,7 +14,7 @@ class AddTagihansTotalColumn extends Migration
     public function up()
     {
         Schema::table('tagihans', function (Blueprint $table) {
-            $table->double('total')->default(0)->after('tagihan_id');
+            $table->double('total')->default(0)->after('id');
         });
     }
 
