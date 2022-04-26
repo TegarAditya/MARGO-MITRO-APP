@@ -31,6 +31,11 @@ class InvoiceDetail extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'price' => 'double',
+        'total' => 'double',
+    ];
+
     public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'invoice_id');

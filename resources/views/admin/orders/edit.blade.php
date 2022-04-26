@@ -68,8 +68,8 @@
             @php
             $tabs = [
                 [ 'label' => 'Daftar Produk', 'enabled' => true ],
-                [ 'label' => 'Tagihan', 'enabled' => !!$order->id ],
                 [ 'label' => 'Faktur', 'enabled' => !!$order->id ],
+                [ 'label' => 'Tagihan', 'enabled' => !!$order->id ],
             ];
             @endphp
             <ul class="nav nav-tabs" id="orderTabs" role="tablist">
@@ -95,11 +95,11 @@
                 </div>
 
                 <div class="tab-pane fade" id="order-2" role="tabpanel">
-                    @include('admin.orders.parts.tab-tagihan')
+                    @include('admin.orders.parts.tab-faktur')
                 </div>
 
                 <div class="tab-pane fade" id="order-3" role="tabpanel">
-                    @include('admin.orders.parts.tab-faktur')
+                    @include('admin.orders.parts.tab-tagihan')
                 </div>
             </div>
         </form>

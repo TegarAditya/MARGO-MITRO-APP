@@ -64,6 +64,11 @@ class Order extends Model
         return $this->hasMany(Pembayaran::class);
     }
 
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');

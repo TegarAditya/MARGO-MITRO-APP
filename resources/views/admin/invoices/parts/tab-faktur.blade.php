@@ -1,17 +1,7 @@
 <div class="order-faktur pt-3">
-    <p class="mb-4">
-        <strong>Total Tagihan</strong>
-        <br />
-        <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.total', 0)) }}</span>
-    </p>
-
     <div class="row align-items-center mb-2">
         <div class="col">
             <h5 class="mb-0">Riwayat Faktur</h5>
-        </div>
-
-        <div class="col-auto">
-            <a href="{{ route('admin.invoices.create', ['order_id' => $order->id]) }}" class="btn btn-sm btn-success">Tambah Faktur</a>
         </div>
     </div>
 
@@ -54,9 +44,7 @@
                                     <p class="m-0">
                                         <span>{{ $product->name }}</span>
                                         <br />
-                                        <span class="text-xs text-muted">
-                                            Rp{{ number_format($detail->price) }}
-                                        </span>
+                                        <span class="text-xs text-muted">Rp{{ number_format($detail->price) }}</span>
                                     </p>
                                 @else
                                     <p class="m-0">Produk</p>
@@ -64,7 +52,7 @@
                             </td>
                             <td class="text-center">{{ $detail->quantity }}</td>
                             <td class="text-right">Rp{{ number_format($detail->total) }}</td>
-
+                            
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}" class="text-right">Rp{{ number_format($row->nominal) }}</td>
                             @endif

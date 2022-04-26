@@ -8,8 +8,12 @@ use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\UpdateInvoiceRequest;
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\Product;
 use Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -70,14 +74,79 @@ class InvoiceController extends Controller
     {
         abort_if(Gate::denies('invoice_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $orders = Order::pluck('date', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $orders = Order::get()->mapWithKeys(function($item) {
+            return [$item->id => $item->no_order];
+        })->prepend(trans('global.pleaseSelect'), '');
+        $order_details = OrderDetail::with(['product', 'product.media'])
+            ->whereHas('product')
+            ->get();
 
-        return view('admin.invoices.create', compact('orders'));
+        $invoice = new Invoice();
+        $order = null;
+
+        if ($order_id = request('order_id')) {
+            $order = Order::with('invoices', 'tagihan')->findOrFail($order_id);
+            $order_details = $order_details->where('order_id', $order_id);
+        }
+
+        return view('admin.invoices.create', compact('orders', 'order_details', 'invoice', 'order'));
     }
 
-    public function store(StoreInvoiceRequest $request)
+    public function store(Request $request)
     {
-        $invoice = Invoice::create($request->all());
+        $request->validate([
+            'date' => 'required|date',
+            'order_id' => 'required|exists:orders,id',
+            'products' => 'required|array|min:1',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        DB::beginTransaction();
+        try {
+            $invoice = Invoice::create([
+                'no_suratjalan' => Invoice::generateNoSJ(),
+                'no_invoice' => Invoice::generateNoInvoice(),
+                'date' => $request->date,
+                'nominal' => $request->nominal,
+                'order_id' => $request->order_id,
+            ]);
+
+            $products = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request) {
+                $qty = (int) $request->products[$item->id]['qty'] ?: 0;
+                $price = (float) $request->products[$item->id]['price'] ?: 0;
+
+                // $item->stock_movements()->create([
+                //     'reference' => $invoice->id,
+                //     'type' => 'faktur',
+                //     'quantity' => -1 * $qty,
+                //     'product_id' => $item->id,
+                // ]);
+                // $item->update([ 'stock' => $item->stock - $qty ]);
+
+                $order->order_details()->where('product_id', $item->id)->update([
+                    'moved' => DB::raw("order_details.moved + $qty"),
+                ]);
+
+                return [
+                    'product_id' => $item->id,
+                    'invoice_id' => $invoice->id,
+                    'quantity' => $qty,
+                    'price' => $price,
+                    'total' => $qty * $price,
+                ];
+            })->where('quantity', '>', 0);
+
+            $invoice->invoice_details()->createMany($products->all());
+
+            DB::commit();
+
+            return redirect()->route('admin.invoices.edit', $invoice->id);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
 
         return redirect()->route('admin.invoices.index');
     }
@@ -86,11 +155,27 @@ class InvoiceController extends Controller
     {
         abort_if(Gate::denies('invoice_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $orders = Order::pluck('date', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $orders = Order::get()->mapWithKeys(function($item) {
+            return [$item->id => $item->no_order];
+        })->prepend(trans('global.pleaseSelect'), '');
+        $order_details = OrderDetail::with(['product', 'product.media'])
+            ->whereHas('product')
+            ->get();
 
-        $invoice->load('order');
+        $invoice->load('invoice_details', 'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan');
 
-        return view('admin.invoices.edit', compact('invoice', 'orders'));
+        $order = null;
+        if ($order = $invoice->order) {
+            $order_details = $order_details->where('order_id', $order->id);
+        }
+
+        $invoice->invoice_details->transform(function($item) use ($order_details) {
+            $item->order_detail = $order_details->where('product_id', $item->product_id);
+
+            return $item;
+        });
+
+        return view('admin.invoices.edit', compact('orders', 'order_details', 'invoice', 'order'));
     }
 
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)

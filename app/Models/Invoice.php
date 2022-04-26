@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class Invoice extends Model
 {
@@ -35,9 +36,18 @@ class Invoice extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'nominal' => 'double',
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class, 'order_id');
+    }
+
+    public function invoice_details()
+    {
+        return $this->hasMany(InvoiceDetail::class);
     }
 
     public function getDateAttribute($value)
@@ -53,5 +63,27 @@ class Invoice extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public static function generateNoSJ() {
+        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+
+        $order_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'SJ'.Date::now()->format('dm');
+        $code = $prefix.sprintf("%04d", $order_number);
+
+        return $code;
+    }
+
+    public static function generateNoInvoice() {
+        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+
+        $order_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'INV'.Date::now()->format('dm');
+        $code = $prefix.sprintf("%04d", $order_number);
+
+        return $code;
     }
 }
