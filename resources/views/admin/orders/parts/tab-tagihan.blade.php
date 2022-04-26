@@ -10,9 +10,11 @@
             <h5 class="mb-0">Riwayat Pembayaran</h5>
         </div>
 
-        <div class="col-auto">
-            <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $order->tagihan->id]) }}" class="btn btn-sm btn-success">Tambah Pembayaran</a>
-        </div>
+        @if ($tagihan = $order->tagihan)
+            <div class="col-auto">
+                <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success">Tambah Pembayaran</a>
+            </div>
+        @endif
     </div>
 
     <table class="table table-striped">
@@ -61,12 +63,10 @@
 
     <div class="row mt-4">
         <div class="col">
-            <a href="#order-1" class="btn btn-default border orderTabs-nav">Sebelumnya</a>
+            <a href="#order-2" class="btn btn-default border orderTabs-nav">Sebelumnya</a>
         </div>
 
-        <div class="col-auto">
-            <a href="#order-3" class="btn btn-dark orderTabs-nav">Selanjutnya</a>
-        </div>
+        <div class="col-auto"></div>
     </div>
 </div>
 

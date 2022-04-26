@@ -24,12 +24,18 @@ class OrderDetail extends Model
         'order_id',
         'product_id',
         'quantity',
+        'moved',
         'unit_price',
         'price',
         'total',
         'created_at',
         'updated_at',
         'deleted_at',
+    ];
+
+    protected $casts = [
+        'price' => 'double',
+        'total' => 'double',
     ];
 
     public function order()

@@ -161,7 +161,7 @@
                 var calc = qtyNum + (el.data('action') === '-' ? -1 : 1);
                 var value = calc <= 1 ? 1 : calc;
 
-                qty.val(value).trigger('change');
+                qty.filter(':not([readonly])').val(value).trigger('change');
                 calculatePrice();
             });
 

@@ -94,7 +94,7 @@ class OrderController extends Controller
                 $item->stock_movements()->create([
                     'reference' => $order->id,
                     'type' => 'order',
-                    'quantity' => $qty,
+                    'quantity' => -1 * $qty,
                     'product_id' => $item->id,
                 ]);
                 $item->update([ 'stock' => $item->stock - $qty ]);
@@ -140,7 +140,14 @@ class OrderController extends Controller
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $products = Product::with(['media', 'category'])->get();
 
-        $order->load('salesperson', 'order_details', 'order_details.product', 'tagihan', 'pembayarans');
+        $order->load([
+            'salesperson',
+            'order_details',
+            'order_details.product',
+            'tagihan',
+            'pembayarans',
+            'invoices',
+        ]);
 
         return view('admin.orders.edit', compact('order', 'salespeople', 'products'));
     }

@@ -50,6 +50,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
                 value="{{ $detail->quantity }}"
                 min="{{ $detail->quantity ?: 1 }}"
                 max="{{ $qtyMax }}"
+                :readonly="$detail->id"
             >
                 <x-slot name="left">
                     <button type="button" class="btn btn-sm border-0 px-2 product-qty-act" data-action="-">
