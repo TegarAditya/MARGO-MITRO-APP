@@ -63,16 +63,17 @@ class ProductController extends Controller
             $table->addColumn('category_name', function ($row) {
                 return $row->category ? $row->category->name : '';
             });
-
             $table->addColumn('brand_name', function ($row) {
                 return $row->brand ? $row->brand->name : '';
             });
-
+            $table->editColumn('hpp', function ($row) {
+                return $row->hpp ? 'Rp '. number_format($row->hpp, 0, ',', '.') : '';
+            });
             $table->editColumn('price', function ($row) {
-                return $row->price ? $row->price : '';
+                return $row->price ? 'Rp '. number_format($row->price, 0, ',', '.') : '';
             });
             $table->editColumn('stock', function ($row) {
-                return $row->stock ? $row->stock : '';
+                return $row->stock ? $row->stock. ' '. $row->unit->name : '';
             });
             $table->editColumn('status', function ($row) {
                 return '<input type="checkbox" disabled ' . ($row->status ? 'checked' : null) . '>';
