@@ -30,16 +30,19 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.slug') }}
+                        {{ trans('cruds.product.fields.category') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.product.fields.brand') }}
                     </th>
                     <th>
                         {{ trans('cruds.product.fields.name') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.category') }}
+                        {{ trans('cruds.product.fields.slug') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.brand') }}
+                        {{ trans('cruds.product.fields.hpp') }}
                     </th>
                     <th>
                         {{ trans('cruds.product.fields.price') }}
@@ -56,12 +59,6 @@
                 </tr>
                 <tr>
                     <td>
-                    </td>
-                    <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
-                    </td>
-                    <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
                     </td>
                     <td>
                         <select class="search">
@@ -89,13 +86,17 @@
                     </td>
                     <td>
                     </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
                 </tr>
             </thead>
         </table>
     </div>
 </div>
-
-
 
 @endsection
 @section('scripts')
@@ -141,15 +142,16 @@
     aaSorting: [],
     ajax: "{{ route('admin.products.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'slug', name: 'slug' },
-{ data: 'name', name: 'name' },
-{ data: 'category_name', name: 'category.name' },
-{ data: 'brand_name', name: 'brand.name' },
-{ data: 'price', name: 'price' },
-{ data: 'stock', name: 'stock' },
-{ data: 'status', name: 'status' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'category_name', name: 'category.name' },
+        { data: 'brand_name', name: 'brand.name' },
+        { data: 'name', name: 'name' },
+        { data: 'slug', name: 'slug' },
+        { data: 'hpp', name: 'hpp' },
+        { data: 'price', name: 'price' },
+        { data: 'stock', name: 'stock' },
+        { data: 'status', name: 'status' },
+        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

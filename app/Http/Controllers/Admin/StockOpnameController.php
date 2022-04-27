@@ -6,17 +6,58 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyStockOpnameRequest;
 use App\Http\Requests\StoreStockOpnameRequest;
 use App\Http\Requests\UpdateStockOpnameRequest;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Unit;
 use Gate;
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class StockOpnameController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('stock_opname_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.stockOpnames.index');
+        if ($request->ajax()) {
+            $query = Product::with(['category', 'brand', 'unit'])->select(sprintf('%s.*', (new Product())->table))->where('stock','>', 0)->orderBy('stock', 'DESC');
+            $table = Datatables::of($query);
+
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('value', '&nbsp;');
+
+            $table->editColumn('name', function ($row) {
+                return $row->name ? $row->name : '';
+            });
+            $table->addColumn('category_name', function ($row) {
+                return $row->category ? $row->category->name : '';
+            });
+            $table->addColumn('brand_name', function ($row) {
+                return $row->brand ? $row->brand->name : '';
+            });
+            $table->editColumn('hpp', function ($row) {
+                return $row->hpp ? 'Rp '. number_format($row->hpp, 0, ',', '.') : '';
+            });
+            $table->editColumn('price', function ($row) {
+                return $row->price ? 'Rp '. number_format($row->price, 0, ',', '.') : '';
+            });
+            $table->editColumn('stock', function ($row) {
+                return $row->stock ? $row->stock. ' '. $row->unit->name : '';
+            });
+            $table->editColumn('value', function ($row) {
+                return 'Purchase: Rp'. number_format(($row->stock * $row->hpp), 0, ',', '.') .'<br>Sales: Rp'.number_format(($row->stock * $row->price), 0, ',', '.');
+            });
+            $table->rawColumns(['placeholder', 'category', 'brand', 'value']);
+
+            return $table->make(true);
+        }
+
+        $categories = Category::get();
+        $brands     = Brand::get();
+
+        return view('admin.stockOpnames.index', compact('categories', 'brands'));
     }
 
     public function create()
