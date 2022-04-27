@@ -1,9 +1,21 @@
 <div class="order-tagihan pt-3">
-    <p class="mb-4">
-        <strong>Total Tagihan</strong>
-        <br />
-        <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.total', 0)) }}</span>
-    </p>
+    <div class="row mb-4">
+        <div class="col-auto">
+            <p class="mb-0">
+                <strong>Total Order</strong>
+                <br />
+                <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.total', 0)) }}</span>
+            </p>
+        </div>
+
+        <div class="col-auto">
+            <p class="mb-0">
+                <strong>Total Tagihan</strong>
+                <br />
+                <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.saldo', 0)) }}</span>
+            </p>
+        </div>
+    </div>
 
     <div class="row align-items-center mb-2">
         <div class="col">

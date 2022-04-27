@@ -91,18 +91,10 @@ class OrderController extends Controller
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
                 $unit_price = $item->price;
 
-                $item->stock_movements()->create([
-                    'reference' => $order->id,
-                    'type' => 'order',
-                    'quantity' => -1 * $qty,
-                    'product_id' => $item->id,
-                ]);
-                $item->update([ 'stock' => $item->stock - $qty ]);
-
                 return [
                     'product_id' => $item->id,
                     'order_id' => $order->id,
-                    'quantity' => -1 * $qty,
+                    'quantity' => $qty,
                     'unit_price' => $unit_price,
                     'price' => $price,
                     'total' => $qty * $price,

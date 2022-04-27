@@ -116,13 +116,13 @@ class InvoiceController extends Controller
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
 
-                // $item->stock_movements()->create([
-                //     'reference' => $invoice->id,
-                //     'type' => 'faktur',
-                //     'quantity' => -1 * $qty,
-                //     'product_id' => $item->id,
-                // ]);
-                // $item->update([ 'stock' => $item->stock - $qty ]);
+                $item->stock_movements()->create([
+                    'reference' => $order->id,
+                    'type' => 'order',
+                    'quantity' => -1 * $qty,
+                    'product_id' => $item->id,
+                ]);
+                $item->update([ 'stock' => $item->stock - $qty ]);
 
                 $order->order_details()->where('product_id', $item->id)->update([
                     'moved' => DB::raw("order_details.moved + $qty"),
