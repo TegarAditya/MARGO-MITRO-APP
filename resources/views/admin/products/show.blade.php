@@ -57,18 +57,10 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.unit') }}
-                        </th>
-                        <td>
-                            {{ $product->unit->name ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
                             {{ trans('cruds.product.fields.hpp') }}
                         </th>
                         <td>
-                            {{ $product->hpp }}
+                            @money($product->hpp)
                         </td>
                     </tr>
                     <tr>
@@ -76,7 +68,7 @@
                             {{ trans('cruds.product.fields.price') }}
                         </th>
                         <td>
-                            {{ $product->price }}
+                            @money($product->price)
                         </td>
                     </tr>
                     <tr>
@@ -84,7 +76,7 @@
                             {{ trans('cruds.product.fields.stock') }}
                         </th>
                         <td>
-                            {{ $product->stock }}
+                            {{ $product->stock }} {{ $product->unit->name }}
                         </td>
                     </tr>
                     <tr>
@@ -92,7 +84,7 @@
                             {{ trans('cruds.product.fields.min_stock') }}
                         </th>
                         <td>
-                            {{ $product->min_stock }}
+                            {{ $product->min_stock }} {{ $product->unit->name }}
                         </td>
                     </tr>
                     <tr>

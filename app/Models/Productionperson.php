@@ -41,4 +41,14 @@ class Productionperson extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function($model) {
+            $number = Productionperson::withTrashed()->max('id') + 1;
+            $model->code = 'PROD-'. str_pad($number, 6, '0', STR_PAD_LEFT);
+        });
+    }
 }

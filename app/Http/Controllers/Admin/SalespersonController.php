@@ -15,6 +15,9 @@ use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Excel;
+use App\Imports\SalespersonImport;
+use Alert;
 
 class SalespersonController extends Controller
 {
@@ -158,5 +161,18 @@ class SalespersonController extends Controller
         $media         = $model->addMediaFromRequest('upload')->toMediaCollection('ck-media');
 
         return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('import_file');
+        $request->validate([
+            'import_file' => 'mimes:csv,txt,xls,xlsx',
+        ]);
+
+        Excel::import(new SalespersonImport(), $file);
+
+        Alert::success('Success', 'Sales Person berhasil di import');
+        return redirect()->back();
     }
 }
