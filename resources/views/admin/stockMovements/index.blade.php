@@ -27,9 +27,6 @@
                     <th>
                         {{ trans('cruds.stockMovement.fields.created_at') }}
                     </th>
-                    <th>
-                        &nbsp;
-                    </th>
                 </tr>
                 <tr>
                     <td>
@@ -54,12 +51,8 @@
                         </select>
                     </td>
                     <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
                     </td>
                     <td>
-                    </td>
-                    <td>
-                        &nbsp;
                     </td>
                 </tr>
             </thead>
@@ -90,10 +83,9 @@
         { data: 'product_name', name: 'product.name' },
         { data: 'quantity', name: 'quantity' },
         { data: 'created_at', name: 'created_at' },
-        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
-    order: [[ 5, 'desc' ]],
+    order: [[ 4, 'desc' ]],
     pageLength: 100,
   };
   let table = $('.datatable-StockMovement').DataTable(dtOverrideGlobals);

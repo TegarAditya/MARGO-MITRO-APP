@@ -41,9 +41,11 @@ class StockMovementController extends Controller
 
             $table->editColumn('reference', function ($row) {
                 if ($row->type == 'adjustment') {
-                    return '<a href="stock-adjustments/'.$row->reference.'">Reference</a>';
+                    return '<a href="'.route('admin.stock-adjustments.show', $row->reference).'">Reference</a>';
                 } else if ($row->type == 'faktur') {
-                    return '<a href="stock-adjustments/'.$row->reference.'">Reference</a>';
+                    return '<a href="'.route('admin.stock-adjustments.show', $row->reference).'">Reference</a>';
+                } else if ($row->type == 'order') {
+                    return '<a href="'.route('admin.stock-adjustments.show', $row->reference).'">Reference</a>';
                 }
 
                 return $row->reference ? $row->reference : '';

@@ -88,7 +88,7 @@ class StockAdjustmentController extends Controller
                 'reference' => $stockAdjustment->id,
                 'type' => 'adjustment',
                 'product_id' => $request->product_id,
-                'quantity' => $request->quantity
+                'quantity' => $stockAdjustment->is_increase ? $request->quantity : (-1 * $request->quantity)
             ]);
 
             $product = Product::find($request->product_id);

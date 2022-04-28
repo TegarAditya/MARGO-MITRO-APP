@@ -47,4 +47,15 @@ class StockMovement extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function referensi() {
+        if ($this->attributes['type'] === 'faktur') {
+            return $this->belongsTo(Invoice::class, 'reference');
+        } else if ($this->attributes['type'] === 'adjustment') {
+            return $this->belongsTo(StockAdjustment::class, 'reference');
+        } else if ($this->attributes['type'] === 'order') {
+            return $this->belongsTo(Order::class, 'reference');
+        }
+    }
+
 }
