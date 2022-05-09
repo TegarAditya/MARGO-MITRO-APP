@@ -73,6 +73,14 @@
                     </tr>
                     <tr>
                         <th>
+                            {{ trans('cruds.product.fields.finishing_cost') }}
+                        </th>
+                        <td>
+                            @money($product->finishing_cost)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             {{ trans('cruds.product.fields.stock') }}
                         </th>
                         <td>

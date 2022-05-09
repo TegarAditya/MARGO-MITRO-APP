@@ -51,10 +51,6 @@ class StockOpnameController extends Controller
             });
             $table->rawColumns(['placeholder', 'category', 'brand', 'value', 'name']);
 
-            $table->with('total_stock', function() use ($query) {
-                return $query->sum('stock');
-            });
-
             return $table->make(true);
         }
 

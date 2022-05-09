@@ -42,6 +42,7 @@ class Product extends Model implements HasMedia
         'hpp',
         'price',
         'stock',
+        'finishing_cost',
         'min_stock',
         'status',
         'created_at',
@@ -52,6 +53,7 @@ class Product extends Model implements HasMedia
     protected $casts = [
         'hpp' => 'double',
         'price' => 'double',
+        'finishing_cost' => 'double',
     ];
 
     public function sluggable(): array
