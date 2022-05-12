@@ -123,7 +123,7 @@
         <div class="col"></div>
 
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Simpan Invoice</a>
+            <button type="submit" class="btn {{ !$order->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
         </div>
     </div>
 </div>

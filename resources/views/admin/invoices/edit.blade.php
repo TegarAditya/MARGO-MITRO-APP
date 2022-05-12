@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="order-2" role="tabpanel">
-                    @include('admin.invoices.parts.tab-faktur')
+                    @include('admin.invoices.parts.tab-invoice-history')
                 </div>
             </div>
         </form>
