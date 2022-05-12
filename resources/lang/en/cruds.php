@@ -217,6 +217,8 @@ return [
             'hpp_helper'         => ' ',
             'foto'               => 'Foto',
             'foto_helper'        => ' ',
+            'finishing_cost'        => 'Finishing Cost',
+            'finishing_cost_helper' => ' ',
         ],
     ],
     'salesperson' => [

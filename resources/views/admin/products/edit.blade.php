@@ -79,6 +79,14 @@
                 <span class="help-block">{{ trans('cruds.product.fields.price_helper') }}</span>
             </div>
             <div class="form-group">
+                <label for="finishing_cost">{{ trans('cruds.product.fields.finishing_cost') }}</label>
+                <input class="form-control {{ $errors->has('finishing_cost') ? 'is-invalid' : '' }}" type="number" name="finishing_cost" id="finishing_cost" value="{{ old('finishing_cost', $product->finishing_cost) }}" step="0.01">
+                @if($errors->has('finishing_cost'))
+                    <span class="text-danger">{{ $errors->first('finishing_cost') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.product.fields.finishing_cost_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label class="required" for="stock">{{ trans('cruds.product.fields.stock') }}</label>
                 <input class="form-control {{ $errors->has('stock') ? 'is-invalid' : '' }}" type="number" name="stock" id="stock" value="{{ old('stock', $product->stock) }}" step="1" required>
                 @if($errors->has('stock'))

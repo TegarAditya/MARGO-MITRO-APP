@@ -41,7 +41,7 @@ class StockAdjustmentImport implements ToCollection, WithHeadingRow
                     'reference' => $stockAdjustment->id,
                     'type' => 'adjustment',
                     'product_id' => $product->id,
-                    'quantity' => $row['quantity']
+                    'quantity' => $stockAdjustment->is_increase ? $row['quantity'] : (-1 * $row['quantity'])
                 ]);
 
                 $updateProduct = Product::find($product->id);
@@ -57,7 +57,7 @@ class StockAdjustmentImport implements ToCollection, WithHeadingRow
             DB::commit();
         }  catch (Exception $e) {
             DB::rollback();
-            dd($e);
+            dd('Relax you are doin fine', $e);
         }
     }
 }

@@ -12,6 +12,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
+use App\Models\StockMovement;
 use Gate;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -162,7 +163,9 @@ class ProductController extends Controller
 
         $product->load('category', 'brand', 'unit');
 
-        return view('admin.products.show', compact('product'));
+        $stockMovements = StockMovement::with(['product'])->where('product_id', $product->id)->orderBy('created_at', 'DESC')->get();
+
+        return view('admin.products.show', compact('product', 'stockMovements'));
     }
 
     public function destroy(Product $product)

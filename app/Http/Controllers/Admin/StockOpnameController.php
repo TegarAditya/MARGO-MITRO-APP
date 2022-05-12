@@ -29,7 +29,7 @@ class StockOpnameController extends Controller
             $table->addColumn('value', '&nbsp;');
 
             $table->editColumn('name', function ($row) {
-                return $row->name ? $row->name : '';
+                return '<a href="'.route('admin.products.show', $row->id).'">'.$row->name .'</a>';
             });
             $table->addColumn('category_name', function ($row) {
                 return $row->category ? $row->category->name : '';
@@ -49,7 +49,7 @@ class StockOpnameController extends Controller
             $table->editColumn('value', function ($row) {
                 return 'Purchase: Rp'. number_format(($row->stock * $row->hpp), 0, ',', '.') .'<br>Sales: Rp'.number_format(($row->stock * $row->price), 0, ',', '.');
             });
-            $table->rawColumns(['placeholder', 'category', 'brand', 'value']);
+            $table->rawColumns(['placeholder', 'category', 'brand', 'value', 'name']);
 
             return $table->make(true);
         }
