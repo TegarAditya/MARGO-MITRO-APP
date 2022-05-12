@@ -8,7 +8,7 @@
 $product = $detail->product ?: new App\Models\Product;
 $category = $product->category;
 
-$qtyMax = $detail->quantity - $detail->moved;
+$qtyMax = $product->stock;
 @endphp
 <div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price }}" data-moved="{{ $detail->moved }}" data-max="{{ $qtyMax }}" data-qty="{{ $detail->quantity }}">
     <div class="col-auto" style="display: {{ !$product->id ? 'none' : 'block' }}">
@@ -45,9 +45,8 @@ $qtyMax = $detail->quantity - $detail->moved;
                 boxClass=" p-0"
                 class="form-control-sm hide-arrows text-center product-qty"
                 value="{{ $detail->quantity }}"
-                min="{{ $detail->quantity ?: 0 }}"
+                min="{{ 1 }}"
                 max="{{ $qtyMax }}"
-                :readonly="$detail->id"
             >
                 <x-slot name="left">
                     <button type="button" class="btn btn-sm border-0 px-2 product-qty-act" data-action="-">
@@ -75,7 +74,7 @@ $qtyMax = $detail->quantity - $detail->moved;
                 class="form-control-sm product-price"
                 value="{{ $detail->price }}"
                 min="1"
-                :readonly="$detail->id"
+                readonly
             >
                 <x-slot name="left">
                     <span class="text-sm mr-1">Rp</span>
@@ -88,12 +87,10 @@ $qtyMax = $detail->quantity - $detail->moved;
             <p class="m-0 product-subtotal">Rp{{ number_format($detail->total) }}</p>
         </div>
 
-        @if (!$detail->id)
-            <div class="col-auto pl-5 item-product-action">
-                <a href="#" class="btn btn-danger btn-sm product-delete">
-                    <i class="fa fa-trash"></i>
-                </a>
-            </div>
-        @endif
+        <div class="col-auto pl-5 item-product-action">
+            <a href="#" class="btn btn-danger btn-sm product-delete">
+                <i class="fa fa-trash"></i>
+            </a>
+        </div>
     </div>
 </div>

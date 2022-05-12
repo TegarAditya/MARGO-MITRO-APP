@@ -1,10 +1,4 @@
 <div class="order-faktur pt-3">
-    <p class="mb-4">
-        <strong>Total Tagihan</strong>
-        <br />
-        <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.total', 0)) }}</span>
-    </p>
-
     <div class="row align-items-center mb-2">
         <div class="col">
             <h5 class="mb-0">Riwayat Faktur</h5>

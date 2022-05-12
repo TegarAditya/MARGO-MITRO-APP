@@ -43,7 +43,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
             <x-admin.form-group
                 type="number"
                 id="fieldQty-{{ $product->id }}"
-                name="products[{{ $product->id ?: 0 }}][qty]"
+                :name="!$product->id ? null : 'products['.$product->id.'][qty]'"
                 containerClass=" m-0"
                 boxClass=" p-0"
                 class="form-control-sm hide-arrows text-center product-qty"
@@ -71,7 +71,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
             <x-admin.form-group
                 type="number"
                 id="fieldPrice-{{ $product->id }}"
-                name="products[{{ $product->id ?: 0 }}][price]"
+                :name="!$product->id ? null : 'products['.$product->id.'][price]'"
                 containerClass=" m-0"
                 boxClass=" px-2 py-0"
                 class="form-control-sm product-price"
@@ -89,12 +89,10 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
             <p class="m-0 product-subtotal">Rp{{ number_format($detail->total) }}</p>
         </div>
 
-        @if (!$detail->id)
-            <div class="col-auto pl-5 item-product-action">
-                <a href="#" class="btn btn-danger btn-sm product-delete">
-                    <i class="fa fa-trash"></i>
-                </a>
-            </div>
-        @endif
+        <div class="col-auto pl-5 item-product-action">
+            <a href="#" class="btn btn-danger btn-sm product-delete">
+                <i class="fa fa-trash"></i>
+            </a>
+        </div>
     </div>
 </div>

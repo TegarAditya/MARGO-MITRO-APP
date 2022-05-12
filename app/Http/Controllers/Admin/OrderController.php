@@ -7,6 +7,7 @@ use App\Http\Requests\MassDestroyOrderRequest;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\Salesperson;
 use Gate;
@@ -86,7 +87,7 @@ class OrderController extends Controller
                 'salesperson_id' => $request->salesperson_id,
             ]);
 
-            $products = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($order, $request) {
+            $order_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($order, $request) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
                 $unit_price = $item->price;
@@ -101,18 +102,18 @@ class OrderController extends Controller
                 ];
             });
 
-            $order->order_details()->createMany($products->all());
+            $order->order_details()->createMany($order_details->all());
 
             $tagihan = $order->tagihan()->create([
                 'order_id' => $order->id,
                 'salesperson_id' => $order->salesperson_id,
-                'total' => $products->sum('total'),
-                'saldo' => $products->sum('total'),
+                'total' => $order_details->sum('total'),
+                'saldo' => $order_details->sum('total'),
             ]);
             $tagihan->tagihan_movements()->create([
                 'reference' => $order->id,
                 'type' => 'order',
-                'nominal' => $products->sum('total'),
+                'nominal' => $order_details->sum('total'),
             ]);
 
             DB::commit();
@@ -146,9 +147,73 @@ class OrderController extends Controller
 
     public function update(UpdateOrderRequest $request, Order $order)
     {
-        $order->update($request->all());
+        $request->validate([
+            'date' => 'required|date',
+            'salesperson_id' => 'required|exists:salespeople,id',
+            'products' => 'required|array|min:1',
+        ]);
 
-        return redirect()->route('admin.orders.index');
+        DB::beginTransaction();
+        try {
+            $order->forceFill([
+                'date' => $request->date,
+                'salesperson_id' => $request->salesperson_id,
+            ])->save();
+
+            // Update with new items
+            $order_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($order, $request) {
+                $qty = (int) $request->products[$item->id]['qty'] ?: 0;
+                $price = (float) $request->products[$item->id]['price'] ?: 0;
+                $unit_price = $item->price;
+
+                return [
+                    'product_id' => $item->id,
+                    'order_id' => $order->id,
+                    'quantity' => $qty,
+                    'unit_price' => $unit_price,
+                    'price' => $price,
+                    'total' => $qty * $price,
+                ];
+            });
+
+            foreach ($order_details as $order_detail) {
+                $exists = $order->order_details->where('product_id', $order_detail['product_id'])->first() ?: new OrderDetail;
+
+                $exists->forceFill($order_detail)->save();
+            }
+
+            // Delete items if removed
+            $order->order_details()
+                ->whereNotIn('product_id', $order_details->pluck('product_id'))
+                ->delete();
+
+            // Last but not least
+            $tagihan = $order->tagihan()->updateOrCreate([
+                'order_id' => $order->id,
+                'salesperson_id' => $order->salesperson_id,
+            ], [
+                'order_id' => $order->id,
+                'salesperson_id' => $order->salesperson_id,
+                'total' => $order_details->sum('total'),
+                'saldo' => $order_details->sum('total'),
+            ]);
+            $tagihan->tagihan_movements()->updateOrCreate([
+                'reference' => $order->id,
+                'type' => 'order',
+            ], [
+                'reference' => $order->id,
+                'type' => 'order',
+                'nominal' => $order_details->sum('total'),
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.orders.edit', $order->id);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function show(Order $order)

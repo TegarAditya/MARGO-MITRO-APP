@@ -1,45 +1,86 @@
-<div class="order-product pt-3">
-    @if (!$invoice->id)
-        <div class="product-action mb-4">
-            <div class="row align-items-end">
-                <div class="col-4">
-                    <div class="form-group m-0">
-                        <label for="products">Pilih Produk</label>
-                        <select class="form-control select2 {{ $errors->has('products') ? 'is-invalid' : '' }} product-options field-select2" name="products" id="products" data-placeholder="Pilih Produk">
-                            <option></option>
+<div class="tab-invoice pt-3">
+    <input type="hidden" name="nominal" value="{{ $invoice->nominal }}" />
 
-                            @foreach($order_details as $id => $entry)
-                                <option
-                                    value="{{ $id }}"
-                                    data-id="{{ $entry->product_id }}"
-                                    data-price="{{ $entry->price }}"
-                                    data-qty="{{ $entry->quantity }}"
-                                    data-moved="{{ $entry->moved }}"
-                                    data-max="{{ $entry->quantity - $entry->moved }}"
-                                    @if ($foto = $entry->product->foto->first())
-                                        data-image="{{ $foto->getUrl('thumb') }}"
-                                    @endif
-                                >{{ $entry->product->name }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('products'))
-                            <span class="text-danger">{{ $errors->first('products') }}</span>
-                        @endif
-                    </div>
-                </div>
+    <div class="form-group">
+        <label class="required" for="no_suratjalan">{{ trans('cruds.invoice.fields.no_suratjalan') }}</label>
+        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', $invoice->no_suratjalan) }}" readonly placeholder="(Otomatis)">
+        @if($errors->has('no_suratjalan'))
+            <span class="text-danger">{{ $errors->first('no_suratjalan') }}</span>
+        @endif
+        <span class="help-block">{{ trans('cruds.invoice.fields.no_suratjalan_helper') }}</span>
+    </div>
+    <div class="form-group">
+        <label class="required" for="no_invoice">{{ trans('cruds.invoice.fields.no_invoice') }}</label>
+        <input class="form-control {{ $errors->has('no_invoice') ? 'is-invalid' : '' }}" type="text" name="no_invoice" id="no_invoice" value="{{ old('no_invoice', $invoice->no_invoice) }}" readonly placeholder="(Otomatis)">
+        @if($errors->has('no_invoice'))
+            <span class="text-danger">{{ $errors->first('no_invoice') }}</span>
+        @endif
+        <span class="help-block">{{ trans('cruds.invoice.fields.no_invoice_helper') }}</span>
+    </div>
+    <div class="form-group">
+        <label class="required" for="order_id">{{ trans('cruds.invoice.fields.order') }}</label>
+        <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="order_id" id="order_id" required>
+            @foreach($orders as $id => $entry)
+                <option value="{{ $id }}" {{ (old('order_id') ? old('order_id') : $invoice->order->id ?? '') == $id ? 'selected' : (
+                    request('order_id') == $id ? 'selected' : ''
+                ) }}>{{ $entry }}</option>
+            @endforeach
+        </select>
+        @if($errors->has('order'))
+            <span class="text-danger">{{ $errors->first('order') }}</span>
+        @endif
+        <span class="help-block">{{ trans('cruds.invoice.fields.order_helper') }}</span>
+    </div>
+    <div class="form-group">
+        <label class="required" for="date">{{ trans('cruds.invoice.fields.date') }}</label>
+        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $invoice->date) }}" required>
+        @if($errors->has('date'))
+            <span class="text-danger">{{ $errors->first('date') }}</span>
+        @endif
+        <span class="help-block">{{ trans('cruds.invoice.fields.date_helper') }}</span>
+    </div>
 
-                <div class="col-auto">
-                    <button type="button" class="btn py-1 border product-add">Tambah</button>
+    <hr class="my-3" />
+
+    <h5>Daftar Produk</h5>
+
+    <div class="product-action mb-4">
+        <div class="row align-items-end">
+            <div class="col-4">
+                <div class="form-group m-0">
+                    <label for="products">Pilih Produk</label>
+                    <select class="form-control select2 {{ $errors->has('products') ? 'is-invalid' : '' }} product-options field-select2" name="products" id="products" data-placeholder="Pilih Produk">
+                        <option></option>
+
+                        @foreach($order_details as $id => $entry)
+                            <option
+                                value="{{ $id }}"
+                                data-id="{{ $entry->product_id }}"
+                                data-price="{{ $entry->price }}"
+                                data-qty="{{ $entry->quantity }}"
+                                data-moved="{{ $entry->moved }}"
+                                data-max="{{ $entry->quantity - $entry->moved }}"
+                                @if ($foto = $entry->product->foto->first())
+                                    data-image="{{ $foto->getUrl('thumb') }}"
+                                @endif
+                            >{{ $entry->product->name }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('products'))
+                        <span class="text-danger">{{ $errors->first('products') }}</span>
+                    @endif
                 </div>
             </div>
-        </div>
-    @endif
 
-    <h5>Produk Dipilih</h5>
+            <div class="col-auto">
+                <button type="button" class="btn py-1 border product-add">Tambah</button>
+            </div>
+        </div>
+    </div>
 
     <div class="product-list">
-        @if ($invoice->invoice_details->count())
-            @each('admin.invoices.parts.item-invoice-detail', $invoice->invoice_details, 'detail')
+        @if ($invoice_details->count())
+            @each('admin.invoices.parts.item-invoice-detail', $invoice_details, 'detail')
         @else
             <div class="product-empty">
                 <p>Belum ada produk yang ditambahkan</p>
@@ -47,7 +88,7 @@
         @endif
     </div>
 
-    <div class="product-summary" style="display: {{ !$invoice->invoice_details->count() ? 'none' : 'block' }}">
+    <div class="product-summary" style="display: {{ !$invoice_details->count() ? 'none' : 'block' }}">
         <div class="row border-top pt-2">
             <div class="col text-right">
                 <p class="mb-0">
@@ -55,6 +96,11 @@
                     <br />
                     <strong class="product-total">Rp{{ number_format($invoice->nominal) }}</strong>
                 </p>
+
+                @if($errors->has('nominal'))
+                    <span class="text-danger">{{ $errors->first('nominal') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.invoice.fields.nominal_helper') }}</span>
             </div>
 
             @if (!$invoice->id)
@@ -77,11 +123,7 @@
         <div class="col"></div>
 
         <div class="col-auto">
-            @if (!$invoice->id)
-                <button type="submit" class="btn btn-primary">Simpan Invoice</a>
-            @else
-                <a href="#order-2" class="btn btn-dark invoiceTabs-nav">Selanjutnya</a>
-            @endif
+            <button type="submit" class="btn btn-primary">Simpan Invoice</a>
         </div>
     </div>
 </div>
@@ -109,7 +151,7 @@
     $(function() {
         var form = $('#invoiceForm');
 
-        var orderProduct = form.find('.order-product');
+        var invoice = form.find('.tab-invoice');
         var products = form.find('.product-list');
         var productOpts = form.find('.product-options');
         var productAdd = form.find('.product-add');
@@ -143,6 +185,7 @@
             });
 
             productTotal.html(numeral(total).format('$0,0'));
+            form.find('[name="nominal"]').val(total);
         };
 
         var bindProduct = function(product) {
