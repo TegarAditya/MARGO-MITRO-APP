@@ -8,13 +8,14 @@
 $product = $detail->product ?: new App\Models\Product;
 $category = $product->category;
 
-$qtyMax = $product->stock;
+$order_detail = $detail->order_detail ?: null;
+$qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
 @endphp
-<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price }}" data-moved="{{ $detail->moved }}" data-max="{{ $qtyMax }}" data-qty="{{ $detail->quantity }}">
+<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price }}" data-moved="{{ $order_detail->moved ?? 0 }}" data-max="{{ $qtyMax }}" data-qty="{{ $detail->quantity }}">
     <div class="col-auto" style="display: {{ !$product->id ? 'none' : 'block' }}">
         @if ($product->foto && $foto = $product->foto->first())
             <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
-        @else
+        @elseif (!$product->id)
             <img src="" class="product-img" />
         @endif
     </div>
@@ -26,11 +27,9 @@ $qtyMax = $product->stock;
             Quantity: <span class="product-qty-max">{{ $detail->quantity }}</span>
         </p>
 
-        @if (!$detail->id)
-            <p class="mb-0 text-sm">
-                Terkirim: <span class="product-moved">{{ $detail->moved }}</span>
-            </p>
-        @endif
+        <p class="mb-0 text-sm">
+            Terkirim: <span class="product-moved">{{ $order_detail->moved ?? '' }}</span>
+        </p>
     </div>
 
     <div class="col row align-items-end align-self-center">

@@ -15,7 +15,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
     <div class="col-auto" style="display: {{ !$product->id ? 'none' : 'block' }}">
         @if ($product->foto && $foto = $product->foto->first())
             <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
-        @else
+        @elseif (!$product->id)
             <img src="" class="product-img" />
         @endif
     </div>

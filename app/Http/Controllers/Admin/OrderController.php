@@ -104,16 +104,11 @@ class OrderController extends Controller
 
             $order->order_details()->createMany($order_details->all());
 
-            $tagihan = $order->tagihan()->create([
+            $order->tagihan()->create([
                 'order_id' => $order->id,
                 'salesperson_id' => $order->salesperson_id,
                 'total' => $order_details->sum('total'),
-                'saldo' => $order_details->sum('total'),
-            ]);
-            $tagihan->tagihan_movements()->create([
-                'reference' => $order->id,
-                'type' => 'order',
-                'nominal' => $order_details->sum('total'),
+                'saldo' => 0, // $order_details->sum('total'),
             ]);
 
             DB::commit();
@@ -188,23 +183,17 @@ class OrderController extends Controller
                 ->delete();
 
             // Last but not least
-            $tagihan = $order->tagihan()->updateOrCreate([
+            $tagihan = $order->tagihan()->firstOrNew([
                 'order_id' => $order->id,
                 'salesperson_id' => $order->salesperson_id,
             ], [
                 'order_id' => $order->id,
                 'salesperson_id' => $order->salesperson_id,
-                'total' => $order_details->sum('total'),
-                'saldo' => $order_details->sum('total'),
             ]);
-            $tagihan->tagihan_movements()->updateOrCreate([
-                'reference' => $order->id,
-                'type' => 'order',
-            ], [
-                'reference' => $order->id,
-                'type' => 'order',
-                'nominal' => $order_details->sum('total'),
-            ]);
+
+            $tagihan->total = $order_details->sum('total');
+            $tagihan->saldo = $tagihan->tagihan_movements()->sum('nominal') ?: 0;
+            $tagihan->save();
 
             DB::commit();
 

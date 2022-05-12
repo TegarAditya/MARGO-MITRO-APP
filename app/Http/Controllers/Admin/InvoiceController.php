@@ -171,7 +171,7 @@ class InvoiceController extends Controller
         }
 
         $invoice_details = $invoice->invoice_details->map(function($item) use ($order_details) {
-            $item->order_detail = $order_details->where('product_id', $item->product_id);
+            $item->order_detail = $order_details->where('product_id', $item->product_id)->first();
 
             return $item;
         });

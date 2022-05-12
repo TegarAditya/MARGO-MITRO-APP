@@ -28,14 +28,19 @@
                 @foreach ($order->invoices as $row)
                     @php
                     $rowspan = $row->invoice_details->count();
+                    $link = route('admin.invoices.edit', $row->id);
                     @endphp
 
                     @foreach ($row->invoice_details as $detail)
                         <tr>
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}">{{ $loop->iteration }}</td>
-                                <td rowspan="{{ $rowspan }}">{{ $row->no_suratjalan }}</td>
-                                <td rowspan="{{ $rowspan }}">{{ $row->no_invoice }}</td>
+                                <td rowspan="{{ $rowspan }}">
+                                    <a href="{{ $link }}">{{ $row->no_suratjalan }}</a>
+                                </td>
+                                <td rowspan="{{ $rowspan }}">
+                                    <a href="{{ $link }}">{{ $row->no_invoice }}</a>
+                                </td>
                                 <td rowspan="{{ $rowspan }}">{{ $row->date }}</td>
                             @endif
 

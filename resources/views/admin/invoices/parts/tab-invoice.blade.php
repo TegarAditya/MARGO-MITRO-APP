@@ -59,7 +59,7 @@
                                 data-price="{{ $entry->price }}"
                                 data-qty="{{ $entry->quantity }}"
                                 data-moved="{{ $entry->moved }}"
-                                data-max="{{ $entry->quantity - $entry->moved }}"
+                                data-max="{{ $entry->quantity }}"
                                 @if ($foto = $entry->product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
                                 @endif

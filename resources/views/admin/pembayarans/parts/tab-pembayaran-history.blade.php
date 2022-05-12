@@ -1,10 +1,10 @@
-<div class="order-tagihan pt-3">
+<div class="order-pembayaran pt-3">
     <div class="row mb-4">
         <div class="col-auto">
             <p class="mb-0">
                 <strong>Total Tagihan</strong>
                 <br />
-                <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.total', 0)) }}</span>
+                <span class="h5 mb-0 tagihan-total">Rp{{ number_format($tagihan->total) }}</span>
             </p>
         </div>
 
@@ -12,7 +12,7 @@
             <p class="mb-0">
                 <strong>Total Pembayaran</strong>
                 <br />
-                <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.saldo', 0)) }}</span>
+                <span class="h5 mb-0 tagihan-total">Rp{{ number_format($tagihan->saldo) }}</span>
             </p>
         </div>
 
@@ -20,7 +20,7 @@
             <p class="mb-0">
                 <strong>Sisa Tagihan</strong>
                 <br />
-                <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.selisih', 0)) }}</span>
+                <span class="h5 mb-0 tagihan-total">Rp{{ number_format($tagihan->selisih) }}</span>
             </p>
         </div>
     </div>
@@ -30,11 +30,9 @@
             <h5 class="mb-0">Riwayat Pembayaran</h5>
         </div>
 
-        @if ($tagihan = $order->tagihan)
-            <div class="col-auto">
-                <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success">Tambah Pembayaran</a>
-            </div>
-        @endif
+        <div class="col-auto">
+            <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success">Tambah Pembayaran</a>
+        </div>
     </div>
 
     <table class="table table-striped">
@@ -50,7 +48,7 @@
         </thead>
 
         <tbody>
-            @forelse ($order->pembayarans as $row)
+            @forelse ($pembayarans as $row)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>
@@ -70,7 +68,7 @@
             @endforelse
         </tbody>
 
-        @if ($order->pembayarans->count() && $tagihan = $order->tagihan)
+        @if ($pembayarans->count() && $tagihan)
             <tfoot>
                 <td colspan="5" class="text-right">
                     <strong>Sisa Tagihan</strong>
