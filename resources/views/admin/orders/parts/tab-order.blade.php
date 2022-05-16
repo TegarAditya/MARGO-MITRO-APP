@@ -42,7 +42,7 @@
 
     <hr class="my-3" />
 
-    <div class="product-action mb-4">
+    <div class="product-action mb-1 pt-2 pb-3">
         <div class="row align-items-end">
             <div class="col-4">
                 <div class="form-group m-0">
@@ -128,6 +128,16 @@
 
 @push('styles')
 <style>
+.product-action {
+    position: sticky;
+    position: -webkit-sticky;
+    z-index: 10;
+    top: 0;
+    background-color: #fff;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+}
+
 .item-product {
     padding: .5rem 0;
     transition: 250ms ease-in-out;
@@ -208,9 +218,10 @@
             qty.on('change blur', function (e) {
                 var el = $(e.currentTarget);
                 var valueNum = parseInt(el.val());
-                var value = (isNaN(valueNum) || valueNum <= 0) ? 1 : (valueNum > qtyMax ? qtyMax : valueNum);
+                var value = (isNaN(valueNum) || valueNum <= 0) ? 1 : valueNum;
 
-                value = qtyMin > value ? qtyMin : value;
+                value = (qtyMax && value > qtyMax) ? qtyMax : value;
+                value = (qtyMin && qtyMin > value) ? qtyMin : value;
 
                 if (value !== valueNum) {
                     el.val(value);

@@ -3,6 +3,10 @@ body {
     font-size: 14px
 }
 
+h6 {
+    font-weight: 700;
+}
+
 .ck-editor__editable,
 textarea {
     min-height: 150px;

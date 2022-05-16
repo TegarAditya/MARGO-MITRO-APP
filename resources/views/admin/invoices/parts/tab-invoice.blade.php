@@ -39,12 +39,28 @@
         @endif
         <span class="help-block">{{ trans('cruds.invoice.fields.date_helper') }}</span>
     </div>
+    <div class="form-group">
+        <label class="required" for="invoice_type">Jenis Invoice</label>
+        <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="invoice_type" id="invoice_type" required>
+            @foreach([
+                1 => 'Invoice Keluar',
+                -1 => 'Invoice Masuk'
+            ] as $id => $entry)
+                <option value="{{ $id }}" {{ (old('invoice_type') ? old('invoice_type') : $invoice->invoice_type ?? '') == $id ? 'selected' : (
+                    request('invoice_type') == $id ? 'selected' : ''
+                ) }}>{{ $entry }}</option>
+            @endforeach
+        </select>
+        @if($errors->has('invoice_type'))
+            <span class="text-danger">{{ $errors->first('invoice_type') }}</span>
+        @endif
+    </div>
 
     <hr class="my-3" />
 
     <h5>Daftar Produk</h5>
 
-    <div class="product-action mb-4">
+    <div class="product-action mb-1 pt-2 pb-3">
         <div class="row align-items-end">
             <div class="col-4">
                 <div class="form-group m-0">
@@ -59,7 +75,7 @@
                                 data-price="{{ $entry->price }}"
                                 data-qty="{{ $entry->quantity }}"
                                 data-moved="{{ $entry->moved }}"
-                                data-max="{{ $entry->quantity }}"
+                                data-max="{{ $entry->quantity - $entry->moved }}"
                                 @if ($foto = $entry->product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
                                 @endif
@@ -130,6 +146,16 @@
 
 @push('styles')
 <style>
+.product-action {
+    position: sticky;
+    position: -webkit-sticky;
+    z-index: 10;
+    top: 0;
+    background-color: #fff;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+}
+
 .item-product {
     padding: .5rem 0;
     transition: 250ms ease-in-out;

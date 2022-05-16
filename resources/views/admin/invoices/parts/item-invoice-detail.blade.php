@@ -86,10 +86,12 @@ $qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
             <p class="m-0 product-subtotal">Rp{{ number_format($detail->total) }}</p>
         </div>
 
-        <div class="col-auto pl-5 item-product-action">
-            <a href="#" class="btn btn-danger btn-sm product-delete">
-                <i class="fa fa-trash"></i>
-            </a>
-        </div>
+        @if (!$detail->id)
+            <div class="col-auto pl-5 item-product-action">
+                <a href="#" class="btn btn-danger btn-sm product-delete">
+                    <i class="fa fa-trash"></i>
+                </a>
+            </div>
+        @endif
     </div>
 </div>

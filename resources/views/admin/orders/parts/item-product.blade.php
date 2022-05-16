@@ -21,7 +21,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
     </div>
 
     <div class="col-4">
-        <h5 class="product-name mb-1">{{ $product->name }}</h5>
+        <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
 
         <p class="mb-0 text-sm">
             HPP: <span class="product-hpp">Rp{{ number_format($product->hpp) }}</span>
@@ -34,6 +34,12 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
         <p class="mb-0 text-sm">
             Stock: <span class="product-stock">{{ $product->stock }}</span>
         </p>
+
+        @if ($detail->moved)
+            <p class="mb-0 text-sm">
+                Dikirim: <span class="product-moved">{{ $detail->moved }}</span>
+            </p>
+        @endif
     </div>
 
     <div class="col row align-items-end align-self-center">
@@ -48,8 +54,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
                 boxClass=" p-0"
                 class="form-control-sm hide-arrows text-center product-qty"
                 value="{{ $detail->quantity }}"
-                min="{{ $detail->quantity ?: 1 }}"
-                max="{{ $qtyMax }}"
+                min="{{ 1 }}"
             >
                 <x-slot name="left">
                     <button type="button" class="btn btn-sm border-0 px-2 product-qty-act" data-action="-">
@@ -90,7 +95,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
         </div>
 
         <div class="col-auto pl-5 item-product-action">
-            <a href="#" class="btn btn-danger btn-sm product-delete">
+            <a href="#" class="btn {{ !$detail->moved ? 'btn-danger' : 'btn-default disabled' }} btn-sm product-delete">
                 <i class="fa fa-trash"></i>
             </a>
         </div>
