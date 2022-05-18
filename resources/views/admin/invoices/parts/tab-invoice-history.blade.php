@@ -12,6 +12,7 @@
                 <th rowspan="2">No. Surat Jalan</th>
                 <th rowspan="2">No. Invoice</th>
                 <th rowspan="2" width="120">Tanggal</th>
+                <th rowspan="2" width="120">Masuk/Keluar</th>
                 <th colspan="3" class="text-center py-2">Produk</th>
                 <th rowspan="2" class="text-center" width="1%">Total</th>
             </tr>
@@ -29,6 +30,7 @@
                     @php
                     $rowspan = $row->invoice_details->count();
                     $link = route('admin.invoices.edit', $row->id);
+                    $is_out = 0 < $row->nominal;
                     @endphp
 
                     @foreach ($row->invoice_details as $detail)
@@ -42,6 +44,7 @@
                                     <a href="{{ $link }}">{{ $row->no_invoice }}</a>
                                 </td>
                                 <td rowspan="{{ $rowspan }}">{{ $row->date }}</td>
+                                <td rowspan="{{ $rowspan }}">{{ $is_out ? 'Keluar' : 'Masuk' }}</td>
                             @endif
 
                             <td>
@@ -55,11 +58,11 @@
                                     <p class="m-0">Produk</p>
                                 @endif
                             </td>
-                            <td class="text-center">{{ $detail->quantity }}</td>
-                            <td class="text-right">Rp{{ number_format($detail->total) }}</td>
+                            <td class="text-center">{{ abs($detail->quantity) }}</td>
+                            <td class="text-right">Rp{{ number_format(abs($detail->total)) }}</td>
                             
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-right">Rp{{ number_format($row->nominal) }}</td>
+                                <td rowspan="{{ $rowspan }}" class="text-right">Rp{{ number_format(abs($row->nominal)) }}</td>
                             @endif
                         </tr>
                     @endforeach

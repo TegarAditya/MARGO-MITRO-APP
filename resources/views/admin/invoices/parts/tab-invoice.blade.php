@@ -39,22 +39,23 @@
         @endif
         <span class="help-block">{{ trans('cruds.invoice.fields.date_helper') }}</span>
     </div>
-    <div class="form-group">
-        <label class="required" for="invoice_type">Jenis Invoice</label>
-        <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="invoice_type" id="invoice_type" required>
-            @foreach([
-                1 => 'Invoice Keluar',
-                -1 => 'Invoice Masuk'
-            ] as $id => $entry)
-                <option value="{{ $id }}" {{ (old('invoice_type') ? old('invoice_type') : $invoice->invoice_type ?? '') == $id ? 'selected' : (
-                    request('invoice_type') == $id ? 'selected' : ''
-                ) }}>{{ $entry }}</option>
-            @endforeach
-        </select>
-        @if($errors->has('invoice_type'))
-            <span class="text-danger">{{ $errors->first('invoice_type') }}</span>
-        @endif
-    </div>
+
+    @if ($type = !$invoice->id ? -1 : (0 > (int) $invoice->nominal ? 1 : -1))
+        <div class="form-group">
+            <label class="required" for="invoice_type">Jenis Invoice</label>
+            <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="invoice_type" id="invoice_type" required>
+                @foreach([
+                    -1 => 'Invoice Keluar',
+                    1 => 'Invoice Masuk'
+                ] as $id => $entry)
+                    <option value="{{ $id }}" {{ (old('invoice_type') ? old('invoice_type') : $type ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                @endforeach
+            </select>
+            @if($errors->has('invoice_type'))
+                <span class="text-danger">{{ $errors->first('invoice_type') }}</span>
+            @endif
+        </div>
+    @endif
 
     <hr class="my-3" />
 

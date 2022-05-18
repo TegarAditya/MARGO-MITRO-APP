@@ -21,7 +21,7 @@ $qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
     </div>
 
     <div class="col-4">
-        <h5 class="product-name mb-1">{{ $product->name }}</h5>
+        <h6 class="product-name mb-1 text-sm">{{ $product->name }}</h6>
 
         <p class="mb-0 text-sm">
             Quantity: <span class="product-qty-max">{{ $detail->quantity }}</span>
@@ -39,12 +39,12 @@ $qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
             <x-admin.form-group
                 type="number"
                 id="fieldQty-{{ $product->id }}"
-                name="products[{{ $product->id ?: 0 }}][qty]"
+                :name="!$product->id ? null : 'products[{{ $product->id ?: 0 }}][qty]'"
                 containerClass=" m-0"
                 boxClass=" p-0"
                 class="form-control-sm hide-arrows text-center product-qty"
-                value="{{ $detail->quantity }}"
-                min="{{ 1 }}"
+                value="{{ abs($detail->quantity) }}"
+                :min="!$product->id ? 0 : 1"
                 max="{{ $qtyMax }}"
             >
                 <x-slot name="left">
@@ -67,12 +67,12 @@ $qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
             <x-admin.form-group
                 type="number"
                 id="fieldPrice-{{ $product->id }}"
-                name="products[{{ $product->id ?: 0 }}][price]"
+                :name="!$product->id ? null : 'products[{{ $product->id ?: 0 }}][price]'"
                 containerClass=" m-0"
                 boxClass=" px-2 py-0"
                 class="form-control-sm product-price"
                 value="{{ $detail->price }}"
-                min="1"
+                :min="!$product->id ? 0 : 1"
                 readonly
             >
                 <x-slot name="left">

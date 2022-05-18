@@ -32,7 +32,7 @@
 
         @if ($tagihan = $order->tagihan)
             <div class="col-auto">
-                <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success">Tambah Pembayaran</a>
+                <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success{{ 0 >= data_get($order, 'tagihan.selisih', 0) ? ' disabled' : '' }} ">Tambah Pembayaran</a>
             </div>
         @endif
     </div>

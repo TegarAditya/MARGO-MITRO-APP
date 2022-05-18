@@ -107,17 +107,20 @@ class InvoiceController extends Controller
 
         DB::beginTransaction();
         try {
+            $multiplier = -1 * (int) $request->get('invoice_type', -1);
             $invoice = Invoice::create([
                 'no_suratjalan' => Invoice::generateNoSJ(),
                 'no_invoice' => Invoice::generateNoInvoice(),
                 'date' => $request->date,
-                'nominal' => $request->nominal,
+                'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
             ]);
 
-            $products = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request) {
+            $products = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request, $multiplier) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
+
+                $qty = $qty * $multiplier;
 
                 $item->stock_movements()->create([
                     'reference' => $invoice->id,
@@ -138,11 +141,15 @@ class InvoiceController extends Controller
                     'price' => $price,
                     'total' => $qty * $price,
                 ];
-            })->where('quantity', '>', 0);
+            });
 
             $invoice->invoice_details()->createMany($products->all());
 
             DB::commit();
+
+            if ($request->redirect) {
+                return redirect($request->redirect);
+            }
 
             return redirect()->route('admin.invoices.edit', $invoice->id);
         } catch (\Exception $e) {
@@ -191,11 +198,12 @@ class InvoiceController extends Controller
 
         DB::beginTransaction();
         try {
+            $multiplier = -1 * (int) $request->get('invoice_type', -1);
             $invoice->forceFill([
                 'no_suratjalan' => Invoice::generateNoSJ(),
                 'no_invoice' => Invoice::generateNoInvoice(),
                 'date' => $request->date,
-                'nominal' => $request->nominal,
+                'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
             ])->save();
 
@@ -217,9 +225,11 @@ class InvoiceController extends Controller
             }
 
             // Update with new items
-            $invoice_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request) {
+            $invoice_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request, $multiplier) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
+
+                $qty = $qty * $multiplier;
 
                 $item->stock_movements()->updateOrCreate([
                     'reference' => $invoice->id,
@@ -244,7 +254,7 @@ class InvoiceController extends Controller
                     'price' => $price,
                     'total' => $qty * $price,
                 ];
-            })->where('quantity', '>', 0);
+            });
 
             foreach ($invoice_details as $invoice_detail) {
                 $exists = $invoice->invoice_details->where('product_id', $invoice_detail['product_id'])->first() ?: new InvoiceDetail;
@@ -262,6 +272,10 @@ class InvoiceController extends Controller
                 ->delete();
 
             DB::commit();
+
+            if ($request->redirect) {
+                return redirect($request->redirect);
+            }
 
             return redirect()->route('admin.invoices.edit', $invoice->id);
         } catch (\Exception $e) {

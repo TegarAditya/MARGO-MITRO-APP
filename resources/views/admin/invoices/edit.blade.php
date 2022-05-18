@@ -21,6 +21,10 @@
             @method(!$invoice->id ? 'POST' : 'PUT')
             @csrf
 
+            @if ($order_id = request('order_id'))
+                <input type="hidden" name="redirect" value="{{ route('admin.orders.edit', $order_id) }}" />
+            @endif
+
             @php
             $tabs = [
                 [ 'label' => 'Faktur', 'enabled' => true ],

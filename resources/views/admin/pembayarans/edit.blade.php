@@ -17,6 +17,10 @@
             @method(!$pembayaran->id ? 'POST' : 'PUT')
             @csrf
 
+            @if ($order_id = request('order_id', $tagihan->order_id))
+                <input type="hidden" name="redirect" value="{{ route('admin.orders.edit', $order_id) }}" />
+            @endif
+
             @php
             $tabs = [
                 [ 'label' => 'Pembayaran', 'enabled' => true ],
