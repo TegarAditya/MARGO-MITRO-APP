@@ -289,7 +289,17 @@ class InvoiceController extends Controller
     {
         abort_if(Gate::denies('invoice_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $invoice->load('order');
+        $invoice->load([
+            'invoice_details',
+            'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan',
+        ]);
+
+        switch (request('print')) {
+            case 'sj':
+                return view('admin.invoices.prints.surat-jalan', compact('invoice'));
+            case 'inv':
+                return view('admin.invoices.prints.faktur', compact('invoice'));
+        }
 
         return view('admin.invoices.show', compact('invoice'));
     }

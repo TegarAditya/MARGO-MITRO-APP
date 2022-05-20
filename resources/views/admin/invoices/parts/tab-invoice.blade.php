@@ -111,7 +111,7 @@
                 <p class="mb-0">
                     <span class="text-sm">Total</span>
                     <br />
-                    <strong class="product-total">Rp{{ number_format($invoice->nominal) }}</strong>
+                    <strong class="product-total">@money($invoice->nominal)</strong>
                 </p>
 
                 @if($errors->has('nominal'))

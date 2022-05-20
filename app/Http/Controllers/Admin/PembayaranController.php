@@ -144,7 +144,11 @@ class PembayaranController extends Controller
     {
         abort_if(Gate::denies('pembayaran_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $pembayaran->load('tagihan');
+        $pembayaran->load(['tagihan', 'tagihan.pembayarans']);
+
+        if (request('print')) {
+            return view('admin.pembayarans.prints.kwitansi', compact('pembayaran'));
+        }
 
         return view('admin.pembayarans.show', compact('pembayaran'));
     }

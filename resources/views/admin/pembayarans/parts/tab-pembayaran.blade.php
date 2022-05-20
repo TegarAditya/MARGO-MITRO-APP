@@ -98,7 +98,7 @@
             name="bayar_text"
             containerClass=" m-0"
             boxClass=" px-2 py-0"
-            value="Rp{{ number_format($pembayaran->bayar) }}"
+            value="Rp{{ number_format($pembayaran->bayar, 0, ',', '.') }}"
             min="1"
             readonly
         />

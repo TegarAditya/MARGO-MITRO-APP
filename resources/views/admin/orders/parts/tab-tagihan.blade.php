@@ -4,7 +4,7 @@
             <p class="mb-0">
                 <strong>Total Tagihan</strong>
                 <br />
-                <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.total', 0)) }}</span>
+                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.total', 0))</span>
             </p>
         </div>
 
@@ -12,7 +12,7 @@
             <p class="mb-0">
                 <strong>Total Pembayaran</strong>
                 <br />
-                <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.saldo', 0)) }}</span>
+                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.saldo', 0))</span>
             </p>
         </div>
 
@@ -20,7 +20,7 @@
             <p class="mb-0">
                 <strong>Sisa Tagihan</strong>
                 <br />
-                <span class="h5 mb-0 tagihan-total">Rp{{ number_format(data_get($order, 'tagihan.selisih', 0)) }}</span>
+                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.selisih', 0))</span>
             </p>
         </div>
     </div>
@@ -46,6 +46,7 @@
                 <th class="text-center" width="1%">Nominal</th>
                 <th class="text-center" width="1%">Diskon</th>
                 <th class="text-center" width="1%">Bayar</th>
+                <th class="text-center" width="1%"></th>
             </tr>
         </thead>
 
@@ -57,13 +58,27 @@
                         <a href="{{ route('admin.pembayarans.edit', $row->id) }}">{{ $row->no_kwitansi }}</a>
                     </td>
                     <td>{{ $row->tanggal }}</td>
-                    <td class="text-right">Rp{{ number_format($row->nominal) }}</td>
-                    <td class="text-right">{{ !$row->diskon ? '-' : 'Rp'.number_format($row->diskon) }}</td>
-                    <td class="text-right">Rp{{ number_format($row->bayar) }}</td>
+                    <td class="text-right">@money($row->nominal)</td>
+                    <td class="text-right">
+                        @if (!$row->diskon)
+                            <span>-</span>
+                        @else
+                            @money($row->diskon)
+                        @endif
+                    </td>
+                    <td class="text-right">@money($row->bayar)</td>
+                    <td class="text-center px-3">
+                        <a href="{{ route('admin.pembayarans.show', [
+                            'pembayaran' => $row->id,
+                            'print' => 'on'
+                        ]) }}" target="_blank">
+                            <i class="fa fa-print text-dark"></i>
+                        </a>
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">
+                    <td colspan="7" class="text-center">
                         <p class="mb-0">Belum ada riwayat pembayaran</p>
                     </td>
                 </tr>
@@ -77,7 +92,7 @@
                 </td>
 
                 <td class="text-right">
-                    Rp{{ number_format($tagihan->selisih) }}
+                    @money($tagihan->selisih)
                 </td>
             </tfoot>
         @endif

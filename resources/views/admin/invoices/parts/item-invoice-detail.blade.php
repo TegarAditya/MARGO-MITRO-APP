@@ -83,7 +83,7 @@ $qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
 
         <div class="col text-right">
             <p class="text-sm mb-0">Subtotal</p>
-            <p class="m-0 product-subtotal">Rp{{ number_format($detail->total) }}</p>
+            <p class="m-0 product-subtotal">@money($detail->total)</p>
         </div>
 
         @if (!$detail->id)

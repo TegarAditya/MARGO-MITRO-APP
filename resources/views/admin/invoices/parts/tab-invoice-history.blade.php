@@ -5,7 +5,7 @@
         </div>
     </div>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered table-invoice">
         <thead>
             <tr>
                 <th rowspan="2" width="1%">No.</th>
@@ -24,12 +24,15 @@
             </tr>
         </thead>
 
-        <tbody>
-            @if ($order && count($order->invoices))
-                @foreach ($order->invoices as $row)
+        @if ($order && count($order->invoices))
+            @foreach ($order->invoices as $row)
+                <tbody>
                     @php
                     $rowspan = $row->invoice_details->count();
                     $link = route('admin.invoices.edit', $row->id);
+                    $print = function($type) use ($row) {
+                        return route('admin.invoices.show', ['invoice' => $row->id, 'print' => $type]);
+                    };
                     $is_out = 0 < $row->nominal;
                     @endphp
 
@@ -38,10 +41,30 @@
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}">{{ $loop->iteration }}</td>
                                 <td rowspan="{{ $rowspan }}">
-                                    <a href="{{ $link }}">{{ $row->no_suratjalan }}</a>
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1 pr-2">
+                                            <a href="{{ $link }}">{{ $row->no_suratjalan }}</a>
+                                        </div>
+
+                                        <div>
+                                            <a href="{{ $print('sj') }}" target="_blank">
+                                                <i class="fa fa-print text-dark"></i>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td rowspan="{{ $rowspan }}">
-                                    <a href="{{ $link }}">{{ $row->no_invoice }}</a>
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1 pr-2">
+                                            <a href="{{ $link }}">{{ $row->no_invoice }}</a>
+                                        </div>
+
+                                        <div>
+                                            <a href="{{ $print('inv') }}" target="_blank">
+                                                <i class="fa fa-print text-dark"></i>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td rowspan="{{ $rowspan }}">{{ $row->date }}</td>
                                 <td rowspan="{{ $rowspan }}">{{ $is_out ? 'Keluar' : 'Masuk' }}</td>
@@ -52,29 +75,31 @@
                                     <p class="m-0">
                                         <span>{{ $product->name }}</span>
                                         <br />
-                                        <span class="text-xs text-muted">Rp{{ number_format($detail->price) }}</span>
+                                        <span class="text-xs text-muted">@money($detail->price)</span>
                                     </p>
                                 @else
                                     <p class="m-0">Produk</p>
                                 @endif
                             </td>
                             <td class="text-center">{{ abs($detail->quantity) }}</td>
-                            <td class="text-right">Rp{{ number_format(abs($detail->total)) }}</td>
+                            <td class="text-right">@money(abs($detail->total))</td>
                             
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-right">Rp{{ number_format(abs($row->nominal)) }}</td>
+                                <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($row->nominal))</td>
                             @endif
                         </tr>
                     @endforeach
-                @endforeach
-            @else
+                </tbody>
+            @endforeach
+        @else
+            <tbody>
                 <tr>
                     <td colspan="8" class="text-center">
                         <p class="mb-0">Belum ada riwayat faktur</p>
                     </td>
                 </tr>
-            @endforelse
-        </tbody>
+            </tbody>
+        @endforelse
     </table>
 
     <div class="row mt-4">

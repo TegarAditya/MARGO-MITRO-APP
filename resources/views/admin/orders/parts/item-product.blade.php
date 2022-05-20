@@ -24,7 +24,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
         <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
 
         <p class="mb-0 text-sm">
-            HPP: <span class="product-hpp">Rp{{ number_format($product->hpp) }}</span>
+            HPP: <span class="product-hpp">@money($product->hpp)</span>
         </p>
 
         <p class="mb-0 text-sm">
@@ -91,7 +91,7 @@ $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
 
         <div class="col text-right">
             <p class="text-sm mb-0">Subtotal</p>
-            <p class="m-0 product-subtotal">Rp{{ number_format($detail->total) }}</p>
+            <p class="m-0 product-subtotal">@money($detail->total)</p>
         </div>
 
         <div class="col-auto pl-5 item-product-action">
