@@ -24,7 +24,11 @@ $qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
         <h6 class="product-name mb-1 text-sm">{{ $product->name }}</h6>
 
         <p class="mb-0 text-sm">
-            Quantity: <span class="product-qty-max">{{ $detail->quantity }}</span>
+            Order Qty: <span class="product-qty-max">{{ $order_detail->quantity ?? '' }}</span>
+        </p>
+
+        <p class="mb-0 text-sm">
+            Stock: <span class="product-stock">{{ $product->stock }}</span>
         </p>
 
         <p class="mb-0 text-sm">

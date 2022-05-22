@@ -70,16 +70,20 @@
                         <option></option>
 
                         @foreach($order_details as $id => $entry)
+                            @continue($entry->moved === $entry->quantity)
+
                             <option
                                 value="{{ $id }}"
                                 data-id="{{ $entry->product_id }}"
                                 data-price="{{ $entry->price }}"
                                 data-qty="{{ $entry->quantity }}"
                                 data-moved="{{ $entry->moved }}"
+                                data-stock="{{ $entry->product->stock }}"
                                 data-max="{{ $entry->quantity - $entry->moved }}"
                                 @if ($foto = $entry->product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
                                 @endif
+                                {{ $entry->moved === $entry->quantity ? ' disabled' : '' }}
                             >{{ $entry->product->name }}</option>
                         @endforeach
                     </select>
@@ -236,11 +240,10 @@
             qty.on('change blur', function (e) {
                 var el = $(e.currentTarget);
                 var valueNum = parseInt(el.val());
-                var value = (isNaN(valueNum) || valueNum <= 0) ? qtyMin : (valueNum > qtyMax ? qtyMax : valueNum);
+                var value = (isNaN(valueNum) || valueNum <= 0) ? qtyMin : valueNum;
 
-                console.log("ASDASD", value, valueNum, qtyMin, qtyMax);
-
-                value = qtyMin > value ? qtyMin : value;
+                value = (qtyMax && value > qtyMax) ? qtyMax : value;
+                value = (qtyMin && qtyMin > value) ? qtyMin : value;
 
                 if (value !== valueNum) {
                     el.val(value);
@@ -302,6 +305,7 @@
             product.attr('data-stock', selected.data('stock'));
             product.attr('data-qty', selected.data('qty'));
             product.attr('data-moved', selected.data('moved'));
+            product.attr('data-stock', selected.data('stock'));
             product.attr('data-max', qtyMax);
             product.find('.product-name').html(selected.html());
             product.find('.product-category').html(selected.data('category'));

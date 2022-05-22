@@ -180,7 +180,7 @@ class OrderController extends Controller
             // Delete items if removed
             $order->order_details()
                 ->whereNotIn('product_id', $order_details->pluck('product_id'))
-                ->destroy();
+                ->forceDelete();
 
             // Last but not least
             $tagihan = $order->tagihan()->firstOrNew([

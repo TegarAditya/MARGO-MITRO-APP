@@ -11,7 +11,7 @@ $category = $product->category;
 $stock = $product->stock ?: 0;
 $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
 @endphp
-<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-stock="{{ $qtyMax }}">
+<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}">
     <div class="col-auto" style="display: {{ !$product->id ? 'none' : 'block' }}">
         @if ($product->foto && $foto = $product->foto->first())
             <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
