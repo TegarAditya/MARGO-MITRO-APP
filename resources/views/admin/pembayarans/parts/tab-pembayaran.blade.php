@@ -1,4 +1,4 @@
-<div class="tab-pembayaran">
+<div class="tab-pembayaran pt-3">
     <input type="hidden" name="diskon" value="{{ $pembayaran->diskon }}" />
     <input type="hidden" name="bayar" value="{{ $pembayaran->bayar }}" />
 
@@ -11,12 +11,22 @@
         <span class="help-block">{{ trans('cruds.pembayaran.fields.no_kwitansi_helper') }}</span>
     </div>
     <div class="form-group">
-        <label class="required" for="tagihan_id">{{ trans('cruds.pembayaran.fields.tagihan') }}</label>
+        <label class="required" for="tagihan_id">Order</label>
         <select class="form-control select2 {{ $errors->has('tagihan') ? 'is-invalid' : '' }}" name="tagihan_id" id="tagihan_id" required>
-            @foreach($tagihans as $id => $entry)
-                <option value="{{ $id }}" {{ (old('tagihan_id') ? old('tagihan_id') : $pembayaran->tagihan->id ?? '') == $id ? 'selected' : (
-                    request('tagihan_id') == $id ? 'selected' : ''
-                ) }}>{{ $entry }}</option>
+            <option value="">Please Select</option>
+
+            @foreach($tagihans as $entry)
+                <option
+                    value="{{ $entry->id }}"
+                    data-total="{{ $entry->total }}"
+                    data-saldo="{{ $entry->saldo }}"
+                    data-selisih="{{ $entry->selisih }}"
+                    {{(
+                        old('tagihan_id') ? old('tagihan_id') : $pembayaran->tagihan->id ?? ''
+                    ) == $entry->id ? 'selected' : (
+                        request('tagihan_id') == $entry->id ? 'selected' : ''
+                    ) }}
+                >{{ $entry->order->no_order }}</option>
             @endforeach
         </select>
         @if($errors->has('tagihan'))
@@ -24,8 +34,39 @@
         @endif
         <span class="help-block">{{ trans('cruds.pembayaran.fields.tagihan_helper') }}</span>
     </div>
+
+    <div class="detail-tagihan mb-3" style="display: none; margin-top: -.5rem">
+        <p class="mb-0 font-weight-bold">Detail Order</p>
+
+        <div class="row">
+            <div class="col-auto">
+                <p class="mb-0">
+                    <small class="font-weight-bold">Total Tagihan</small>
+                    <br />
+                    <span class="tagihan-total"></span>
+                </p>
+            </div>
+
+            <div class="col-auto">
+                <p class="mb-0">
+                    <small class="font-weight-bold">Total Pembayaran</small>
+                    <br />
+                    <span class="tagihan-saldo"></span>
+                </p>
+            </div>
+
+            <div class="col-auto">
+                <p class="mb-0">
+                    <small class="font-weight-bold">Sisa Tagihan</small>
+                    <br />
+                    <span class="tagihan-selisih">x</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
     <div class="form-group">
-        <label class="required" for="nominal">{{ trans('cruds.pembayaran.fields.nominal') }}</label>
+        <label class="required" for="nominal">Nominal Bayar</label>
         <x-admin.form-group
             type="number"
             id="nominal"
@@ -123,12 +164,39 @@
 (function($) {
     $(function() {
         var form = $('#pembayaranForm');
+        var tagihan = form.find('[name="tagihan_id"]');
         var nominal = form.find('[name="nominal"]');
         var diskonTypes = form.find('[name="diskon_type"]');
         var diskonAmount = form.find('[name="diskon_amount"]');
         var diskon = form.find('[name="diskon"]');
         var bayar = form.find('[name="bayar"]');
         var bayarText = form.find('[name="bayar_text"]');
+
+        var tagihanDetail = form.find('.detail-tagihan');
+        var tagihanTotal = tagihanDetail.find('.tagihan-total');
+        var tagihanSaldo = tagihanDetail.find('.tagihan-saldo');
+        var tagihanSelisih = tagihanDetail.find('.tagihan-selisih');
+
+        tagihan.on('change', function(e) {
+            var selected = tagihan.find('option').filter(':selected');
+            var total = Math.abs(selected.data('total'));
+            var saldo = Math.abs(selected.data('saldo'));
+            var selisih = Math.abs(selected.data('selisih'));
+
+            if (!isNaN(total) && !isNaN(saldo) && !isNaN(selisih)) {
+                nominal.attr('max', selisih);
+                selisih < parseFloat(nominal.val()) && nominal.val(selisih).trigger('change');
+
+                tagihanDetail.show();
+                tagihanTotal.html(numeral(total).format('$0,0'));
+                tagihanSaldo.html(numeral(saldo).format('$0,0'));
+                tagihanSelisih.html(numeral(selisih).format('$0,0'));
+            } else {
+                tagihanDetail.hide();
+            }
+
+            console.log("ASDASD", total, saldo, selisih);
+        }).trigger('change');
 
         diskonTypes.on('change', function(e) {
             var el = $(e.currentTarget);
@@ -157,12 +225,15 @@
         });
 
         nominal.add(diskonAmount).on('change keyup blur', function(e) {
+            var max = Math.abs(nominal.attr('max'));
             var nominalVal = parseFloat(nominal.val()) || 0;
             var diskonVal = parseFloat(diskonAmount.val()) || 0;
             var diskonRp = diskonTypes.filter(':checked').val() !== 'percent' ? diskonVal : (nominalVal * diskonVal / 100);
             var value = nominalVal - diskonRp;
 
-            bayar.val(value);
+            value = (max && max < value) ? max : value;
+
+            bayar.add(nominal).val(value);
             bayarText.val(numeral(value).format('$0,0'));
             diskon.val(diskonRp);
         });

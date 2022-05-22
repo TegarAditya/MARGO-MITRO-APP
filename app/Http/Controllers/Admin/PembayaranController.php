@@ -34,11 +34,6 @@ class PembayaranController extends Controller
         $pembayarans = $tagihan->pembayarans;
 
         $tagihans = Tagihan::with('order')->get();
-        $tagihans = $tagihans->mapWithKeys(function($item) {
-            return [
-                $item->id => $item->order->no_order,
-            ];
-        })->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.pembayarans.create', compact('tagihans', 'pembayaran', 'pembayarans', 'tagihan'));
     }
@@ -88,11 +83,6 @@ class PembayaranController extends Controller
         $pembayarans = $tagihan->pembayarans;
 
         $tagihans = Tagihan::with('order')->get();
-        $tagihans = $tagihans->mapWithKeys(function($item) {
-            return [
-                $item->id => $item->order->no_order,
-            ];
-        })->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.pembayarans.edit', compact('tagihans', 'pembayaran', 'pembayarans', 'tagihan'));
     }
