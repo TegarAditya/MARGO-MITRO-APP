@@ -25,18 +25,17 @@ class PembayaranController extends Controller
         return view('admin.pembayarans.index', compact('pembayarans'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         abort_if(Gate::denies('pembayaran_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $tagihans = Tagihan::with('order')->get();
-        $tagihans = $tagihans->mapWithKeys(function($item) {
-            return [
-                $item->id => $item->order->no_order.' - Rp'.number_format($item->total),
-            ];
-        })->prepend(trans('global.pleaseSelect'), '');
+        $pembayaran = new Pembayaran();
+        $tagihan = !$request->tagihan_id ? new Tagihan : Tagihan::find($request->tagihan_id);
+        $pembayarans = $tagihan->pembayarans;
 
-        return view('admin.pembayarans.create', compact('tagihans'));
+        $tagihans = Tagihan::with('order')->get();
+
+        return view('admin.pembayarans.create', compact('tagihans', 'pembayaran', 'pembayarans', 'tagihan'));
     }
 
     public function store(StorePembayaranRequest $request)
@@ -54,10 +53,10 @@ class PembayaranController extends Controller
                 'tagihan_id' => $tagihan->id,
                 'reference' => $pembayaran->id,
                 'type' => 'pembayaran',
-                'nominal' => -1 * (float) $request->bayar,
+                'nominal' => (float) $request->bayar,
             ]);
             $tagihan->update([
-                'saldo' => $tagihan->saldo - (float) $request->nominal,
+                'saldo' => $tagihan->saldo + (float) $request->nominal,
             ]);
 
             DB::commit();
@@ -66,7 +65,7 @@ class PembayaranController extends Controller
                 return redirect($request->redirect);
             }
 
-            return redirect()->route('admin.pembayarans.index');
+            return redirect()->route('admin.pembayarans.edit', $pembayaran->id);
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -74,34 +73,72 @@ class PembayaranController extends Controller
         }
     }
 
-    public function edit(Pembayaran $pembayaran)
+    public function edit(Request $request, Pembayaran $pembayaran)
     {
         abort_if(Gate::denies('pembayaran_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $pembayaran->load(['tagihan', 'tagihan.pembayarans']);
+
+        $tagihan = $pembayaran->tagihan ?: new Tagihan;
+        $pembayarans = $tagihan->pembayarans;
+
         $tagihans = Tagihan::with('order')->get();
-        $tagihans = $tagihans->mapWithKeys(function($item) {
-            return [
-                $item->id => $item->order->no_order.' - Rp'.number_format($item->total),
-            ];
-        })->prepend(trans('global.pleaseSelect'), '');
 
-        $pembayaran->load('tagihan');
-
-        return view('admin.pembayarans.edit', compact('pembayaran', 'tagihans'));
+        return view('admin.pembayarans.edit', compact('tagihans', 'pembayaran', 'pembayarans', 'tagihan'));
     }
 
     public function update(UpdatePembayaranRequest $request, Pembayaran $pembayaran)
     {
-        $pembayaran->update($request->all());
+        $tagihan = Tagihan::findOrFail($request->tagihan_id);
 
-        return redirect()->route('admin.pembayarans.index');
+        DB::beginTransaction();
+        try {
+            $pembayaran->forceFill([
+                'order_id' => $tagihan->order_id,
+                'tagihan_id' => $tagihan->id,
+                'nominal' => $request->nominal,
+                'diskon' => $request->diskon ?: null,
+                'bayar' => $request->bayar,
+                'tanggal' => $request->tanggal,
+            ])->save();
+
+            $tagihan->tagihan_movements()->updateOrCreate([
+                'tagihan_id' => $tagihan->id,
+                'reference' => $pembayaran->id,
+                'type' => 'pembayaran',
+            ], [
+                'tagihan_id' => $tagihan->id,
+                'reference' => $pembayaran->id,
+                'type' => 'pembayaran',
+                'nominal' => (float) $request->bayar,
+            ]);
+            $tagihan->update([
+                'saldo' => $tagihan->tagihan_movements()->sum('nominal') ?: 0,
+            ]);
+
+            DB::commit();
+
+            if ($request->redirect) {
+                return redirect($request->redirect);
+            }
+
+            return redirect()->route('admin.pembayarans.edit', $pembayaran->id);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function show(Pembayaran $pembayaran)
     {
         abort_if(Gate::denies('pembayaran_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $pembayaran->load('tagihan');
+        $pembayaran->load(['tagihan', 'tagihan.pembayarans']);
+
+        if (request('print')) {
+            return view('admin.pembayarans.prints.kwitansi', compact('pembayaran'));
+        }
 
         return view('admin.pembayarans.show', compact('pembayaran'));
     }

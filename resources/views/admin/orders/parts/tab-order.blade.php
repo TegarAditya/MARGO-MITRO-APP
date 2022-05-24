@@ -1,5 +1,48 @@
 <div class="order-product pt-3">
-    <div class="product-action mb-4">
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label for="no_order">No. Order</label>
+                <input class="form-control h-auto py-1 {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $order->no_order) }}" readonly placeholder="(Otomatis)">
+                @if($errors->has('no_order'))
+                    <span class="text-danger">{{ $errors->first('no_order') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.order.fields.date_helper') }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label class="required" for="date">{{ trans('cruds.order.fields.date') }}</label>
+                <input class="form-control date h-auto py-1 {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $order->date) }}" required>
+                @if($errors->has('date'))
+                    <span class="text-danger">{{ $errors->first('date') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.order.fields.date_helper') }}</span>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-group">
+                <label class="required" for="salesperson_id">{{ trans('cruds.order.fields.salesperson') }}</label>
+                <select class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" required>
+                    @foreach($salespeople as $id => $entry)
+                        <option value="{{ $id }}" {{ (old('salesperson_id') ? old('salesperson_id') : $order->salesperson->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('salesperson'))
+                    <span class="text-danger">{{ $errors->first('salesperson') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.order.fields.salesperson_helper') }}</span>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-3" />
+
+    <div class="product-action mb-1 pt-2 pb-3">
         <div class="row align-items-end">
             <div class="col-4">
                 <div class="form-group m-0">
@@ -23,9 +66,6 @@
                             >{{ $entry->name }}</option>
                         @endforeach
                     </select>
-                    @if($errors->has('products'))
-                        <span class="text-danger">{{ $errors->first('products') }}</span>
-                    @endif
                 </div>
             </div>
 
@@ -33,6 +73,10 @@
                 <button type="button" class="btn py-1 border product-add">Tambah</button>
             </div>
         </div>
+
+        @if($errors->has('products'))
+            <span class="text-danger">{{ $errors->first('products') }}</span>
+        @endif
     </div>
 
     <h5>Produk Dipilih</h5>
@@ -53,7 +97,7 @@
                 <p class="mb-0">
                     <span class="text-sm">Grand Total</span>
                     <br />
-                    <strong class="product-total">Rp{{ number_format(data_get($order, 'tagihan.total', 0)) }}</strong>
+                    <strong class="product-total">@money(data_get($order, 'tagihan.total', 0))</strong>
                 </p>
             </div>
 
@@ -77,17 +121,23 @@
         <div class="col"></div>
 
         <div class="col-auto">
-            @if (!$order->id)
-                <button type="submit" class="btn btn-primary">Simpan Order</a>
-            @else
-                <a href="#order-2" class="btn btn-dark orderTabs-nav">Selanjutnya</a>
-            @endif
+            <button type="submit" class="btn {{ !$order->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
         </div>
     </div>
 </div>
 
 @push('styles')
 <style>
+.product-action {
+    position: sticky;
+    position: -webkit-sticky;
+    z-index: 10;
+    top: 0;
+    background-color: #fff;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+}
+
 .item-product {
     padding: .5rem 0;
     transition: 250ms ease-in-out;
@@ -168,9 +218,10 @@
             qty.on('change blur', function (e) {
                 var el = $(e.currentTarget);
                 var valueNum = parseInt(el.val());
-                var value = (isNaN(valueNum) || valueNum <= 0) ? 1 : (valueNum > qtyMax ? qtyMax : valueNum);
+                var value = (isNaN(valueNum) || valueNum <= 0) ? 1 : valueNum;
 
-                value = qtyMin > value ? qtyMin : value;
+                value = (qtyMax && value > qtyMax) ? qtyMax : value;
+                value = (qtyMin && qtyMin > value) ? qtyMin : value;
 
                 if (value !== valueNum) {
                     el.val(value);

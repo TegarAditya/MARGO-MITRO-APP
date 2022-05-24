@@ -36,6 +36,12 @@ class Pembayaran extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'nominal' => 'double',
+        'diskon' => 'double',
+        'bayar' => 'double',
+    ];
+
     public function tagihan()
     {
         return $this->belongsTo(Tagihan::class, 'tagihan_id');
