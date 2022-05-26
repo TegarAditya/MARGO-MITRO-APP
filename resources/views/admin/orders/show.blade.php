@@ -262,7 +262,27 @@
                         @forelse ($order->pembayarans as $pembayaran)
                             <tr>
                                 <td class="text-right px-3">{{ $loop->iteration }}.</td>
-                                <td>{{ $pembayaran->no_kwitansi }}</td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col">
+                                            <span>{{ $pembayaran->no_kwitansi }}</span>
+                                            <a href="{{ route('admin.pembayarans.show', [
+                                                'pembayaran' => $pembayaran->id,
+                                                'print' => 'on'
+                                            ]) }}" title="Cetak Pembayaran" target="_blank" class="text-info ml-1">
+                                                <i class="fa fa-print"></i>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-auto">
+                                            <a href="{{ route('admin.pembayarans.edit', [
+                                                'pembayaran' => $pembayaran->id,
+                                            ]) }}" title="Edit Pembayaran" class="text-info ml-1">
+                                                <i class="fa fa-edit"></i> Edit
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td>{{ $pembayaran->tanggal }}</td>
                                 <td class="text-right px-3">@money($pembayaran->nominal)</td>
                                 <td class="text-center px-3">
