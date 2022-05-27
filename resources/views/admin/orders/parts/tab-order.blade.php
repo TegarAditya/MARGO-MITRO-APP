@@ -220,7 +220,7 @@
                 var valueNum = parseInt(el.val());
                 var value = (isNaN(valueNum) || valueNum <= 0) ? 1 : valueNum;
 
-                value = (qtyMax && value > qtyMax) ? qtyMax : value;
+                // value = (qtyMax && value > qtyMax) ? qtyMax : value;
                 value = (qtyMin && qtyMin > value) ? qtyMin : value;
 
                 if (value !== valueNum) {
@@ -235,7 +235,7 @@
             product.find('.product-delete').on('click', function(e) {
                 product.remove();
                 calculatePrice();
-                
+
                 if (!products.children('.item-product').length) {
                     productEmpty.clone().appendTo(products);
                     productSummary.hide();
@@ -286,7 +286,7 @@
             product.find('.product-qty').val(1)
                 .attr('id', 'fieldQty-'+selected.data('id'))
                 .attr('name', 'products['+selected.data('id')+'][qty]')
-                .attr('max', selected.data('stock'))
+                // .attr('max', selected.data('stock'))
                 .attr('required', true);
             product.find('.product-price').val(selected.data('price'))
                 .attr('id', 'fieldPrice-'+selected.data('id'))
