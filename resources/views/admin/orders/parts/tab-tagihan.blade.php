@@ -1,6 +1,6 @@
 <div class="order-tagihan pt-3">
     <div class="row mb-4">
-        <div class="col-auto">
+        <div class="col-auto border-right pr-3 mr-2">
             <p class="mb-0">
                 <strong>Total Order</strong>
                 <br />
