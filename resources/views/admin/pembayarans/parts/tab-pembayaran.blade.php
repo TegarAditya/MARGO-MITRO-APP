@@ -194,8 +194,6 @@
             } else {
                 tagihanDetail.hide();
             }
-
-            console.log("ASDASD", total, saldo, selisih);
         }).trigger('change');
 
         diskonTypes.on('change', function(e) {
@@ -228,14 +226,25 @@
             var max = Math.abs(nominal.attr('max'));
             var nominalVal = parseFloat(nominal.val()) || 0;
             var diskonVal = parseFloat(diskonAmount.val()) || 0;
-            var diskonRp = diskonTypes.filter(':checked').val() !== 'percent' ? diskonVal : (nominalVal * diskonVal / 100);
+            var diskonType = diskonTypes.filter(':checked').val();
+            var diskonCalc = diskonType !== 'percent' ? (
+                diskonType !== 'value' ? 0 : diskonVal
+            ) : (nominalVal * diskonVal / 100);
+
+            nominalVal = (max && max < nominalVal) ? max : nominalVal;
+
+            var diskonRp = diskonCalc <= nominalVal ? diskonCalc : nominalVal;
+            diskonVal = diskonCalc <= nominalVal ? diskonVal : (
+                diskonType === 'percent' ? 100 : nominalVal
+            );
+
             var value = nominalVal - diskonRp;
 
-            value = (max && max < value) ? max : value;
-
-            bayar.add(nominal).val(value);
+            nominal.val(nominalVal);
+            bayar.val(value);
             bayarText.val(numeral(value).format('$0,0'));
             diskon.val(diskonRp);
+            diskonAmount.val(diskonVal);
         });
     });
 })(jQuery);

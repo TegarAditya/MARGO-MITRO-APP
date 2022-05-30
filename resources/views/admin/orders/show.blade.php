@@ -23,11 +23,20 @@
         <div class="model-detail mt-3">
             <h5>Order #{{ $order->no_order }}</h5>
 
+            <div class="breadcrumb-nav">
+                <ul class="m-0 border-bottom">
+                    <li><a href="#modelDetail" class="active">Detail Order</a></li>
+                    <li><a href="#modelProduct">Daftar Produk</a></li>
+                    <li><a href="#modelInvoice">Invoice &amp; Faktur</a></li>
+                    <li><a href="#modelTagihan">Pembayaran</a></li>
+                </ul>
+            </div>
+
             {{-- Detail Order --}}
-            <section class="mt-3" id="modelDetail">
+            <section class="py-3" id="modelDetail">
                 <h6>Detail Order</h6>
 
-                <table class="table table-sm border">
+                <table class="table table-sm border m-0">
                     <tbody>
                         <tr>
                             <th width="150">
@@ -58,10 +67,10 @@
             </section>
 
             {{-- Daftar Order --}}
-            <section class="mt-3" id="modelProduct">
+            <section class="border-top py-3" id="modelProduct">
                 <h6 class="mb-0">Daftar Produk</h6>
 
-                <p class="mb-2">Total pemesanan {{ $order->order_details->count() }} produk</p>
+                <p class="mb-2">Total pemesanan: {{ $order->order_details->count() }} produk</p>
 
                 @foreach ($order->order_details as $order_detail)
                     @php
@@ -122,17 +131,17 @@
                     </div>
                 @endforeach
 
-                <div class="border-top mt-2 pt-2 text-right">
+                <div class="border-top mt-2 pt-2 text-right ml-5">
                     <p class="m-0">Grand Total</p>
                     <h5 class="m-0">@money($order->tagihan->total)</h5>
                 </div>
             </section>
 
             {{-- Invoice --}}
-            <section class="mt-3" id="modelInvoice">
+            <section class="border-top py-3" id="modelInvoice">
                 <h6>Daftar Invoice &amp; Surat Jalan</h6>
 
-                <p class="mb-2">Total invoice {{ $order->invoices->count() }}</p>
+                <p class="mb-2">Total invoice: {{ $order->invoices->count() }}</p>
 
                 @foreach ($order->invoices as $invoice)
                     @php
@@ -201,9 +210,9 @@
                                         <tr>
                                             <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                             <td>{{ $product->name }}</td>
-                                            <td class="text-right px-3">@money($invoice_detail->price)</td>
-                                            <td class="text-center px-3">{{ $invoice_detail->quantity }}</td>
-                                            <td class="text-right px-3">@money($invoice_detail->total)</td>
+                                            <td class="text-right px-3">@money(abs($invoice_detail->price))</td>
+                                            <td class="text-center px-3">{{ abs($invoice_detail->quantity) }}</td>
+                                            <td class="text-right px-3">@money(abs($invoice_detail->total))</td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -216,7 +225,7 @@
                                     <tr>
                                         <td class="text-right px-3" colspan="4">Total</td>
                                         <td class="text-right px-3">
-                                            <strong>@money($invoice->nominal)</strong>
+                                            <strong>@money(abs($invoice->nominal))</strong>
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -225,18 +234,168 @@
                     </div>
                 @endforeach
 
-                <div class="border-top mt-2 pt-2 text-right">
+                <div class="border-top mt-2 pt-2 text-right ml-5">
                     <p class="m-0">Total Invoice</p>
                     <h5 class="m-0">@money($order->invoices->sum('nominal'))</h5>
                 </div>
             </section>
 
-            {{-- Pembayaran --}}
-            <section class="mt-3" id="modelPembayaran">
-                <h6>Daftar Pembayaran</h6>
+            {{-- Tagihan & Pembayaran --}}
+            <section class="border-top py-3" id="modelTagihan">
+                <h6>Tagihan &amp; Pembayaran</h6>
 
+                <p class="mb-2">Total pembayaran: {{ $order->pembayarans->count() }}</p>
+
+                <table class="table table-bordered table-hover m-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center" width="1%">No.</th>
+                            <th>No. Kwitansi</th>
+                            <th class="text-center px-3" width="100">Tanggal</th>
+                            <th class="text-center px-3" width="1%">Nominal</th>
+                            <th class="text-center px-3" width="1%">Diskon</th>
+                            <th class="text-center px-3" width="1%">Bayar</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse ($order->pembayarans as $pembayaran)
+                            <tr>
+                                <td class="text-right px-3">{{ $loop->iteration }}.</td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col">
+                                            <span>{{ $pembayaran->no_kwitansi }}</span>
+                                            <a href="{{ route('admin.pembayarans.show', [
+                                                'pembayaran' => $pembayaran->id,
+                                                'print' => 'on'
+                                            ]) }}" title="Cetak Pembayaran" target="_blank" class="text-info ml-1">
+                                                <i class="fa fa-print"></i>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-auto">
+                                            <a href="{{ route('admin.pembayarans.edit', [
+                                                'pembayaran' => $pembayaran->id,
+                                            ]) }}" title="Edit Pembayaran" class="text-info ml-1">
+                                                <i class="fa fa-edit"></i> Edit
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ $pembayaran->tanggal }}</td>
+                                <td class="text-right px-3">@money($pembayaran->nominal)</td>
+                                <td class="text-center px-3">
+                                    @if (!$pembayaran->diskon)
+                                        <span>-</span>
+                                    @else
+                                        <span>@money($pembayaran->diskon)</span>
+                                    @endif
+                                </td>
+                                <td class="text-right px-3">@money($pembayaran->bayar)</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td class="px-3" colspan="5">Belum ada pembayaran</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+
+                    <tfoot>
+                        <tr>
+                            <td class="text-right px-3" colspan="3">
+                                <strong>Total</strong>
+                            </td>
+                            <td class="text-right px-3">
+                                <strong>@money($order->pembayarans->sum('nominal'))</strong>
+                            </td>
+                            <td class="text-right px-3">
+                                <strong>@money($order->pembayarans->sum('diskon'))</strong>
+                            </td>
+                            <td class="text-right px-3">
+                                <strong>@money($order->pembayarans->sum('bayar'))</strong>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+
+                <div class="border-top mt-2 pt-2 text-right ml-5">
+                    <div class="row justify-content-end">
+                        <div class="col-auto">
+                            <p class="mb-0">
+                                <span>Total Tagihan</span>
+                                <br />
+                                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.total', 0))</span>
+                            </p>
+                        </div>
+
+                        <div class="col-auto">
+                            <p class="mb-0">
+                                <span>Total Pembayaran</span>
+                                <br />
+                                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.saldo', 0))</span>
+                            </p>
+                        </div>
+
+                        <div class="col-auto">
+                            <p class="mb-0">
+                                <span>Sisa Tagihan</span>
+                                <br />
+                                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.selisih', 0))</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </section>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function($) {
+    $(function() {
+        var detail = $('.model-detail');
+        var nav = $('.breadcrumb-nav');
+        var navHi = nav.height();
+        var sections = detail.children('section');
+        var tops = sections.map(function (index, item) {
+            return $(item).offset().top;
+        });
+
+        $(window).on('scroll', function(e) {
+            var scroll = e.currentTarget.scrollY + navHi;
+            var section;
+
+            tops.map(function(index, item) {
+                if (scroll >= item) {
+                    section = sections.eq(index);
+                }
+            });
+
+            if (section) {
+                var id = section.attr('id');
+                var navLink = nav.find('a[href="#'+id+'"]');
+
+                nav.find('a').removeClass('active');
+                navLink.length && navLink.addClass('active');
+            }
+        });
+
+        nav.find('a').on('click', function(e) {
+            e.preventDefault();
+
+            var el = $(e.currentTarget);
+            var href = el.attr('href');
+            var target = $(href);
+
+            target.length && $('html, body').animate({
+                scrollTop: target.offset().top - nav.height()
+            }, 500, 'linear');
+        });
+    });
+})(jQuery);
+</script>
+@endpush
