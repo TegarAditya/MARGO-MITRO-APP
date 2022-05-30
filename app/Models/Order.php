@@ -85,4 +85,13 @@ class Order extends Model
 
         return $code;
     }
+
+    public function getSisaTagihanAttribute()
+    {
+        if ($this->relationLoaded('pembayarans') && $this->relationLoaded('invoices')) {
+            return $this->invoices->sum('nominal') - $this->pembayarans->sum('nominal');
+        }
+
+        return $this->invoices()->sum('nominal') - $this->pembayarans()->sum('nominal');
+    }
 }

@@ -139,9 +139,17 @@
 
             {{-- Invoice --}}
             <section class="border-top py-3" id="modelInvoice">
-                <h6>Daftar Invoice &amp; Surat Jalan</h6>
+                <div class="row mb-2">
+                    <div class="col">
+                        <h6>Daftar Invoice &amp; Surat Jalan</h6>
 
-                <p class="mb-2">Total invoice: {{ $order->invoices->count() }}</p>
+                        <p class="mb-0">Total invoice: {{ $order->invoices->count() }}</p>
+                    </div>
+
+                    <div class="col-auto">
+                        <a href="{{ route('admin.invoices.create', ['order_id'=>$order->id]) }}" class="btn btn-sm btn-success">Tambah Invoice</a>
+                    </div>
+                </div>
 
                 @foreach ($order->invoices as $invoice)
                     @php
@@ -242,9 +250,17 @@
 
             {{-- Tagihan & Pembayaran --}}
             <section class="border-top py-3" id="modelTagihan">
-                <h6>Tagihan &amp; Pembayaran</h6>
+                <div class="row mb-2">
+                    <div class="col">
+                        <h6>Tagihan &amp; Pembayaran</h6>
 
-                <p class="mb-2">Total pembayaran: {{ $order->pembayarans->count() }}</p>
+                        <p class="mb-0">Total pembayaran: {{ $order->pembayarans->count() }}</p>
+                    </div>
+
+                    <div class="col-auto">
+                        <a href="{{ route('admin.pembayarans.create', ['order_id'=>$order->id,'tagihan_id'=>$order->tagihan->id]) }}" class="btn btn-sm btn-success">Tambah Pembayaran</a>
+                    </div>
+                </div>
 
                 <table class="table table-bordered table-hover m-0">
                     <thead>
@@ -319,32 +335,43 @@
                     </tfoot>
                 </table>
 
+                <hr class="my-2 text-right ml-5 mx-0" />
+                
+                <div class="row text-right">
+                    <div class="col text-left">
+                        <h6 class="m-0">Detail Tagihan</h6>
+                    </div>
 
-                <div class="border-top mt-2 pt-2 text-right ml-5">
-                    <div class="row justify-content-end">
-                        <div class="col-auto">
-                            <p class="mb-0">
-                                <span>Total Tagihan</span>
-                                <br />
-                                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.total', 0))</span>
-                            </p>
-                        </div>
+                    <div class="col-auto">
+                        <p class="mb-0">
+                            <span>Total Order</span>
+                            <br />
+                            <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.total', 0))</span>
+                        </p>
+                    </div>
 
-                        <div class="col-auto">
-                            <p class="mb-0">
-                                <span>Total Pembayaran</span>
-                                <br />
-                                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.saldo', 0))</span>
-                            </p>
-                        </div>
+                    <div class="col-auto">
+                        <p class="mb-0">
+                            <span>Total Tagihan</span>
+                            <br />
+                            <span class="h5 mb-0 tagihan-total">@money($order->invoices->sum('nominal'))</span>
+                        </p>
+                    </div>
 
-                        <div class="col-auto">
-                            <p class="mb-0">
-                                <span>Sisa Tagihan</span>
-                                <br />
-                                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.selisih', 0))</span>
-                            </p>
-                        </div>
+                    <div class="col-auto">
+                        <p class="mb-0">
+                            <span>Total Pembayaran</span>
+                            <br />
+                            <span class="h5 mb-0 tagihan-total">@money($order->pembayarans->sum('nominal'))</span>
+                        </p>
+                    </div>
+
+                    <div class="col-auto">
+                        <p class="mb-0">
+                            <span>Sisa Tagihan</span>
+                            <br />
+                            <span class="h5 mb-0 tagihan-total">@money($order->sisa_tagihan)</span>
+                        </p>
                     </div>
                 </div>
             </section>
@@ -357,6 +384,7 @@
 <script>
 (function($) {
     $(function() {
+        var maxScroll = $(document).height() - $(window).height();
         var detail = $('.model-detail');
         var nav = $('.breadcrumb-nav');
         var navHi = nav.height();
@@ -374,6 +402,10 @@
                     section = sections.eq(index);
                 }
             });
+
+            if (scroll >= maxScroll) {
+                section = sections.eq(tops.length - 1);
+            }
 
             if (section) {
                 var id = section.attr('id');

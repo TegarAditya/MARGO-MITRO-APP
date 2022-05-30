@@ -42,6 +42,11 @@ class Pembayaran extends Model
         'bayar' => 'double',
     ];
 
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
     public function tagihan()
     {
         return $this->belongsTo(Tagihan::class, 'tagihan_id');
