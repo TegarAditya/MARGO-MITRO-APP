@@ -1,28 +1,38 @@
 <div class="order-pembayaran pt-3">
     <div class="row mb-4">
-        <div class="col-auto">
+        <div class="col-auto border-right pr-3 mr-2">
             <p class="mb-0">
-                <strong>Total Tagihan</strong>
+                <strong>Total Order</strong>
                 <br />
                 <span class="h5 mb-0 tagihan-total">@money($tagihan->total)</span>
             </p>
         </div>
 
-        <div class="col-auto">
-            <p class="mb-0">
-                <strong>Total Pembayaran</strong>
-                <br />
-                <span class="h5 mb-0 tagihan-total">@money($tagihan->saldo)</span>
-            </p>
-        </div>
+        @if ($order)
+            <div class="col-auto">
+                <p class="mb-0">
+                    <strong>Total Tagihan</strong>
+                    <br />
+                    <span class="h5 mb-0 tagihan-total">@money($order->invoices->sum('nominal'))</span>
+                </p>
+            </div>
 
-        <div class="col-auto">
-            <p class="mb-0">
-                <strong>Sisa Tagihan</strong>
-                <br />
-                <span class="h5 mb-0 tagihan-total">@money($tagihan->selisih)</span>
-            </p>
-        </div>
+            <div class="col-auto">
+                <p class="mb-0">
+                    <strong>Total Pembayaran</strong>
+                    <br />
+                    <span class="h5 mb-0 tagihan-total">@money($order->pembayarans->sum('nominal'))</span>
+                </p>
+            </div>
+
+            <div class="col-auto">
+                <p class="mb-0">
+                    <strong>Sisa Tagihan</strong>
+                    <br />
+                    <span class="h5 mb-0 tagihan-total">@money($order->sisa_tagihan)</span>
+                </p>
+            </div>
+        @endif
     </div>
 
     <div class="row align-items-center mb-2">
@@ -31,7 +41,7 @@
         </div>
 
         <div class="col-auto">
-            <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success{{ $tagihan->selisih <= 0 ? ' disabled' : '' }}">Tambah Pembayaran</a>
+            <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success{{ data_get($order, 'sisa_tagihan', 0) <= 0 ? ' disabled' : '' }}">Tambah Pembayaran</a>
         </div>
     </div>
 
@@ -44,7 +54,6 @@
                 <th class="text-center" width="1%">Nominal</th>
                 <th class="text-center" width="1%">Diskon</th>
                 <th class="text-center" width="1%">Bayar</th>
-                <th class="text-center" width="1%"></th>
             </tr>
         </thead>
 
@@ -54,6 +63,13 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>
                         <a href="{{ route('admin.pembayarans.edit', $row->id) }}">{{ $row->no_kwitansi }}</a>
+
+                        <a href="{{ route('admin.pembayarans.show', [
+                            'pembayaran' => $row->id,
+                            'print' => 'on'
+                        ]) }}" target="_blank" title="Cetak Kwitansi" class="ml-1">
+                            <i class="fa fa-print text-dark"></i>
+                        </a>
                     </td>
                     <td>{{ $row->tanggal }}</td>
                     <td class="text-right">@money($row->nominal)</td>
@@ -65,33 +81,47 @@
                         @endif
                     </td>
                     <td class="text-right">@money($row->bayar)</td>
-                    <td class="text-center px-3">
-                        <a href="{{ route('admin.pembayarans.show', [
-                            'pembayaran' => $row->id,
-                            'print' => 'on'
-                        ]) }}" target="_blank">
-                            <i class="fa fa-print text-dark"></i>
-                        </a>
-                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center">
+                    <td colspan="6" class="text-center">
                         <p class="mb-0">Belum ada riwayat pembayaran</p>
                     </td>
                 </tr>
             @endforelse
         </tbody>
 
-        @if ($pembayarans->count() && $tagihan)
+        @if ($pembayarans->count() && $tagihan && $order)
             <tfoot>
-                <td colspan="5" class="text-right">
-                    <strong>Sisa Tagihan</strong>
-                </td>
+                <tr>
+                    <td colspan="5" class="text-right">
+                        <strong>Total</strong>
+                    </td>
 
-                <td class="text-right">
-                    @money($tagihan->selisih)
-                </td>
+                    <td class="text-right">
+                        @money($order->pembayarans->sum('nominal'))
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="5" class="text-right py-2">
+                        <strong>Total Tagihan</strong>
+                    </td>
+
+                    <td class="text-right py-2">
+                        @money($order->invoices->sum('nominal'))
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="5" class="text-right py-2">
+                        <strong>Sisa Tagihan</strong>
+                    </td>
+
+                    <td class="text-right py-2">
+                        @money($order->sisa_tagihan)
+                    </td>
+                </tr>
             </tfoot>
         @endif
     </table>

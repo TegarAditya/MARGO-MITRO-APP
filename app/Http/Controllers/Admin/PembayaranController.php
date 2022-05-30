@@ -32,10 +32,15 @@ class PembayaranController extends Controller
         $pembayaran = new Pembayaran();
         $tagihan = !$request->tagihan_id ? new Tagihan : Tagihan::find($request->tagihan_id);
         $pembayarans = $tagihan->pembayarans;
+        $order = $tagihan->order;
 
-        $tagihans = Tagihan::with('order')->get();
+        if ($order) {
+            $order->load('invoices', 'pembayarans');
+        }
 
-        return view('admin.pembayarans.create', compact('tagihans', 'pembayaran', 'pembayarans', 'tagihan'));
+        $tagihans = Tagihan::with('order', 'order.invoices', 'order.pembayarans')->get();
+
+        return view('admin.pembayarans.create', compact('tagihans', 'pembayaran', 'pembayarans', 'tagihan', 'order'));
     }
 
     public function store(StorePembayaranRequest $request)
@@ -81,10 +86,15 @@ class PembayaranController extends Controller
 
         $tagihan = $pembayaran->tagihan ?: new Tagihan;
         $pembayarans = $tagihan->pembayarans;
+        $order = $tagihan->order;
+
+        if ($order) {
+            $order->load('invoices', 'pembayarans');
+        }
 
         $tagihans = Tagihan::with('order')->get();
 
-        return view('admin.pembayarans.edit', compact('tagihans', 'pembayaran', 'pembayarans', 'tagihan'));
+        return view('admin.pembayarans.edit', compact('tagihans', 'pembayaran', 'pembayarans', 'tagihan', 'order'));
     }
 
     public function update(UpdatePembayaranRequest $request, Pembayaran $pembayaran)
@@ -134,7 +144,7 @@ class PembayaranController extends Controller
     {
         abort_if(Gate::denies('pembayaran_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $pembayaran->load(['tagihan', 'tagihan.pembayarans']);
+        $pembayaran->load(['tagihan', 'tagihan.pembayarans', 'order', 'order.pembayarans', 'order.invoices']);
 
         if (request('print')) {
             return view('admin.pembayarans.prints.kwitansi', compact('pembayaran'));

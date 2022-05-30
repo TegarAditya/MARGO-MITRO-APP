@@ -16,11 +16,16 @@
             <option value="">Please Select</option>
 
             @foreach($tagihans as $entry)
+                @php
+                $order = $entry->order;
+
+                if (!$order) { continue; }
+                @endphp
                 <option
                     value="{{ $entry->id }}"
-                    data-total="{{ $entry->total }}"
-                    data-saldo="{{ $entry->saldo }}"
-                    data-selisih="{{ $entry->selisih }}"
+                    data-total="{{ $order->invoices->sum('nominal') }}"
+                    data-saldo="{{ $order->pembayarans->sum('nominal') }}"
+                    data-sisa="{{ $order->sisa_tagihan }}"
                     {{(
                         old('tagihan_id') ? old('tagihan_id') : $pembayaran->tagihan->id ?? ''
                     ) == $entry->id ? 'selected' : (
@@ -59,7 +64,7 @@
                 <p class="mb-0">
                     <small class="font-weight-bold">Sisa Tagihan</small>
                     <br />
-                    <span class="tagihan-selisih">x</span>
+                    <span class="tagihan-sisa">x</span>
                 </p>
             </div>
         </div>
@@ -175,22 +180,22 @@
         var tagihanDetail = form.find('.detail-tagihan');
         var tagihanTotal = tagihanDetail.find('.tagihan-total');
         var tagihanSaldo = tagihanDetail.find('.tagihan-saldo');
-        var tagihanSelisih = tagihanDetail.find('.tagihan-selisih');
+        var tagihanSisa = tagihanDetail.find('.tagihan-sisa');
 
         tagihan.on('change', function(e) {
             var selected = tagihan.find('option').filter(':selected');
             var total = Math.abs(selected.data('total'));
             var saldo = Math.abs(selected.data('saldo'));
-            var selisih = Math.abs(selected.data('selisih'));
+            var sisa = Math.abs(selected.data('sisa'));
 
-            if (!isNaN(total) && !isNaN(saldo) && !isNaN(selisih)) {
-                nominal.attr('max', selisih);
-                selisih < parseFloat(nominal.val()) && nominal.val(selisih).trigger('change');
+            if (!isNaN(total) && !isNaN(saldo) && !isNaN(sisa)) {
+                nominal.attr('max', sisa);
+                sisa < parseFloat(nominal.val()) && nominal.val(sisa).trigger('change');
 
                 tagihanDetail.show();
                 tagihanTotal.html(numeral(total).format('$0,0'));
                 tagihanSaldo.html(numeral(saldo).format('$0,0'));
-                tagihanSelisih.html(numeral(selisih).format('$0,0'));
+                tagihanSisa.html(numeral(sisa).format('$0,0'));
             } else {
                 tagihanDetail.hide();
             }
@@ -205,6 +210,7 @@
 
             $('.diskon-prefix').html(prefix || '');
             $('.diskon-nominal')[!value ? 'hide' : 'show']();
+            diskonAmount.attr('min', !value ? null : 1);
 
             if ('percent' === value && diskonVal > 100) {
                 diskonAmount.val(Math.round(diskonVal * 100 / nominalVal));

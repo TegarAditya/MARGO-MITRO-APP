@@ -108,31 +108,31 @@ function terbilang($nilai) {
 
 <div class="row">
     <div class="col align-self-end">
-        @if ($tagihan = $pembayaran->tagihan)
+        @if ($order = $pembayaran->order)
             <table cellpadding="0" cellspacing="0" style="width: 360px">
                 <tbody>
                     <tr>
                         <td width="150">Total Tagihan</td>
                         <td width="12">:</td>
-                        <td>@money($tagihan->total)</td>
+                        <td>@money($order->invoices->sum('nominal'))</td>
                     </tr>
             
                     <tr>
                         <td width="120">Total Pembayaran</td>
                         <td width="8">:</td>
-                        <td>@money($tagihan->saldo)</td>
+                        <td>@money($order->pembayarans->sum('nominal'))</td>
                     </tr>
 
                     <tr>
                         <td width="120">Sisa Tagihan</td>
                         <td width="8">:</td>
-                        <td>@money($tagihan->selisih)</td>
+                        <td>@money($order->sisa_tagihan)</td>
                     </tr>
 
                     <tr class="mt-3">
                         <td class="pt-2" width="120">Status</td>
                         <td class="pt-2" width="8">:</td>
-                        <td class="pt-2">{{ !$tagihan->selisih ? 'Lunas' : 'Belum Lunas' }}</td>
+                        <td class="pt-2">{{ !$order->sisa_tagihan ? 'Lunas' : 'Belum Lunas' }}</td>
                     </tr>
                 </tbody>
             </table>
