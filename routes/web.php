@@ -101,6 +101,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('pembayarans/destroy', 'PembayaranController@massDestroy')->name('pembayarans.massDestroy');
     Route::resource('pembayarans', 'PembayaranController');
 
+    // Laporan
+    Route::get('report/invoices', 'ReportController@invoices')->name('report.invoices');
+    Route::post('report/invoices', 'ReportController@invoices');
+
     // Stock Opname
     Route::delete('stock-opnames/destroy', 'StockOpnameController@massDestroy')->name('stock-opnames.massDestroy');
     Route::resource('stock-opnames', 'StockOpnameController');

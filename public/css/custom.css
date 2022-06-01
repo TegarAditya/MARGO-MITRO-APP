@@ -96,6 +96,14 @@ table.dataTable thead .sorting_desc {
     display: block;
 }
 
+.form-control {
+    font-size: 1em;
+}
+
+.text-sm {
+    font-size: .875em !important;
+}
+
 .dataTables_length label select {
     width: 65px!important;
 }
