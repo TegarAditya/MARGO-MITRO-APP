@@ -72,7 +72,7 @@
                             </x-slot>
 
                             <x-slot name="right">
-                                <button type="button" class="btn btn-sm border-0 btn-default px-2 date-clear" data-action="+">
+                                <button type="button" class="btn btn-sm border-0 btn-default px-2 date-clear" data-action="+" style="display:{{ !request('date', old('date')) ? 'none' : 'block' }}">
                                     <i class="fa fa-times"></i>
                                 </button>
                             </x-slot>
