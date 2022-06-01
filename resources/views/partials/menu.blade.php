@@ -428,6 +428,29 @@
                         </ul>
                     </li>
                 @endcan
+                @can('sales_order_access')
+                    <li class="nav-item has-treeview {{ request()->is("admin/report*") ? "menu-open" : "" }} {{ request()->is("admin/report-details*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
+                            <i class="fa-fw nav-icon fas fa-file"></i>
+                            <p>
+                                Laporan
+                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route("admin.report.invoices") }}" class="nav-link {{ request()->is("admin/report-invoices") || request()->is("admin/report-invoices/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-print">
+
+                                    </i>
+                                    <p>
+                                        History Pengiriman
+                                    </p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
                 <li class="nav-item">
                     <a href="{{ route("admin.systemCalendar") }}" class="nav-link {{ request()->is("admin/system-calendar") || request()->is("admin/system-calendar/*") ? "active" : "" }}">
                         <i class="fas fa-fw fa-calendar nav-icon">

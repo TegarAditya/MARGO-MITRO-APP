@@ -67,7 +67,9 @@
                                     </div>
                                 </td>
                                 <td rowspan="{{ $rowspan }}">{{ $row->date }}</td>
-                                <td rowspan="{{ $rowspan }}">{{ $is_out ? 'Keluar' : 'Masuk' }}</td>
+                                <td rowspan="{{ $rowspan }}" class="{{ $is_out ? 'text-warning' : 'text-info' }}">
+                                    {{ $is_out ? 'Keluar' : 'Masuk' }}
+                                </td>
                             @endif
 
                             <td>
