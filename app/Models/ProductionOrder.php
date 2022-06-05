@@ -27,17 +27,30 @@ class ProductionOrder extends Model
     protected $fillable = [
         'po_number',
         'no_spk',
+        'no_kwitansi',
         'productionperson_id',
         'date',
+        'total',
+        'bayar',
         'created_by_id',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
 
+    protected $casts = [
+        'total' => 'double',
+        'bayar' => 'double',
+    ];
+
     public function productionperson()
     {
         return $this->belongsTo(Productionperson::class, 'productionperson_id');
+    }
+
+    public function production_order_details()
+    {
+        return $this->hasMany(ProductionOrderDetail::class);
     }
 
     public function getDateAttribute($value)

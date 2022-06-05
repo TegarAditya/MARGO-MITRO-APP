@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroyProductionOrderRequest;
 use App\Http\Requests\StoreProductionOrderRequest;
 use App\Http\Requests\UpdateProductionOrderRequest;
+use App\Models\Product;
 use App\Models\ProductionOrder;
 use App\Models\Productionperson;
 use Gate;
@@ -71,8 +72,9 @@ class ProductionOrderController extends Controller
         abort_if(Gate::denies('production_order_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $productionpeople = Productionperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $products = Product::with(['media', 'category'])->get();
 
-        return view('admin.productionOrders.create', compact('productionpeople'));
+        return view('admin.productionOrders.create', compact('productionpeople', 'products'));
     }
 
     public function store(StoreProductionOrderRequest $request)
