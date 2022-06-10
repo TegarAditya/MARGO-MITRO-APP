@@ -32,6 +32,11 @@ class ProductionOrderDetail extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'ongkos_satuan' => 'double',
+        'ongkos_total' => 'double',
+    ];
+
     public function production_order()
     {
         return $this->belongsTo(ProductionOrder::class, 'production_order_id');

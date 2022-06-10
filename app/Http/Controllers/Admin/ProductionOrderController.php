@@ -7,11 +7,14 @@ use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroyProductionOrderRequest;
 use App\Http\Requests\StoreProductionOrderRequest;
 use App\Http\Requests\UpdateProductionOrderRequest;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductionOrder;
+use App\Models\ProductionOrderDetail;
 use App\Models\Productionperson;
 use Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -71,35 +74,138 @@ class ProductionOrderController extends Controller
     {
         abort_if(Gate::denies('production_order_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $productionpeople = Productionperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $productionpeople = Productionperson::get();
+
+        $categories = Category::whereIn('slug', ['buku', 'bahan'])->get();
         $products = Product::with(['media', 'category'])->get();
 
-        return view('admin.productionOrders.create', compact('productionpeople', 'products'));
+        return view('admin.productionOrders.create', compact('productionpeople', 'products', 'categories'));
     }
 
     public function store(StoreProductionOrderRequest $request)
     {
-        $productionOrder = ProductionOrder::create($request->all());
+        $request->validate([
+            'date' => 'required|date',
+            'type' => 'required|string',
+            'productionperson_id' => 'required|exists:productionpeople,id',
+            'products' => 'required|array|min:1',
+            // 'bahans' => 'required|array|min:1',
+        ]);
 
-        return redirect()->route('admin.production-orders.index');
+        $user = $request->user();
+
+        DB::beginTransaction();
+        try {
+            $productionOrder = new ProductionOrder();
+            
+            $productionOrder->forceFill([
+                'productionperson_id' => $request->productionperson_id,
+                'date' => $request->date,
+                'total' => $request->total ?: 0,
+                'type' => $request->type,
+                'po_number' => ProductionOrder::generateNoPO(),
+                'no_spk' => ProductionOrder::generateNoSPK(),
+                'no_kwitansi' => ProductionOrder::generateNoKwitansi(),
+                'created_by_id' => $user->id,
+            ])->save();
+
+            $order_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($productionOrder, $request) {
+                $qty = (int) $request->products[$item->id]['qty'] ?: 0;
+                $prod = (int) $request->products[$item->id]['prod'] ?: 0;
+                $price = (float) $request->products[$item->id]['price'] ?: 0;
+
+                return [
+                    'product_id' => $item->id,
+                    'production_order_id' => $productionOrder->id,
+                    'order_qty' => $qty,
+                    'prod_qty' => $prod,
+                    'ongkos_satuan' => $price,
+                    'ongkos_total' => $price * $qty,
+                ];
+            });
+
+            $productionOrder->production_order_details()->createMany($order_details->all());
+
+            DB::commit();
+
+            return redirect()->route('admin.production-orders.edit', $productionOrder->id);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function edit(ProductionOrder $productionOrder)
     {
         abort_if(Gate::denies('production_order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $productionpeople = Productionperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $productionOrder->load('productionperson', 'created_by', 'production_order_details');
 
-        $productionOrder->load('productionperson', 'created_by');
+        $productionpeople = Productionperson::get();
 
-        return view('admin.productionOrders.edit', compact('productionOrder', 'productionpeople'));
+        $categories = Category::whereIn('slug', ['buku', 'bahan'])->get();
+        $products = Product::with(['media', 'category'])->get();
+
+        return view('admin.productionOrders.edit', compact('productionOrder', 'productionpeople', 'products', 'categories'));
     }
 
     public function update(UpdateProductionOrderRequest $request, ProductionOrder $productionOrder)
     {
-        $productionOrder->update($request->all());
+        $request->validate([
+            'date' => 'required|date',
+            'type' => 'required|string',
+            'productionperson_id' => 'required|exists:productionpeople,id',
+            'products' => 'required|array|min:1',
+            // 'bahans' => 'required|array|min:1',
+        ]);
 
-        return redirect()->route('admin.production-orders.index');
+        $user = $request->user();
+
+        DB::beginTransaction();
+        try {
+            $productionOrder->forceFill([
+                'productionperson_id' => $request->productionperson_id,
+                'date' => $request->date,
+                'total' => $request->total ?: 0,
+                'type' => $request->type,
+                'created_by_id' => $user->id,
+            ])->save();
+
+            $order_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($productionOrder, $request) {
+                $qty = (int) $request->products[$item->id]['qty'] ?: 0;
+                $prod = (int) $request->products[$item->id]['prod'] ?: 0;
+                $price = (float) $request->products[$item->id]['price'] ?: 0;
+
+                return [
+                    'product_id' => $item->id,
+                    'production_order_id' => $productionOrder->id,
+                    'order_qty' => $qty,
+                    'prod_qty' => $prod,
+                    'ongkos_satuan' => $price,
+                    'ongkos_total' => $price * $qty,
+                ];
+            });
+
+            foreach ($order_details as $order_detail) {
+                $exists = $productionOrder->production_order_details()->where('product_id', $order_detail['product_id'])->first() ?: new ProductionOrderDetail();
+
+                $exists->forceFill($order_detail)->save();
+            }
+
+            // Delete items if removed
+            $productionOrder->production_order_details()
+                ->whereNotIn('product_id', $order_details->pluck('product_id'))
+                ->forceDelete();
+
+            DB::commit();
+
+            return redirect()->route('admin.production-orders.edit', $productionOrder->id);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function show(ProductionOrder $productionOrder)
