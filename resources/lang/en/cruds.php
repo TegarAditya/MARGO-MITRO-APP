@@ -222,8 +222,8 @@ return [
         ],
     ],
     'salesperson' => [
-        'title'          => 'Sales Person',
-        'title_singular' => 'Sales Person',
+        'title'          => 'Salesman',
+        'title_singular' => 'Salesman',
         'fields'         => [
             'id'                    => 'ID',
             'id_helper'             => ' ',
@@ -241,6 +241,12 @@ return [
             'area_pemasaran_helper' => ' ',
             'foto'                  => 'Foto',
             'foto_helper'           => ' ',
+            'telephone'             => 'Telepon',
+            'telephone_helper'      => ' ',
+            'company'               => 'Payung Hukum',
+            'company_helper'        => ' ',
+            'alamat'                => 'Alamat',
+            'alamat_helper'         => ' ',
         ],
     ],
     'order' => [
@@ -474,8 +480,8 @@ return [
         'title_singular' => 'Pembayaran',
     ],
     'productionperson' => [
-        'title'          => 'Production Person',
-        'title_singular' => 'Production Person',
+        'title'          => 'Produsen',
+        'title_singular' => 'Produsen',
         'fields'         => [
             'id'                => 'ID',
             'id_helper'         => ' ',
@@ -485,7 +491,7 @@ return [
             'name_helper'       => ' ',
             'type'              => 'Type',
             'type_helper'       => ' ',
-            'contact'           => 'Contact',
+            'contact'           => 'Telepon',
             'contact_helper'    => ' ',
             'created_at'        => 'Created at',
             'created_at_helper' => ' ',
@@ -493,6 +499,10 @@ return [
             'updated_at_helper' => ' ',
             'deleted_at'        => 'Deleted at',
             'deleted_at_helper' => ' ',
+            'alamat'            => 'Alamat',
+            'alamat_helper'     => ' ',
+            'company'           => 'Payung Hukum',
+            'company_helper'    => ' ',
         ],
     ],
     'productionOrder' => [

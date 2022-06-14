@@ -40,6 +40,22 @@
                 <span class="help-block">{{ trans('cruds.productionperson.fields.contact_helper') }}</span>
             </div>
             <div class="form-group">
+                <label for="alamat">{{ trans('cruds.productionperson.fields.alamat') }}</label>
+                <textarea class="form-control {{ $errors->has('alamat') ? 'is-invalid' : '' }}" name="alamat" id="alamat">{{ old('alamat', $productionperson->alamat) }}</textarea>
+                @if($errors->has('alamat'))
+                    <span class="text-danger">{{ $errors->first('alamat') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.productionperson.fields.alamat_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label for="company">{{ trans('cruds.productionperson.fields.company') }}</label>
+                <input class="form-control {{ $errors->has('company') ? 'is-invalid' : '' }}" type="text" name="company" id="company" value="{{ old('company', $productionperson->company) }}">
+                @if($errors->has('company'))
+                    <span class="text-danger">{{ $errors->first('company') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.productionperson.fields.company_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>

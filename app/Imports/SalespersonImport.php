@@ -27,7 +27,10 @@ class SalespersonImport implements ToCollection, WithHeadingRow
     {
         foreach ($rows as $row) {
             $salesperson = Salesperson::create([
-                'name' => $row['name']
+                'name' => $row['name'],
+                'telephone' => $row['telepon'],
+                'company' => $row['payung_hukum'],
+                'alamat' => $row['alamat']
             ]);
             $cities = explode(";", $row['area_pemasaran']);
             $area_pemasaran = [];
