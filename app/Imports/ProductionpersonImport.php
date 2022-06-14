@@ -20,7 +20,7 @@ class ProductionpersonImport implements ToModel, WithHeadingRow
             'name' => $row['name'],
             'type' => $row['type'],
             'contact' => $row['telepon'],
-            'company' => $row['payung_hukum'],
+            'company' => $row['badan_usaha'],
             'alamat' => $row['alamat']
         ]);
     }

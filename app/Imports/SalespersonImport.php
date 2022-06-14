@@ -29,7 +29,7 @@ class SalespersonImport implements ToCollection, WithHeadingRow
             $salesperson = Salesperson::create([
                 'name' => $row['name'],
                 'telephone' => $row['telepon'],
-                'company' => $row['payung_hukum'],
+                'company' => $row['badan_usaha'],
                 'alamat' => $row['alamat']
             ]);
             $cities = explode(";", $row['area_pemasaran']);
