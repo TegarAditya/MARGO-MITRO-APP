@@ -113,6 +113,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('productionpeople/destroy', 'ProductionpersonController@massDestroy')->name('productionpeople.massDestroy');
     Route::post('productionpeople/parse-csv-import', 'ProductionpersonController@parseCsvImport')->name('productionpeople.parseCsvImport');
     Route::post('productionpeople/process-csv-import', 'ProductionpersonController@processCsvImport')->name('productionpeople.processCsvImport');
+    Route::post('productionpeople/import', 'ProductionpersonController@import')->name('productionpeople.import');
     Route::resource('productionpeople', 'ProductionpersonController');
 
     // Production Order
