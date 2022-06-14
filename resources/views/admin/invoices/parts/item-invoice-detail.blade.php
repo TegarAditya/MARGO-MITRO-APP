@@ -8,29 +8,32 @@
 $product = $detail->product ?: new App\Models\Product;
 $category = $product->category;
 
-$qtyMax = $detail->quantity - $detail->moved;
+$order_detail = $detail->order_detail ?: null;
+$qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
 @endphp
-<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price }}" data-moved="{{ $detail->moved }}" data-max="{{ $qtyMax }}" data-qty="{{ $detail->quantity }}">
+<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price }}" data-moved="{{ $order_detail->moved ?? 0 }}" data-max="{{ $qtyMax }}" data-qty="{{ $detail->quantity }}">
     <div class="col-auto" style="display: {{ !$product->id ? 'none' : 'block' }}">
         @if ($product->foto && $foto = $product->foto->first())
             <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
-        @else
+        @elseif (!$product->id)
             <img src="" class="product-img" />
         @endif
     </div>
 
     <div class="col-4">
-        <h5 class="product-name mb-1">{{ $product->name }}</h5>
+        <h6 class="product-name mb-1 text-sm">{{ $product->name }}</h6>
 
         <p class="mb-0 text-sm">
-            Quantity: <span class="product-qty-max">{{ $detail->quantity }}</span>
+            Order Qty: <span class="product-qty-max">{{ $order_detail->quantity ?? '' }}</span>
         </p>
 
-        @if (!$detail->id)
-            <p class="mb-0 text-sm">
-                Terkirim: <span class="product-moved">{{ $detail->moved }}</span>
-            </p>
-        @endif
+        <p class="mb-0 text-sm">
+            Stock: <span class="product-stock">{{ $product->stock }}</span>
+        </p>
+
+        <p class="mb-0 text-sm">
+            Terkirim: <span class="product-moved">{{ $order_detail->moved ?? '' }}</span>
+        </p>
     </div>
 
     <div class="col row align-items-end align-self-center">
@@ -40,14 +43,13 @@ $qtyMax = $detail->quantity - $detail->moved;
             <x-admin.form-group
                 type="number"
                 id="fieldQty-{{ $product->id }}"
-                name="products[{{ $product->id ?: 0 }}][qty]"
+                :name="!$product->id ? null : 'products[{{ $product->id ?: 0 }}][qty]'"
                 containerClass=" m-0"
                 boxClass=" p-0"
                 class="form-control-sm hide-arrows text-center product-qty"
-                value="{{ $detail->quantity }}"
-                min="{{ $detail->quantity ?: 0 }}"
+                value="{{ abs($detail->quantity) }}"
+                :min="!$product->id ? 0 : 1"
                 max="{{ $qtyMax }}"
-                :readonly="$detail->id"
             >
                 <x-slot name="left">
                     <button type="button" class="btn btn-sm border-0 px-2 product-qty-act" data-action="-">
@@ -69,13 +71,13 @@ $qtyMax = $detail->quantity - $detail->moved;
             <x-admin.form-group
                 type="number"
                 id="fieldPrice-{{ $product->id }}"
-                name="products[{{ $product->id ?: 0 }}][price]"
+                :name="!$product->id ? null : 'products[{{ $product->id ?: 0 }}][price]'"
                 containerClass=" m-0"
                 boxClass=" px-2 py-0"
                 class="form-control-sm product-price"
                 value="{{ $detail->price }}"
-                min="1"
-                :readonly="$detail->id"
+                :min="!$product->id ? 0 : 1"
+                readonly
             >
                 <x-slot name="left">
                     <span class="text-sm mr-1">Rp</span>
@@ -85,7 +87,7 @@ $qtyMax = $detail->quantity - $detail->moved;
 
         <div class="col text-right">
             <p class="text-sm mb-0">Subtotal</p>
-            <p class="m-0 product-subtotal">Rp{{ number_format($detail->total) }}</p>
+            <p class="m-0 product-subtotal">@money($detail->total)</p>
         </div>
 
         @if (!$detail->id)

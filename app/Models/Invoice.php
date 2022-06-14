@@ -86,4 +86,9 @@ class Invoice extends Model
 
         return $code;
     }
+
+    public function getTypeAttribute()
+    {
+        return $this->nominal > 0 ? 'Keluar' : 'Masuk';
+    }
 }

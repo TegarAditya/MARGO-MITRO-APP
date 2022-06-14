@@ -1,5 +1,67 @@
-<div class="order-product pt-3">
-    <div class="product-action mb-4">
+<div class="tab-invoice pt-3">
+    <input type="hidden" name="nominal" value="{{ $invoice->nominal }}" />
+
+    <div class="form-group">
+        <label class="required" for="no_suratjalan">{{ trans('cruds.invoice.fields.no_suratjalan') }}</label>
+        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', $invoice->no_suratjalan) }}" readonly placeholder="(Otomatis)">
+        @if($errors->has('no_suratjalan'))
+            <span class="text-danger">{{ $errors->first('no_suratjalan') }}</span>
+        @endif
+        <span class="help-block">{{ trans('cruds.invoice.fields.no_suratjalan_helper') }}</span>
+    </div>
+    <div class="form-group">
+        <label class="required" for="no_invoice">{{ trans('cruds.invoice.fields.no_invoice') }}</label>
+        <input class="form-control {{ $errors->has('no_invoice') ? 'is-invalid' : '' }}" type="text" name="no_invoice" id="no_invoice" value="{{ old('no_invoice', $invoice->no_invoice) }}" readonly placeholder="(Otomatis)">
+        @if($errors->has('no_invoice'))
+            <span class="text-danger">{{ $errors->first('no_invoice') }}</span>
+        @endif
+        <span class="help-block">{{ trans('cruds.invoice.fields.no_invoice_helper') }}</span>
+    </div>
+    <div class="form-group">
+        <label class="required" for="order_id">{{ trans('cruds.invoice.fields.order') }}</label>
+        <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="order_id" id="order_id" required>
+            @foreach($orders as $id => $entry)
+                <option value="{{ $id }}" {{ (old('order_id') ? old('order_id') : $invoice->order->id ?? '') == $id ? 'selected' : (
+                    request('order_id') == $id ? 'selected' : ''
+                ) }}>{{ $entry }}</option>
+            @endforeach
+        </select>
+        @if($errors->has('order'))
+            <span class="text-danger">{{ $errors->first('order') }}</span>
+        @endif
+        <span class="help-block">{{ trans('cruds.invoice.fields.order_helper') }}</span>
+    </div>
+    <div class="form-group">
+        <label class="required" for="date">{{ trans('cruds.invoice.fields.date') }}</label>
+        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $invoice->date) }}" required>
+        @if($errors->has('date'))
+            <span class="text-danger">{{ $errors->first('date') }}</span>
+        @endif
+        <span class="help-block">{{ trans('cruds.invoice.fields.date_helper') }}</span>
+    </div>
+
+    @if ($type = !$invoice->id ? -1 : (0 > (int) $invoice->nominal ? 1 : -1))
+        <div class="form-group">
+            <label class="required" for="invoice_type">Jenis Invoice</label>
+            <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="invoice_type" id="invoice_type" required>
+                @foreach([
+                    -1 => 'Invoice Keluar',
+                    1 => 'Invoice Masuk'
+                ] as $id => $entry)
+                    <option value="{{ $id }}" {{ (old('invoice_type') ? old('invoice_type') : $type ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                @endforeach
+            </select>
+            @if($errors->has('invoice_type'))
+                <span class="text-danger">{{ $errors->first('invoice_type') }}</span>
+            @endif
+        </div>
+    @endif
+
+    <hr class="my-3" />
+
+    <h5>Daftar Produk</h5>
+
+    <div class="product-action mb-1 pt-2 pb-3">
         <div class="row align-items-end">
             <div class="col-4">
                 <div class="form-group m-0">
@@ -7,20 +69,22 @@
                     <select class="form-control select2 {{ $errors->has('products') ? 'is-invalid' : '' }} product-options field-select2" name="products" id="products" data-placeholder="Pilih Produk">
                         <option></option>
 
-                        @foreach($products as $id => $entry)
+                        @foreach($order_details as $id => $entry)
+                            @continue($entry->moved === $entry->quantity)
+
                             <option
                                 value="{{ $id }}"
-                                data-id="{{ $entry->id }}"
+                                data-id="{{ $entry->product_id }}"
                                 data-price="{{ $entry->price }}"
-                                data-hpp="{{ $entry->hpp }}"
-                                data-stock="{{ $entry->stock }}"
-                                @if ($foto = $entry->foto->first())
+                                data-qty="{{ $entry->quantity }}"
+                                data-moved="{{ $entry->moved }}"
+                                data-stock="{{ $entry->product->stock }}"
+                                data-max="{{ $entry->quantity - $entry->moved }}"
+                                @if ($foto = $entry->product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
                                 @endif
-                                @if ($category = $entry->category)
-                                    data-category="{{ $category->name }}"
-                                @endif
-                            >{{ $entry->name }}</option>
+                                {{ $entry->moved === $entry->quantity ? ' disabled' : '' }}
+                            >{{ $entry->product->name }}</option>
                         @endforeach
                     </select>
                     @if($errors->has('products'))
@@ -35,11 +99,9 @@
         </div>
     </div>
 
-    <h5>Produk Dipilih</h5>
-
     <div class="product-list">
-        @if ($order->order_details->count())
-            @each('admin.orders.parts.item-product', $order->order_details, 'detail')
+        @if ($invoice_details->count())
+            @each('admin.invoices.parts.item-invoice-detail', $invoice_details, 'detail')
         @else
             <div class="product-empty">
                 <p>Belum ada produk yang ditambahkan</p>
@@ -47,17 +109,22 @@
         @endif
     </div>
 
-    <div class="product-summary" style="display: {{ !$order->order_details->count() ? 'none' : 'block' }}">
+    <div class="product-summary" style="display: {{ !$invoice_details->count() ? 'none' : 'block' }}">
         <div class="row border-top pt-2">
             <div class="col text-right">
                 <p class="mb-0">
-                    <span class="text-sm">Grand Total</span>
+                    <span class="text-sm">Total</span>
                     <br />
-                    <strong class="product-total">Rp{{ number_format(data_get($order, 'tagihan.total', 0)) }}</strong>
+                    <strong class="product-total">@money($invoice->nominal)</strong>
                 </p>
+
+                @if($errors->has('nominal'))
+                    <span class="text-danger">{{ $errors->first('nominal') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.invoice.fields.nominal_helper') }}</span>
             </div>
 
-            @if (!$order->id)
+            @if (!$invoice->id)
                 <div class="col-auto opacity-0 pl-5 order-action-placeholder" style="pointer-events: none">
                     <button type="button" class="btn py-1"></button>
                 </div>
@@ -66,7 +133,7 @@
     </div>
 
     <div class="product-faker d-none">
-        @include('admin.orders.parts.item-product', ['detail' => new App\Models\OrderDetail])
+        @include('admin.invoices.parts.item-invoice-detail', ['detail' => new App\Models\InvoiceDetail])
 
         <div class="product-empty">
             <p>Belum ada produk yang ditambahkan</p>
@@ -77,17 +144,23 @@
         <div class="col"></div>
 
         <div class="col-auto">
-            @if (!$order->id)
-                <button type="submit" class="btn btn-primary">Simpan Order</a>
-            @else
-                <a href="#order-2" class="btn btn-dark orderTabs-nav">Selanjutnya</a>
-            @endif
+            <button type="submit" class="btn {{ !$order->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
         </div>
     </div>
 </div>
 
 @push('styles')
 <style>
+.product-action {
+    position: sticky;
+    position: -webkit-sticky;
+    z-index: 10;
+    top: 0;
+    background-color: #fff;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+}
+
 .item-product {
     padding: .5rem 0;
     transition: 250ms ease-in-out;
@@ -107,10 +180,9 @@
 <script>
 (function($, numeral) {
     $(function() {
-        var form = $('#orderForm');
-        var orderTagihan = form.find('.order-tagihan');
+        var form = $('#invoiceForm');
 
-        var orderProduct = form.find('.order-product');
+        var invoice = form.find('.tab-invoice');
         var products = form.find('.product-list');
         var productOpts = form.find('.product-options');
         var productAdd = form.find('.product-add');
@@ -144,12 +216,12 @@
             });
 
             productTotal.html(numeral(total).format('$0,0'));
-            orderTagihan.find('.tagihan-total').html(numeral(total).format('$0,0'));
+            form.find('[name="nominal"]').val(total);
         };
 
         var bindProduct = function(product) {
             var qty = product.find('.product-qty');
-            var qtyMax = parseInt(product.data('stock') || 0);
+            var qtyMax = parseInt(Math.min(product.data('max'), product.data('stock')) || 0);
             var qtyMin = parseInt(product.find('.product-qty').attr('min') || 0);
             var actions = product.find('.product-qty-act');
             var price = product.find('.product-price');
@@ -168,9 +240,10 @@
             qty.on('change blur', function (e) {
                 var el = $(e.currentTarget);
                 var valueNum = parseInt(el.val());
-                var value = (isNaN(valueNum) || valueNum <= 0) ? 1 : (valueNum > qtyMax ? qtyMax : valueNum);
+                var value = (isNaN(valueNum) || valueNum <= 0) ? qtyMin : valueNum;
 
-                value = qtyMin > value ? qtyMin : value;
+                value = (qtyMax && value > qtyMax) ? qtyMax : value;
+                value = (qtyMin && qtyMin > value) ? qtyMin : value;
 
                 if (value !== valueNum) {
                     el.val(value);
@@ -184,7 +257,7 @@
             product.find('.product-delete').on('click', function(e) {
                 product.remove();
                 calculatePrice();
-                
+
                 if (!products.children('.item-product').length) {
                     productEmpty.clone().appendTo(products);
                     productSummary.hide();
@@ -225,17 +298,25 @@
                 return void(0);
             }
 
+            var qtyMax = parseInt(selected.data('max') || 0);
+
             product.attr('data-id', selected.data('id'));
             product.attr('data-price', selected.data('price'));
             product.attr('data-stock', selected.data('stock'));
+            product.attr('data-qty', selected.data('qty'));
+            product.attr('data-moved', selected.data('moved'));
+            product.attr('data-stock', selected.data('stock'));
+            product.attr('data-max', qtyMax);
             product.find('.product-name').html(selected.html());
             product.find('.product-category').html(selected.data('category'));
             product.find('.product-stock').html(selected.data('stock'));
-            product.find('.product-hpp').html(numeral(selected.data('hpp')).format('$0,0'));
-            product.find('.product-qty').val(1)
+            product.find('.product-moved').html(selected.data('moved'));
+            product.find('.product-qty-max').html(selected.data('qty'));
+            product.find('.product-qty').val(!qtyMax ? 0 : 1)
                 .attr('id', 'fieldQty-'+selected.data('id'))
                 .attr('name', 'products['+selected.data('id')+'][qty]')
-                .attr('max', selected.data('stock'))
+                .attr('max', qtyMax)
+                .attr('min', !qtyMax ? 0 : 1)
                 .attr('required', true);
             product.find('.product-price').val(selected.data('price'))
                 .attr('id', 'fieldPrice-'+selected.data('id'))

@@ -3,10 +3,6 @@
         <div class="col">
             <h5 class="mb-0">Riwayat Faktur</h5>
         </div>
-
-        <div class="col-auto">
-            <a href="{{ route('admin.invoices.create', ['order_id' => $order->id]) }}" class="btn btn-sm btn-success">Tambah Faktur</a>
-        </div>
     </div>
 
     <table class="table table-bordered table-invoice">
@@ -33,7 +29,7 @@
                 <tbody>
                     @php
                     $rowspan = $row->invoice_details->count();
-                    $link = route('admin.invoices.show', $row->id);
+                    $link = route('admin.invoices.edit', $row->id);
                     $print = function($type) use ($row) {
                         return route('admin.invoices.show', ['invoice' => $row->id, 'print' => $type]);
                     };
@@ -81,9 +77,7 @@
                                     <p class="m-0">
                                         <span>{{ $product->name }}</span>
                                         <br />
-                                        <span class="text-xs text-muted">
-                                            @money($detail->price)
-                                        </span>
+                                        <span class="text-xs text-muted">@money($detail->price)</span>
                                     </p>
                                 @else
                                     <p class="m-0">Produk</p>
@@ -116,14 +110,6 @@
         </div>
     </div>
 </div>
-
-@push('styles')
-<style>
-.table-invoice tbody:hover td {
-    background-color: #efefef;
-}
-</style>
-@endpush
 
 @push('scripts')
 <script>

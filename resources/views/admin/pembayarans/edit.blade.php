@@ -7,70 +7,72 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.pembayarans.update", [$pembayaran->id]) }}" enctype="multipart/form-data">
-            @method('PUT')
+        @if (session()->has('error-message'))
+            <p class="text-danger">
+                {{session()->get('error-message')}}
+            </p>
+        @endif
+
+        <form method="POST" action="{{ !$pembayaran->id ? route('admin.pembayarans.store') : route("admin.pembayarans.update", [$pembayaran->id]) }}" enctype="multipart/form-data" id="pembayaranForm">
+            @method(!$pembayaran->id ? 'POST' : 'PUT')
             @csrf
-            <div class="form-group">
-                <label for="no_kwitansi">{{ trans('cruds.pembayaran.fields.no_kwitansi') }}</label>
-                <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', $pembayaran->no_kwitansi) }}">
-                @if($errors->has('no_kwitansi'))
-                    <span class="text-danger">{{ $errors->first('no_kwitansi') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.pembayaran.fields.no_kwitansi_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <label class="required" for="tagihan_id">{{ trans('cruds.pembayaran.fields.tagihan') }}</label>
-                <select class="form-control select2 {{ $errors->has('tagihan') ? 'is-invalid' : '' }}" name="tagihan_id" id="tagihan_id" required>
-                    @foreach($tagihans as $id => $entry)
-                        <option value="{{ $id }}" {{ (old('tagihan_id') ? old('tagihan_id') : $pembayaran->tagihan->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('tagihan'))
-                    <span class="text-danger">{{ $errors->first('tagihan') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.pembayaran.fields.tagihan_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <label class="required" for="nominal">{{ trans('cruds.pembayaran.fields.nominal') }}</label>
-                <input class="form-control {{ $errors->has('nominal') ? 'is-invalid' : '' }}" type="number" name="nominal" id="nominal" value="{{ old('nominal', $pembayaran->nominal) }}" step="0.01" required>
-                @if($errors->has('nominal'))
-                    <span class="text-danger">{{ $errors->first('nominal') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.pembayaran.fields.nominal_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <label for="diskon">{{ trans('cruds.pembayaran.fields.diskon') }}</label>
-                <input class="form-control {{ $errors->has('diskon') ? 'is-invalid' : '' }}" type="number" name="diskon" id="diskon" value="{{ old('diskon', $pembayaran->diskon) }}" step="0.01">
-                @if($errors->has('diskon'))
-                    <span class="text-danger">{{ $errors->first('diskon') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.pembayaran.fields.diskon_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <label class="required" for="bayar">{{ trans('cruds.pembayaran.fields.bayar') }}</label>
-                <input class="form-control {{ $errors->has('bayar') ? 'is-invalid' : '' }}" type="number" name="bayar" id="bayar" value="{{ old('bayar', $pembayaran->bayar) }}" step="1" required>
-                @if($errors->has('bayar'))
-                    <span class="text-danger">{{ $errors->first('bayar') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.pembayaran.fields.bayar_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <label class="required" for="tanggal">{{ trans('cruds.pembayaran.fields.tanggal') }}</label>
-                <input class="form-control date {{ $errors->has('tanggal') ? 'is-invalid' : '' }}" type="text" name="tanggal" id="tanggal" value="{{ old('tanggal', $pembayaran->tanggal) }}" required>
-                @if($errors->has('tanggal'))
-                    <span class="text-danger">{{ $errors->first('tanggal') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.pembayaran.fields.tanggal_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-danger" type="submit">
-                    {{ trans('global.save') }}
-                </button>
+
+            @if ($order_id = request('order_id', $tagihan->order_id))
+                <input type="hidden" name="redirect" value="{{ route('admin.orders.edit', $order_id) }}" />
+            @endif
+
+            @php
+            $tabs = [
+                [ 'label' => 'Pembayaran', 'enabled' => true ],
+                [ 'label' => 'Riwayat', 'enabled' => !!$tagihan->id ],
+            ];
+            @endphp
+            <ul class="nav nav-tabs" id="modelTabs" role="tablist">
+                @foreach ($tabs as $tab)
+                    @php
+                    $classes = $loop->first ? ' active' : '';
+
+                    if (!$tab['enabled']) {
+                        $classes .= ' disabled';
+                    }
+                    @endphp
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link{{ $classes }}" id="order-tab-{{ $loop->iteration }}" data-toggle="tab" href="#order-{{ $loop->iteration }}" role="tab">
+                            {{ $loop->iteration . '. ' . $tab['label'] }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="tab-content" id="modelTabsContent">
+                <div class="tab-pane fade show active" id="order-1" role="tabpanel">
+                    @include('admin.pembayarans.parts.tab-pembayaran')
+                </div>
+
+                <div class="tab-pane fade" id="order-2" role="tabpanel">
+                    @include('admin.pembayarans.parts.tab-pembayaran-history')
+                </div>
             </div>
         </form>
     </div>
 </div>
-
-
-
 @endsection
+
+@push('scripts')
+<script>
+(function($) {
+    $(function() {
+        var form = $('#pembayaranForm');
+        var tabs = form.find('#modelTabs');
+        var tabsContent = form.find('#modelTabsContent');
+        var tabsNavs = form.find('.modelTabs-nav');
+
+        tabsNavs.on('click', function(e) {
+            e.preventDefault();
+
+            tabs.find('[href="'+$(e.currentTarget).attr('href')+'"]').filter(':not(.disabled)').tab('show');
+        });
+    });
+})(jQuery);
+</script>
+@endpush

@@ -20,56 +20,11 @@
             @method(!$order->id ? 'POST' : 'PUT')
             @csrf
 
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group">
-                        <label for="no_order">No. Order</label>
-                        <input class="form-control h-auto py-1 {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $order->no_order) }}" readonly placeholder="(Otomatis)">
-                        @if($errors->has('no_order'))
-                            <span class="text-danger">{{ $errors->first('no_order') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.order.fields.date_helper') }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="date">{{ trans('cruds.order.fields.date') }}</label>
-                        <input class="form-control date h-auto py-1 {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $order->date) }}" required>
-                        @if($errors->has('date'))
-                            <span class="text-danger">{{ $errors->first('date') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.order.fields.date_helper') }}</span>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="salesperson_id">{{ trans('cruds.order.fields.salesperson') }}</label>
-                        <select class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" required>
-                            @foreach($salespeople as $id => $entry)
-                                <option value="{{ $id }}" {{ (old('salesperson_id') ? old('salesperson_id') : $order->salesperson->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('salesperson'))
-                            <span class="text-danger">{{ $errors->first('salesperson') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.order.fields.salesperson_helper') }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="my-3" />
-
-            <h5 class="pt-2">Detail Order</h5>
-
             @php
             $tabs = [
-                [ 'label' => 'Daftar Produk', 'enabled' => true ],
+                [ 'label' => 'Detail Order', 'enabled' => true ],
                 [ 'label' => 'Faktur', 'enabled' => !!$order->id ],
-                [ 'label' => 'Tagihan', 'enabled' => !!$order->id ],
+                [ 'label' => 'Pembayaran', 'enabled' => !!$order->id ],
             ];
             @endphp
             <ul class="nav nav-tabs" id="orderTabs" role="tablist">
@@ -91,7 +46,7 @@
 
             <div class="tab-content" id="orderTabsContent">
                 <div class="tab-pane fade show active" id="order-1" role="tabpanel">
-                    @include('admin.orders.parts.tab-product')
+                    @include('admin.orders.parts.tab-order')
                 </div>
 
                 <div class="tab-pane fade" id="order-2" role="tabpanel">

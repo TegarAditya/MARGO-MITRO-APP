@@ -44,7 +44,16 @@ class Tagihan extends Model
 
     public function tagihan_movements()
     {
-        return $this->hasMany(TagihanMovement::class, 'reference')->where('type', 'tagihan');
+        return $this->hasMany(TagihanMovement::class);
+    }
+
+    public function pembayarans()
+    {
+        return $this->hasMany(Pembayaran::class);
+    }
+
+    public function getSelisihAttribute() {
+        return $this->total - $this->saldo;
     }
 
     protected function serializeDate(DateTimeInterface $date)
