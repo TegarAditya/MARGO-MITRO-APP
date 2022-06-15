@@ -53,6 +53,11 @@ class ProductionOrder extends Model
         return $this->hasMany(ProductionOrderDetail::class);
     }
 
+    public function realisasis()
+    {
+        return $this->hasMany(Realisasi::class);
+    }
+
     public function getDateAttribute($value)
     {
         return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
