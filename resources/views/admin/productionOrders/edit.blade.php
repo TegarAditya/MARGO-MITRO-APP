@@ -92,7 +92,7 @@
                     }
                     @endphp
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link{{ $classes }}" id="order-tab-{{ $loop->iteration }}" data-toggle="tab" href="#model-tab-{{ $loop->iteration }}" role="tab">
+                        <a class="nav-link{{ $classes }}" id="tab-{{ $loop->iteration }}" data-toggle="tab" href="#model-tab-{{ $loop->iteration }}" role="tab">
                             {{ $loop->iteration . '. ' . $tab['label'] }}
                         </a>
                     </li>
@@ -105,9 +105,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="model-tab-2" role="tabpanel">
-                    <div class="py-3">
-                        <p class="h5">Under Maintenance</p>
-                    </div>
+                    @include('admin.productionOrders.parts.tab-realisasi')
                 </div>
             </div>
         </form>
