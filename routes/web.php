@@ -125,6 +125,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('production-order-details/destroy', 'ProductionOrderDetailController@massDestroy')->name('production-order-details.massDestroy');
     Route::resource('production-order-details', 'ProductionOrderDetailController');
 
+    // Realisasi
+    Route::delete('realisasis/destroy', 'RealisasiController@massDestroy')->name('realisasis.massDestroy');
+    Route::post('realisasis/parse-csv-import', 'RealisasiController@parseCsvImport')->name('realisasis.parseCsvImport');
+    Route::post('realisasis/process-csv-import', 'RealisasiController@processCsvImport')->name('realisasis.processCsvImport');
+    Route::resource('realisasis', 'RealisasiController');
+
     Route::get('system-calendar', 'SystemCalendarController@index')->name('systemCalendar');
     Route::get('messenger', 'MessengerController@index')->name('messenger.index');
     Route::get('messenger/create', 'MessengerController@createTopic')->name('messenger.createTopic');
