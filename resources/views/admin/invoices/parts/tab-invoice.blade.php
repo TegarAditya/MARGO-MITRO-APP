@@ -118,7 +118,7 @@
                 <p class="mb-0">
                     <span class="text-sm">Grand Total</span>
                     <br />
-                    <strong class="product-total">@money(data_get($order, 'tagihan.total', 0))</strong>
+                    <strong class="product-total">@money(data_get($invoice, 'nominal', 0))</strong>
                 </p>
             </div>
 
