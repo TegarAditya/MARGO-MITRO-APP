@@ -224,7 +224,10 @@ class ProductionOrderController extends Controller
                 return view('admin.productionOrders.prints.kwitansi', compact('productionOrder'));
         }
 
-        return view('admin.productionOrders.show', compact('productionOrder'));
+        $categories = Category::whereIn('slug', ['buku', 'bahan'])->get();
+        $products = Product::with(['media', 'category'])->get();
+
+        return view('admin.productionOrders.show', compact('productionOrder', 'products', 'categories'));
     }
 
     public function destroy(ProductionOrder $productionOrder)
