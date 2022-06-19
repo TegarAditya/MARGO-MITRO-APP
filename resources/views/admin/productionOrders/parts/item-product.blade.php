@@ -10,10 +10,11 @@ $category = $product->category;
 
 $stock = $product->stock ?: 0;
 $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
-$modal = !isset($modal) ? '#productModal' : $modal;
-$name = !isset($name) ? 'products' : $name;
 
 $foto = !$product->foto ? null : $product->foto->first();
+
+$modal = !isset($modal) ? '#productModal' : $modal;
+$name = !isset($name) ? 'products' : $name;
 @endphp
 <div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}">
     <div class="col-5 row">
