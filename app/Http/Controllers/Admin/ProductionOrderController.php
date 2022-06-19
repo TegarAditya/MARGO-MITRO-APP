@@ -212,7 +212,17 @@ class ProductionOrderController extends Controller
     {
         abort_if(Gate::denies('production_order_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $productionOrder->load('productionperson', 'created_by');
+        $productionOrder->load([
+            'productionperson', 'created_by',
+            'production_order_details', 'production_order_details.product',
+        ]);
+
+        switch (request('print')) {
+            case 'spk':
+                return view('admin.productionOrders.prints.perintah-kerja', compact('productionOrder'));
+            case 'kwitansi':
+                return view('admin.productionOrders.prints.kwitansi', compact('productionOrder'));
+        }
 
         return view('admin.productionOrders.show', compact('productionOrder'));
     }

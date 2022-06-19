@@ -59,7 +59,7 @@
                                     <p class="m-0">Produk</p>
                                 @endif
                             </td>
-                            <td class="text-center">{{ abs($detail->quantity) }}</td>
+                            <td class="text-center">{{ abs($detail->qty) }}</td>
                             <td class="text-right">@money(abs($detail->total))</td>
                             
                             @if ($loop->first)

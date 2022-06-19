@@ -1,32 +1,26 @@
 @extends('layouts.print')
 
 @section('header.right')
-<h6>FAKTUR</h6>
+<h6>KWITANSI PO</h6>
 
 <table cellspacing="0" cellpadding="0" class="text-sm" style="width: 9cm">
     <tbody>
         <tr>
-            <td width="136"><strong>No. Invoice</strong></td>
+            <td width="136"><strong>No. PO</strong></td>
             <td width="12">:</td>
-            <td>{{ $realisasi->no_invoice }}</td>
+            <td>{{ $productionOrder->po_number }}</td>
         </tr>
 
         <tr>
-            <td width="120"><strong>No. Surat Jalan</strong></td>
+            <td width="120"><strong>No. Kwitansi</strong></td>
             <td width="8">:</td>
-            <td>{{ $realisasi->no_suratjalan }}</td>
+            <td>{{ $productionOrder->no_kwitansi }}</td>
         </tr>
 
         <tr>
             <td><strong>Tanggal</strong></td>
             <td>:</td>
-            <td>{{ $realisasi->date }}</td>
-        </tr>
-
-        <tr>
-            <td><strong>{{ $realisasi->type === 'Masuk' ? 'Dari' : 'Kepada' }}</strong></td>
-            <td>:</td>
-            <td style="border-bottom: 1px dotted #000"></td>
+            <td>{{ $productionOrder->date }}</td>
         </tr>
     </tbody>
 </table>
@@ -37,22 +31,22 @@
     <thead>
         <th width="1%">No.</th>
         <th>Nama Produk</th>
-        <th width="1%">Harga</th>
-        <th width="1%">Qty</th>
-        <th width="1%">Subtotal</th>
+        <th width="1%" class="text-center">Harga</th>
+        <th width="120" class="text-center">Order Qty</th>
+        <th width="1%" class="text-center">Subtotal</th>
     </thead>
 
     <tbody>
-        @foreach ($realisasi->realisasi_details as $realisasi_detail)
+        @foreach ($productionOrder->production_order_details as $detail)
             @php
-            $product = $realisasi_detail->product;
+            $product = $detail->product;
             @endphp
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $product->name }}</td>
-                <td class="text-right">@money($realisasi_detail->price)</td>
-                <td class="text-center">{{ abs($realisasi_detail->quantity) }}</td>
-                <td class="text-right">@money(abs($realisasi_detail->total))</td>
+                <td class="text-right">@money($detail->ongkos_satuan)</td>
+                <td class="text-center">{{ abs($detail->order_qty - $detail->prod_qty) }}</td>
+                <td class="text-right">@money(abs($detail->ongkos_total))</td>
             </tr>
         @endforeach
     </tbody>
@@ -60,7 +54,7 @@
     <tfoot>
         <tr>
             <td colspan="4" class="text-right px-3"><strong>Total</strong></td>
-            <td>@money(abs($realisasi->nominal))</td>
+            <td>@money(abs($productionOrder->total))</td>
         </tr>
     </tfoot>
 </table>

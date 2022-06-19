@@ -10,23 +10,27 @@ use App\Models\ProductionOrderDetail;
 use App\Models\Realisasi;
 use App\Models\RealisasiDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class RealisasiController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = Realisasi::with(['order'])->select(sprintf('%s.*', (new Realisasi())->table));
+            $query = Realisasi::with(['production_order'])->select(sprintf('%s.*', (new Realisasi())->getTable()));
             $table = Datatables::of($query);
 
+            $table->addColumn('production_order', '&nbsp;');
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate = 'invoice_show';
-                $editGate = 'invoice_edit';
-                $deleteGate = 'invoice_delete';
-                $crudRoutePart = 'invoices';
+                $viewGate = 'production_order_show';
+                $editGate = 'production_order_edit';
+                $deleteGate = 'production_order_delete';
+                $crudRoutePart = 'realisasis';
 
                 return view('partials.datatablesActions', compact(
                 'viewGate',
@@ -39,6 +43,10 @@ class RealisasiController extends Controller
 
             $table->editColumn('id', function ($row) {
                 return $row->id ? $row->id : '';
+            });
+
+            $table->editColumn('production_order', function ($row) {
+                return !$row->production_order ? '' : $row->production_order->po_number;
             });
             $table->editColumn('no_realisasi', function ($row) {
                 return $row->no_realisasi ? $row->no_realisasi : '';
@@ -87,11 +95,11 @@ class RealisasiController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'order_id' => 'required|exists:orders,id',
+            'production_order_id' => 'required|exists:production_orders,id',
             'products' => 'required|array|min:1',
         ]);
 
-        $productionOrder = ProductionOrder::findOrFail($request->order_id);
+        $productionOrder = ProductionOrder::findOrFail($request->production_order_id);
 
         DB::beginTransaction();
         try {
@@ -99,11 +107,11 @@ class RealisasiController extends Controller
                 'no_realisasi' => Realisasi::generateNoRealisasi(),
                 'date' => $request->date,
                 'nominal' => (float) $request->nominal,
-                'order_id' => $request->order_id,
+                'production_order_id' => $request->production_order_id,
             ]);
 
             $products = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($realisasi, $productionOrder, $request) {
-                $qty = (int) $request->products[$item->id]['qty'] ?: 0;
+                $qty = (int) $request->products[$item->id]['prod'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
 
                 $item->stock_movements()->create([
@@ -118,7 +126,7 @@ class RealisasiController extends Controller
                 
                 if ($po_detail) {
                     $po_detail->update([
-                        'moved' => DB::raw("production_order_details.prod_qty + $qty"),
+                        'prod_qty' => DB::raw("production_order_details.prod_qty + $qty"),
                     ]);
                 }
 
@@ -126,7 +134,7 @@ class RealisasiController extends Controller
                     'product_id' => $item->id,
                     'realisasi_id' => $realisasi->id,
                     'production_order_id' => $productionOrder->id,
-                    'detail_id' => !$po_detail ? null : $po_detail->id,
+                    'po_detail_id' => !$po_detail ? null : $po_detail->id,
                     'qty' => $qty,
                     'price' => $price,
                     'total' => $qty * $price,
@@ -152,7 +160,7 @@ class RealisasiController extends Controller
     public function edit(Realisasi $realisasi)
     {
         $productionOrders = ProductionOrder::get()->mapWithKeys(function($item) {
-            return [$item->id => $item->no_order];
+            return [$item->id => $item->po_number];
         })->prepend(trans('global.pleaseSelect'), '');
         $po_details = ProductionOrderDetail::with(['product', 'product.media'])
             ->whereHas('product')
@@ -161,8 +169,8 @@ class RealisasiController extends Controller
         $realisasi->load('realisasi_details', 'production_order', 'production_order.realisasis', 'production_order.realisasis.realisasi_details');
 
         $productionOrder = null;
-        if ($productionOrder = $realisasi->order) {
-            $po_details = $po_details->where('order_id', $productionOrder->id);
+        if ($productionOrder = $realisasi->production_order) {
+            $po_details = $po_details->where('production_order_id', $productionOrder->id);
         }
 
         $realisasi_details = $realisasi->realisasi_details->map(function($item) use ($po_details) {
@@ -181,7 +189,7 @@ class RealisasiController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'order_id' => 'required|exists:orders,id',
+            'production_order_id' => 'required|exists:production_orders,id',
             'products' => 'required|array|min:1',
         ]);
 
@@ -215,7 +223,7 @@ class RealisasiController extends Controller
 
             // Update with new items
             $realisasi_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($realisasi, $productionOrder, $request) {
-                $qty = (int) $request->products[$item->id]['qty'] ?: 0;
+                $qty = (int) $request->products[$item->id]['prod'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
 
                 $item->stock_movements()->updateOrCreate([
@@ -234,7 +242,7 @@ class RealisasiController extends Controller
                 
                 if ($po_detail) {
                     $po_detail->update([
-                        'moved' => DB::raw("production_order_details.prod_qty + $qty"),
+                        'prod_qty' => DB::raw("production_order_details.prod_qty + $qty"),
                     ]);
                 }
 
@@ -242,7 +250,7 @@ class RealisasiController extends Controller
                     'product_id' => $item->id,
                     'realisasi_id' => $realisasi->id,
                     'production_order_id' => $productionOrder->id,
-                    'detail_id' => !$po_detail ? null : $po_detail->id,
+                    'po_detail_id' => !$po_detail ? null : $po_detail->id,
                     'qty' => $qty,
                     'price' => $price,
                     'total' => $qty * $price,

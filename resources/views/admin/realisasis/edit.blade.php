@@ -11,6 +11,62 @@
     </div>
 
     <div class="card-body">
+        @if ($productionOrder->id)
+            <div class="row mb-4">
+                <div class="col">
+                    <h4>PO No. #{{ $productionOrder->po_number }}</h4>
+
+                    <div class="row">
+                        <div class="col-auto">
+                            <span class="text-xs">Production Person</span>
+                            <p class="m-0">
+                                <strong>{{ $productionOrder->productionperson->name ?? '-' }}</strong>
+                            </p>
+                        </div>
+
+                        <div class="col-auto ml-3">
+                            <span class="text-xs">Jenis</span>
+                            <p class="m-0">
+                                <strong>{{ ucfirst($productionOrder->type) }}</strong>
+                            </p>
+                        </div>
+
+                        <div class="col-auto d-flex align-items-center ml-3">
+                            <a href="{{ route('admin.production-orders.show', [
+                                'production_order' => $productionOrder->id,
+                                'print' => 'spk'
+                            ]) }}" target="_blank" title="Cetak SPK" class="btn btn-sm btn-default border py-0 px-1">
+                                <i class="fa fa-print text-info"></i>
+                            </a>
+
+                            <div class="col text-muted px-2">
+                                <span class="text-xs">No. SPK</span>
+                                <p class="m-0">{{ $productionOrder->no_spk }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-auto ml-3 d-flex align-items-center">
+                            <a href="{{ route('admin.production-orders.show', [
+                                'production_order' => $productionOrder->id,
+                                'print' => 'kwitansi'
+                            ]) }}" target="_blank" title="Cetak Kwitansi" class="btn btn-sm btn-default border py-0 px-1">
+                                <i class="fa fa-print text-info"></i>
+                            </a>
+
+                            <div class="col text-muted px-2">
+                                <span class="text-xs">No. Kwitansi</span>
+                                <p class="m-0">{{ $productionOrder->no_kwitansi }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-auto text-right">
+                    <h6 class="h6 text-primary m-0">{{ $productionOrder->date }}</h6>
+                </div>
+            </div>
+        @endif
+
         @if (session()->has('error-message'))
             <p class="text-danger">
                 {{session()->get('error-message')}}
@@ -28,7 +84,7 @@
             @php
             $tabs = [
                 [ 'label' => 'Faktur', 'enabled' => true ],
-                [ 'label' => 'Riwayat', 'enabled' => $realisasi ],
+                [ 'label' => 'Riwayat', 'enabled' => !!$production_order_id ],
             ];
             @endphp
             <ul class="nav nav-tabs" id="modelTabs" role="tablist">
@@ -53,9 +109,11 @@
                     @include('admin.realisasis.parts.tab-realisasi')
                 </div>
 
-                <div class="tab-pane fade" id="model-tab-2" role="tabpanel">
-                    {{-- @include('admin.realisasis.parts.tab-realisasi-history') --}}
-                </div>
+                @if ($production_order_id)
+                    <div class="tab-pane fade" id="model-tab-2" role="tabpanel">
+                        @include('admin.realisasis.parts.tab-realisasi-history')
+                    </div>
+                @endif
             </div>
         </form>
     </div>

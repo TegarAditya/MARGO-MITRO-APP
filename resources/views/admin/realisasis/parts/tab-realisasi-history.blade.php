@@ -1,7 +1,15 @@
-<div class="order-faktur pt-3">
+<div class="order-realisasi pt-3">
     <div class="row align-items-center mb-2">
         <div class="col">
-            <h5 class="mb-0">Riwayat Faktur</h5>
+            <h5 class="mb-0">Riwayat Realisasi</h5>
+
+            @if ($productionOrder)
+                <p class="mb-0">PO #{{ $productionOrder->po_number }}</p>
+            @endif
+        </div>
+
+        <div class="col-auto">
+            <a href="{{ route('admin.realisasis.create', ['production_order_id' => $productionOrder->id]) }}" class="btn btn-sm btn-success">Tambah Realisasi</a>
         </div>
     </div>
 
@@ -9,10 +17,8 @@
         <thead>
             <tr>
                 <th rowspan="2" width="1%">No.</th>
-                <th rowspan="2">No. Surat Jalan</th>
-                <th rowspan="2">No. Invoice</th>
+                <th rowspan="2" width="120">No. Realisasi</th>
                 <th rowspan="2" width="120">Tanggal</th>
-                <th rowspan="2" width="120">Masuk/Keluar</th>
                 <th colspan="3" class="text-center py-2">Produk</th>
                 <th rowspan="2" class="text-center" width="1%">Total</th>
             </tr>
@@ -24,8 +30,8 @@
             </tr>
         </thead>
 
-        @if ($order && count($order->realisasis))
-            @foreach ($order->realisasis as $row)
+        @if ($productionOrder && count($productionOrder->realisasis))
+            @foreach ($productionOrder->realisasis as $row)
                 <tbody>
                     @php
                     $rowspan = $row->realisasi_details->count();
@@ -41,35 +47,11 @@
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}">{{ $loop->iteration }}</td>
                                 <td rowspan="{{ $rowspan }}">
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1 pr-2">
-                                            <a href="{{ $link }}">{{ $row->no_suratjalan }}</a>
-                                        </div>
-
-                                        <div>
-                                            <a href="{{ $print('sj') }}" target="_blank">
-                                                <i class="fa fa-print text-dark"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td rowspan="{{ $rowspan }}">
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1 pr-2">
-                                            <a href="{{ $link }}">{{ $row->no_invoice }}</a>
-                                        </div>
-
-                                        <div>
-                                            <a href="{{ $print('inv') }}" target="_blank">
-                                                <i class="fa fa-print text-dark"></i>
-                                            </a>
-                                        </div>
-                                    </div>
+                                    <a href="{{ $link }}" title="Edit Realisasi">
+                                        {{ $row->no_realisasi }}
+                                    </a>
                                 </td>
                                 <td rowspan="{{ $rowspan }}">{{ $row->date }}</td>
-                                <td rowspan="{{ $rowspan }}" class="{{ $is_out ? 'text-warning' : 'text-info' }}">
-                                    {{ $is_out ? 'Keluar' : 'Masuk' }}
-                                </td>
                             @endif
 
                             <td>
@@ -77,13 +59,15 @@
                                     <p class="m-0">
                                         <span>{{ $product->name }}</span>
                                         <br />
-                                        <span class="text-xs text-muted">@money($detail->price)</span>
+                                        <span class="text-xs text-muted">
+                                            @money($detail->price)
+                                        </span>
                                     </p>
                                 @else
                                     <p class="m-0">Produk</p>
                                 @endif
                             </td>
-                            <td class="text-center">{{ abs($detail->quantity) }}</td>
+                            <td class="text-center">{{ abs($detail->qty) }}</td>
                             <td class="text-right">@money(abs($detail->total))</td>
                             
                             @if ($loop->first)
@@ -97,7 +81,7 @@
             <tbody>
                 <tr>
                     <td colspan="8" class="text-center">
-                        <p class="mb-0">Belum ada riwayat faktur</p>
+                        <p class="mb-0">Belum ada riwayat realisasi</p>
                     </td>
                 </tr>
             </tbody>
@@ -106,16 +90,24 @@
 
     <div class="row mt-4">
         <div class="col">
-            <a href="#order-1" class="btn btn-default border realisasiTabs-nav">Sebelumnya</a>
+            <a href="#tab-1" class="btn btn-default border modelTabs-nav">Sebelumnya</a>
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+.table-invoice tbody:hover td {
+    background-color: #efefef;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>
 (function($, numeral) {
     $(function() {
-        var form = $('#realisasiForm');
+        var form = $('#modelForm');
 
     });
 })(jQuery, window.numeral);

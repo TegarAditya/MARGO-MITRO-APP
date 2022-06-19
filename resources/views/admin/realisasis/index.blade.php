@@ -25,13 +25,10 @@
                         ID
                     </th>
                     <th>
-                        {{ trans('cruds.invoice.fields.no_suratjalan') }}
+                        No. PO
                     </th>
                     <th>
-                        {{ trans('cruds.invoice.fields.no_invoice') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.invoice.fields.order') }}
+                        No. Realisasi
                     </th>
                     <th>
                         {{ trans('cruds.invoice.fields.date') }}
@@ -96,9 +93,8 @@
     columns: [
       { data: 'placeholder', name: 'placeholder' },
 { data: 'id', name: 'id' },
-{ data: 'no_suratjalan', name: 'no_suratjalan' },
-{ data: 'no_invoice', name: 'no_invoice' },
-{ data: 'order_date', name: 'order.date' },
+{ data: 'production_order', name: 'production_order' },
+{ data: 'no_realisasi', name: 'no_realisasi' },
 { data: 'date', name: 'date' },
 { data: 'nominal', name: 'nominal' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }

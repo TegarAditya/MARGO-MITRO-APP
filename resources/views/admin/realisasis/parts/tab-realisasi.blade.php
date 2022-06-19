@@ -7,7 +7,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 @endphp
 
 <div class="model-products pt-3">
-    <input type="hidden" name="nominal" value="{{ $realisasi->nominal }}" />
+    <input type="hidden" name="nominal" value="{{ $realisasi->nominal }}" id="total" />
 
     <div class="form-group">
         <label class="required" for="no_realisasi">No. Realisasi</label>
@@ -50,12 +50,19 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             'name' => 'products',
         ],
     ] as $item)
+        @php
+        $details = $po_details->whereIn('product_id', $item['product_ids']);
+        @endphp
         <hr style="margin: .5em -15px;border-color:#ccc" />
 
         <div class="product-list-group">
             <h5 class="product-group-title">{{ $item['label'] }}</h5>
 
             <div class="product-list">
+                @if ($realisasi->id && $details->count())
+                    @each('admin.realisasis.parts.item-realisasi-detail', $details, 'detail')
+                @endif
+
                 @include('admin.realisasis.parts.item-realisasi-detail', [
                     'detail' => new App\Models\ProductionOrderDetail,
                     'modal' => $item['modal'],
@@ -185,6 +192,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                         @foreach ($modal['items'] as $product)
                             @php
                             $category = $product->category;
+                            $po_detail = $po_details->where('product_id', $product->id)->first();
                             $search = implode(' ', [
                                 $product->name,
                                 !$category ? '' : $category->name,
@@ -199,6 +207,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 data-price="{{ $product->price }}"
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
+                                @if ($po_detail)
+                                    data-qty="{{ $po_detail->order_qty }}"
+                                    data-prod="0"
+                                @endif
                                 @if ($foto = $product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
                                 @endif
@@ -507,8 +519,6 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             var product = productSelectTarget || $('');
             var selected = $(e.currentTarget);
             var content = selected.find('.product-content').clone();
-            var qty = product.find('.product-qty').val();
-            var price = product.find('.product-price').val();
             var name = product.data('name');
             var data = selected.data();
 
@@ -516,16 +526,16 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             product.attr('data-price', data.price).data('price', data.price);
             product.attr('data-stock', data.stock).data('stock', data.stock);
             product.find('.product-col-main').html(content);
-            product.find('.product-qty1').val(qty || 0)
+            product.find('.product-qty1').val(data.qty || 0)
                 .attr('id', 'fieldQty-'+data.id)
                 .attr('name', name+'['+data.id+'][qty]')
                 .attr('min', 1)
                 .attr('required', true);
-            product.find('.product-qty2').val(qty || 0)
+            product.find('.product-qty2').val(data.prod || 0)
                 .attr('id', 'fieldQtyProd-'+data.id)
                 .attr('name', name+'['+data.id+'][prod]')
                 .attr('required', true);
-            product.find('.product-price').val(price != 0 ? price : data.price)
+            product.find('.product-price').val(data.price || 0)
                 .attr('id', 'fieldPrice-'+data.id)
                 .attr('name', name+'['+data.id+'][price]')
                 .attr('required', true)
