@@ -51,9 +51,9 @@
                 <th width="1%">No.</th>
                 <th>No. Kwintansi</th>
                 <th>Tanggal</th>
-                <th class="text-center" width="1%">Nominal</th>
-                <th class="text-center" width="1%">Diskon</th>
                 <th class="text-center" width="1%">Bayar</th>
+                <th class="text-center" width="1%">Diskon</th>
+                <th class="text-center" width="1%">Nominal</th>
             </tr>
         </thead>
 
@@ -72,7 +72,7 @@
                         </a>
                     </td>
                     <td>{{ $row->tanggal }}</td>
-                    <td class="text-right">@money($row->nominal)</td>
+                    <td class="text-right">@money($row->bayar)</td>
                     <td class="text-right">
                         @if (!$row->diskon)
                             <span>-</span>
@@ -80,7 +80,7 @@
                             @money($row->diskon)
                         @endif
                     </td>
-                    <td class="text-right">@money($row->bayar)</td>
+                    <td class="text-right">@money($row->nominal)</td>
                 </tr>
             @empty
                 <tr>
