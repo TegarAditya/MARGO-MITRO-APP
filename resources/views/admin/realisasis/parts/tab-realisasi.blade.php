@@ -529,11 +529,11 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             product.find('.product-qty1').val(data.qty || 0)
                 .attr('id', 'fieldQty-'+data.id)
                 .attr('name', name+'['+data.id+'][qty]')
-                .attr('min', 1)
                 .attr('required', true);
             product.find('.product-qty2').val(data.prod || 0)
                 .attr('id', 'fieldQtyProd-'+data.id)
                 .attr('name', name+'['+data.id+'][prod]')
+                .attr('min', 1)
                 .attr('required', true);
             product.find('.product-price').val(data.price || 0)
                 .attr('id', 'fieldPrice-'+data.id)

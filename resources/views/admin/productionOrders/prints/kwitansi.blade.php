@@ -40,12 +40,15 @@
         @foreach ($productionOrder->production_order_details as $detail)
             @php
             $product = $detail->product;
+            $selisih = $detail->order_qty - $detail->prod_qty;
             @endphp
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $product->name }}</td>
                 <td class="text-right">@money($detail->ongkos_satuan)</td>
-                <td class="text-center">{{ abs($detail->order_qty - $detail->prod_qty) }}</td>
+                <td class="text-center text-nowrap">
+                    {{ abs($selisih < 0 ? 0 : $selisih) }}{{ $selisih >= 0 ? '' : " (+".abs($selisih).")" }}
+                </td>
                 <td class="text-right">@money(abs($detail->ongkos_total))</td>
             </tr>
         @endforeach
