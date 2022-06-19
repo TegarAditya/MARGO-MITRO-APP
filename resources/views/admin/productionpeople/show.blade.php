@@ -47,6 +47,22 @@
                             {{ $productionperson->contact }}
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.productionperson.fields.alamat') }}
+                        </th>
+                        <td>
+                            {{ $productionperson->alamat }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.productionperson.fields.company') }}
+                        </th>
+                        <td>
+                            {{ $productionperson->company }}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">

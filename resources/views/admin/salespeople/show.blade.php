@@ -43,6 +43,30 @@
                     </tr>
                     <tr>
                         <th>
+                            {{ trans('cruds.salesperson.fields.telephone') }}
+                        </th>
+                        <td>
+                            {{ $salesperson->telephone }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.salesperson.fields.company') }}
+                        </th>
+                        <td>
+                            {{ $salesperson->company }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.salesperson.fields.alamat') }}
+                        </th>
+                        <td>
+                            {{ $salesperson->alamat }}
+                        </td>
+                    </tr>
+                    {{-- <tr>
+                        <th>
                             {{ trans('cruds.salesperson.fields.foto') }}
                         </th>
                         <td>
@@ -52,7 +76,7 @@
                                 </a>
                             @endif
                         </td>
-                    </tr>
+                    </tr> --}}
                 </tbody>
             </table>
             <div class="form-group">

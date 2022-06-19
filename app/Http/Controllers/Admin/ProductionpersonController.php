@@ -12,6 +12,9 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Excel;
+use App\Imports\ProductionpersonImport;
+use Alert;
 
 class ProductionpersonController extends Controller
 {
@@ -102,6 +105,8 @@ class ProductionpersonController extends Controller
 
         $productionperson->delete();
 
+        Alert::success('Success', 'Orang produksi berhasil di hapus');
+
         return back();
     }
 
@@ -110,5 +115,18 @@ class ProductionpersonController extends Controller
         Productionperson::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('import_file');
+        $request->validate([
+            'import_file' => 'mimes:csv,txt,xls,xlsx',
+        ]);
+
+        Excel::import(new ProductionpersonImport(), $file);
+
+        Alert::success('Success', 'Orang produksi berhasil di import');
+        return redirect()->back();
     }
 }

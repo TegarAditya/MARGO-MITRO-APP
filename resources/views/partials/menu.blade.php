@@ -342,7 +342,7 @@
                     </li>
                 @endcan
                 @can('sales_order_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/report*") ? "menu-open" : "" }} {{ request()->is("admin/report-details*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/report/*") ? "menu-open" : "" }} {{ request()->is("admin/report/*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-file"></i>
                             <p>
@@ -352,12 +352,22 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route("admin.report.invoices") }}" class="nav-link {{ request()->is("admin/report-invoices") || request()->is("admin/report-invoices/*") ? "active" : "" }}">
+                                <a href="{{ route("admin.report.invoices") }}" class="nav-link {{ request()->is("admin/report/invoices") || request()->is("admin/report/invoices/*") ? "active" : "" }}">
                                     <i class="fa-fw nav-icon fas fa-print">
 
                                     </i>
                                     <p>
                                         History Pengiriman
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route("admin.report.payment") }}" class="nav-link {{ request()->is("admin/report/payment") || request()->is("admin/report/payment/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-print">
+
+                                    </i>
+                                    <p>
+                                        History Pembayaran
                                     </p>
                                 </a>
                             </li>

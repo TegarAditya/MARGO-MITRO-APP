@@ -221,7 +221,7 @@
 
         var bindProduct = function(product) {
             var qty = product.find('.product-qty');
-            var qtyMax = parseInt(product.data('max') || 0);
+            var qtyMax = parseInt(Math.min(product.data('max'), product.data('stock')) || 0);
             var qtyMin = parseInt(product.find('.product-qty').attr('min') || 0);
             var actions = product.find('.product-qty-act');
             var price = product.find('.product-price');
@@ -257,7 +257,7 @@
             product.find('.product-delete').on('click', function(e) {
                 product.remove();
                 calculatePrice();
-                
+
                 if (!products.children('.item-product').length) {
                     productEmpty.clone().appendTo(products);
                     productSummary.hide();

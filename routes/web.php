@@ -101,9 +101,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('pembayarans/destroy', 'PembayaranController@massDestroy')->name('pembayarans.massDestroy');
     Route::resource('pembayarans', 'PembayaranController');
 
-    // Laporan
+    // Laporan Pengiriman
     Route::get('report/invoices', 'ReportController@invoices')->name('report.invoices');
     Route::post('report/invoices', 'ReportController@invoices');
+
+    // Laporan Pembayaran
+    Route::get('report/payment', 'ReportController@payment')->name('report.payment');
+    Route::post('report/payment', 'ReportController@payment');
 
     // Stock Opname
     Route::delete('stock-opnames/destroy', 'StockOpnameController@massDestroy')->name('stock-opnames.massDestroy');
@@ -113,6 +117,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('productionpeople/destroy', 'ProductionpersonController@massDestroy')->name('productionpeople.massDestroy');
     Route::post('productionpeople/parse-csv-import', 'ProductionpersonController@parseCsvImport')->name('productionpeople.parseCsvImport');
     Route::post('productionpeople/process-csv-import', 'ProductionpersonController@processCsvImport')->name('productionpeople.processCsvImport');
+    Route::post('productionpeople/import', 'ProductionpersonController@import')->name('productionpeople.import');
     Route::resource('productionpeople', 'ProductionpersonController');
 
     // Production Order

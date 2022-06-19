@@ -6,10 +6,14 @@
             <a class="btn btn-success" href="{{ route('admin.productionpeople.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.productionperson.title_singular') }}
             </a>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
+            </button>
             <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
                 {{ trans('global.app_csvImport') }}
             </button>
             @include('csvImport.modal', ['model' => 'Productionperson', 'route' => 'admin.productionpeople.parseCsvImport'])
+            @include('csvImport.import_modal', ['model' => 'Productionperson', 'route' => 'admin.productionpeople.import'])
         </div>
     </div>
 @endcan
@@ -104,7 +108,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

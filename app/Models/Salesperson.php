@@ -33,6 +33,9 @@ class Salesperson extends Model implements HasMedia
     protected $fillable = [
         'code',
         'name',
+        'telephone',
+        'company',
+        'alamat',
         'created_at',
         'updated_at',
         'deleted_at',

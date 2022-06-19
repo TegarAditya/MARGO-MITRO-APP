@@ -34,6 +34,30 @@
                 <span class="help-block">{{ trans('cruds.salesperson.fields.area_pemasaran_helper') }}</span>
             </div>
             <div class="form-group">
+                <label for="telephone">{{ trans('cruds.salesperson.fields.telephone') }}</label>
+                <input class="form-control {{ $errors->has('telephone') ? 'is-invalid' : '' }}" type="text" name="telephone" id="telephone" value="{{ old('telephone', '') }}">
+                @if($errors->has('telephone'))
+                    <span class="text-danger">{{ $errors->first('telephone') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.salesperson.fields.telephone_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label for="company">{{ trans('cruds.salesperson.fields.company') }}</label>
+                <input class="form-control {{ $errors->has('company') ? 'is-invalid' : '' }}" type="text" name="company" id="company" value="{{ old('company', '') }}">
+                @if($errors->has('company'))
+                    <span class="text-danger">{{ $errors->first('company') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.salesperson.fields.company_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label for="alamat">{{ trans('cruds.salesperson.fields.alamat') }}</label>
+                <textarea class="form-control {{ $errors->has('alamat') ? 'is-invalid' : '' }}" name="alamat" id="alamat">{{ old('alamat') }}</textarea>
+                @if($errors->has('alamat'))
+                    <span class="text-danger">{{ $errors->first('alamat') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.salesperson.fields.alamat_helper') }}</span>
+            </div>
+            {{-- <div class="form-group">
                 <label for="foto">{{ trans('cruds.salesperson.fields.foto') }}</label>
                 <div class="needsclick dropzone {{ $errors->has('foto') ? 'is-invalid' : '' }}" id="foto-dropzone">
                 </div>
@@ -41,7 +65,7 @@
                     <span class="text-danger">{{ $errors->first('foto') }}</span>
                 @endif
                 <span class="help-block">{{ trans('cruds.salesperson.fields.foto_helper') }}</span>
-            </div>
+            </div> --}}
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
