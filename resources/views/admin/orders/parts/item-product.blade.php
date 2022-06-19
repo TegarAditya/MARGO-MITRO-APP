@@ -93,7 +93,11 @@ $name = !isset($name) ? 'products' : $name;
                 class="form-control-sm product-price"
                 value="{{ $detail->price ?: 0 }}"
                 min="0"
-            />
+            >
+                <x-slot name="left">
+                    <span class="text-sm mr-1">Rp</span>
+                </x-slot>
+            </x-admin.form-group>
         </div>
 
         <div class="col text-right">
