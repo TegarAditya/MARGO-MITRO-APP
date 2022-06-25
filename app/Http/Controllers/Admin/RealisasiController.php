@@ -9,6 +9,7 @@ use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use App\Models\Realisasi;
 use App\Models\RealisasiDetail;
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
@@ -217,7 +218,7 @@ class RealisasiController extends Controller
                 }
 
                 $productionOrder->production_order_details()->where('product_id', $realisasi_detail->product_id)->update([
-                    'moved' => DB::raw("production_order_details.prod_qty - $realisasi_detail->qty"),
+                    'prod_qty' => DB::raw("production_order_details.prod_qty - $realisasi_detail->qty"),
                 ]);
             }
 
@@ -298,14 +299,55 @@ class RealisasiController extends Controller
 
     public function destroy(Realisasi $realisasi)
     {
-        $realisasi->delete();
+        $productionOrder = ProductionOrder::findOrFail($realisasi->production_order_id);
+
+        DB::beginTransaction();
+        try {
+            $realisasi->load([
+                'realisasi_details', 'realisasi_details.product',
+            ]);
+
+            // Restore to previous data
+            foreach ($realisasi->realisasi_details as $realisasi_detail) {
+                if ($product = $realisasi_detail->product) {
+                    $product->update([
+                        'stock' => $product->stock - $realisasi_detail->qty
+                    ]);
+                }
+
+                $productionOrder->production_order_details()
+                    ->where('product_id', $realisasi_detail->product_id)
+                    ->update([
+                        'prod_qty' => DB::raw("production_order_details.prod_qty - $realisasi_detail->qty"),
+                    ]);
+            }
+
+            // Delete items if removed
+            $realisasi->realisasi_details()
+                ->whereIn('product_id', $realisasi->realisasi_details->pluck('product_id'))
+                ->forceDelete();
+            StockMovement::where('reference', $realisasi->id)
+                ->where('type', 'realisasi')
+                ->whereIn('product_id', $realisasi->realisasi_details->pluck('product_id'))
+                ->delete();
+
+            $realisasi->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.realisasis.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
 
         return back();
     }
 
     public function massDestroy(Request $request)
     {
-        Realisasi::whereIn('id', request('ids'))->delete();
+        // Realisasi::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
