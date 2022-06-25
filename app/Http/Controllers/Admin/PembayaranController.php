@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyPembayaranRequest;
 use App\Http\Requests\StorePembayaranRequest;
 use App\Http\Requests\UpdatePembayaranRequest;
+use App\Models\Order;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use App\Models\TagihanMovement;
@@ -32,7 +33,7 @@ class PembayaranController extends Controller
         $pembayaran = new Pembayaran();
         $tagihan = !$request->tagihan_id ? new Tagihan : Tagihan::find($request->tagihan_id);
         $pembayarans = $tagihan->pembayarans;
-        $order = $tagihan->order;
+        $order = $tagihan->order ?: new Order();
 
         if ($order) {
             $order->load('invoices', 'pembayarans');
@@ -175,7 +176,7 @@ class PembayaranController extends Controller
 
             DB::commit();
 
-            return back();
+            return redirect()->route('admin.pembayarans.index');
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -185,7 +186,7 @@ class PembayaranController extends Controller
 
     public function massDestroy(MassDestroyPembayaranRequest $request)
     {
-        Pembayaran::whereIn('id', request('ids'))->delete();
+        // Pembayaran::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
     }

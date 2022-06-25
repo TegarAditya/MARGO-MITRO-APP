@@ -85,7 +85,7 @@ class InvoiceController extends Controller
 
         $invoice = new Invoice();
         $invoice_details = collect([]);
-        $order = null;
+        $order = new Order();
 
         if ($order_id = request('order_id')) {
             $order = Order::with('invoices', 'tagihan')->findOrFail($order_id);
@@ -342,7 +342,7 @@ class InvoiceController extends Controller
 
             DB::commit();
 
-            return back();
+            return redirect()->route('admin.invoices.index');
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -352,7 +352,7 @@ class InvoiceController extends Controller
 
     public function massDestroy(MassDestroyInvoiceRequest $request)
     {
-        Invoice::whereIn('id', request('ids'))->delete();
+        // Invoice::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
