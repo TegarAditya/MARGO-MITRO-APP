@@ -54,6 +54,7 @@
                 <th class="text-center" width="1%">Bayar</th>
                 <th class="text-center" width="1%">Diskon</th>
                 <th class="text-center" width="1%">Nominal</th>
+                <th class="text-center" width="1%">Action</th>
             </tr>
         </thead>
 
@@ -81,12 +82,18 @@
                         @endif
                     </td>
                     <td class="text-right">@money($row->nominal)</td>
+                    <td class="text-center">
+                        <a href="{{ route('admin.pembayarans.destroy', $row->id) }}" class="pembayaran-delete-btn">
+                            <i class="fa fa-trash text-danger"></i>
+                        </a>
+                    </td>
                 </tr>
             @empty
                 <tr>
                     <td colspan="6" class="text-center">
                         <p class="mb-0">Belum ada riwayat pembayaran</p>
                     </td>
+                    <td>&nbsp;</td>
                 </tr>
             @endforelse
         </tbody>
@@ -141,6 +148,20 @@
     $(function() {
         var form = $('#orderForm');
 
+        $('.pembayaran-delete-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var url = $(e.currentTarget).attr('href');
+
+            if (url && confirm('{{ trans('global.areYouSure') }}')) {
+                $.ajax({
+                    headers: {'x-csrf-token': _token},
+                    method: 'POST',
+                    url: url,
+                    data: { _method: 'DELETE' }
+                }).done(function () { location.reload() })
+            }
+        });
     });
 })(jQuery, window.numeral);
 </script>

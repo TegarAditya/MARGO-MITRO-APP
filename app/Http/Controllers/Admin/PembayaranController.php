@@ -157,9 +157,30 @@ class PembayaranController extends Controller
     {
         abort_if(Gate::denies('pembayaran_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $pembayaran->delete();
+        $tagihan = Tagihan::findOrFail($pembayaran->tagihan_id);
 
-        return back();
+        DB::beginTransaction();
+        try {
+            $tagihan->tagihan_movements()
+                ->where('type', 'pembayaran')
+                ->where('reference', $pembayaran->id)
+                ->where('tagihan_id', $tagihan->id)
+                ->delete();
+
+            $tagihan->update([
+                'saldo' => $tagihan->tagihan_movements()->sum('nominal') ?: 0,
+            ]);
+
+            $pembayaran->delete();
+
+            DB::commit();
+
+            return back();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function massDestroy(MassDestroyPembayaranRequest $request)
