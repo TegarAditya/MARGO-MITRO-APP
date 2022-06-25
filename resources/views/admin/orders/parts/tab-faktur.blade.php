@@ -19,6 +19,7 @@
                 <th rowspan="2" width="120">Masuk/Keluar</th>
                 <th colspan="3" class="text-center py-2">Produk</th>
                 <th rowspan="2" class="text-center" width="1%">Total</th>
+                <th rowspan="2" class="text-center" width="1%">Action</th>
             </tr>
 
             <tr>
@@ -38,12 +39,14 @@
                         return route('admin.invoices.show', ['invoice' => $row->id, 'print' => $type]);
                     };
                     $is_out = 0 < $row->nominal;
+
+                    $no = $loop->iteration;
                     @endphp
 
                     @foreach ($row->invoice_details as $detail)
                         <tr>
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}">{{ $loop->iteration }}</td>
+                                <td rowspan="{{ $rowspan }}">{{ $no }}</td>
                                 <td rowspan="{{ $rowspan }}">
                                     <div class="d-flex">
                                         <div class="flex-grow-1 pr-2">
@@ -94,6 +97,12 @@
                             
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($row->nominal))</td>
+
+                                <td rowspan="{{ $rowspan }}" class="text-center">
+                                    <a href="{{ route('admin.invoices.destroy', $row->id) }}" class="invoice-delete-btn">
+                                        <i class="fa fa-trash text-danger"></i>
+                                    </a>
+                                </td>
                             @endif
                         </tr>
                     @endforeach
@@ -131,6 +140,20 @@
     $(function() {
         var form = $('#invoiceForm');
 
+        $('.invoice-delete-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var url = $(e.currentTarget).attr('href');
+
+            if (url && confirm('{{ trans('global.areYouSure') }}')) {
+                $.ajax({
+                    headers: {'x-csrf-token': _token},
+                    method: 'POST',
+                    url: url,
+                    data: { _method: 'DELETE' }
+                }).done(function () { location.reload() })
+            }
+        });
     });
 })(jQuery, window.numeral);
 </script>
