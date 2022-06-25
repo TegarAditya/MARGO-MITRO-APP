@@ -30,7 +30,7 @@ class TagihanController extends Controller
             $table->editColumn('actions', function ($row) {
                 $viewGate = 'tagihan_show';
                 $editGate = 'tagihan_edit';
-                $deleteGate = 'tagihan_delete';
+                $deleteGate = 'tagihan_delete_hidden'; // 'tagihan_delete';
                 $crudRoutePart = 'tagihans';
 
                 return view('partials.datatablesActions', compact(
