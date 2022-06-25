@@ -83,7 +83,7 @@
                     </td>
                     <td class="text-right">@money($row->nominal)</td>
                     <td class="text-center">
-                        <a href="{{ route('admin.pembayarans.destroy', $row->id) }}" class="pembayaran-delete-btn">
+                        <a href="{{ route('admin.pembayarans.destroy', $row->id) }}" class="pembayaran-delete-btn" data-id="{{ $row->id }}">
                             <i class="fa fa-trash text-danger"></i>
                         </a>
                     </td>
@@ -151,7 +151,9 @@
         $('.pembayaran-delete-btn').on('click', function(e) {
             e.preventDefault();
 
-            var url = $(e.currentTarget).attr('href');
+            var el = $(e.currentTarget);
+            var url = el.attr('href');
+            var id = el.data('id');
 
             if (url && confirm('{{ trans('global.areYouSure') }}')) {
                 $.ajax({
@@ -159,7 +161,13 @@
                     method: 'POST',
                     url: url,
                     data: { _method: 'DELETE' }
-                }).done(function () { location.reload() })
+                }).done(function () {
+                    if (id == '{{ $pembayaran->id }}') {
+                        return (location.href = '{{ route("admin.pembayarans.index") }}');
+                    }
+
+                    location.reload();
+                });
             }
         });
     });
