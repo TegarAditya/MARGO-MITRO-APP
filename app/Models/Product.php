@@ -39,6 +39,9 @@ class Product extends Model implements HasMedia
         'category_id',
         'brand_id',
         'unit_id',
+        'jenjang_id',
+        'kelas_id',
+        'halaman_id',
         'hpp',
         'price',
         'stock',
@@ -84,6 +87,21 @@ class Product extends Model implements HasMedia
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'unit_id');
+    }
+
+    public function jenjang()
+    {
+        return $this->belongsTo(category::class, 'jenjang_id');
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(category::class, 'kelas_id');
+    }
+
+    public function halaman()
+    {
+        return $this->belongsTo(category::class, 'halaman_id');
     }
 
     public function stock_movements()

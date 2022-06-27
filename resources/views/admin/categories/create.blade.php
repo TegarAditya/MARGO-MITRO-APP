@@ -18,6 +18,19 @@
                 <span class="help-block">{{ trans('cruds.category.fields.name_helper') }}</span>
             </div>
             <div class="form-group">
+                <label>{{ trans('cruds.category.fields.type') }}</label>
+                <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
+                    <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                    @foreach(App\Models\Category::TYPE_SELECT as $key => $label)
+                        <option value="{{ $key }}" {{ old('type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('type'))
+                    <span class="text-danger">{{ $errors->first('type') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.category.fields.type_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label for="parent_id">{{ trans('cruds.category.fields.parent') }}</label>
                 <select class="form-control select2 {{ $errors->has('parent') ? 'is-invalid' : '' }}" name="parent_id" id="parent_id">
                     @foreach($parents as $id => $entry)

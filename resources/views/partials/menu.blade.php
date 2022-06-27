@@ -183,15 +183,28 @@
                     </li>
                 @endcan
                 @can('product_access')
-                    <li class="nav-item">
-                        <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is("admin/products") || request()->is("admin/products/*") ? "active" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/product*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-book">
 
                             </i>
                             <p>
                                 {{ trans('cruds.product.title') }}
+                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
                             </p>
                         </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is("admin/products") || request()->is("admin/products/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-book">
+
+                                    </i>
+                                    <p>
+                                        {{ trans('cruds.product.title') }}
+                                    </p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 @endcan
                 @can('stock_access')

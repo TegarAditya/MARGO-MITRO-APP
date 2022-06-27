@@ -50,6 +50,9 @@ class CategoryController extends Controller
             $table->editColumn('slug', function ($row) {
                 return $row->slug ? $row->slug : '';
             });
+            $table->editColumn('type', function ($row) {
+                return $row->type ? Category::TYPE_SELECT[$row->type] : '';
+            });
             $table->addColumn('parent_name', function ($row) {
                 return $row->parent ? $row->parent->name : '';
             });

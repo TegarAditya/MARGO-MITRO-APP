@@ -32,6 +32,9 @@
                         {{ trans('cruds.category.fields.slug') }}
                     </th>
                     <th>
+                        {{ trans('cruds.category.fields.type') }}
+                    </th>
+                    <th>
                         {{ trans('cruds.category.fields.parent') }}
                     </th>
                     <th>
@@ -92,6 +95,7 @@
       { data: 'placeholder', name: 'placeholder' },
 { data: 'name', name: 'name' },
 { data: 'slug', name: 'slug' },
+{ data: 'type', name: 'type' },
 { data: 'parent_name', name: 'parent.name' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
@@ -104,7 +108,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>
