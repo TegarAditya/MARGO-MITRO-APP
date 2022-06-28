@@ -33,9 +33,9 @@
                     <th>
                         {{ trans('cruds.productionOrder.fields.date') }}
                     </th>
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.productionOrder.fields.created_by') }}
-                    </th>
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -96,7 +96,7 @@
 { data: 'no_spk', name: 'no_spk' },
 { data: 'productionperson_name', name: 'productionperson.name' },
 { data: 'date', name: 'date' },
-{ data: 'created_by_name', name: 'created_by.name' },
+// { data: 'created_by_name', name: 'created_by.name' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
@@ -108,7 +108,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

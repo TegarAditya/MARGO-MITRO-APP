@@ -71,7 +71,7 @@
                             </td>
                             <td>
                                 @can('pembayaran_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.pembayarans.show', $pembayaran->id) }}">
+                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.orders.show', $pembayaran->order->id) }}">
                                         {{ trans('global.view') }}
                                     </a>
                                 @endcan
@@ -148,7 +148,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 })
 
 </script>

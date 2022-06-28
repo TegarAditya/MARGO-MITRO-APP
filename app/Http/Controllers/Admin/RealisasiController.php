@@ -32,13 +32,17 @@ class RealisasiController extends Controller
                 $editGate = 'production_order_edit';
                 $deleteGate = 'production_order_delete';
                 $crudRoutePart = 'realisasis';
+                $parent = 'production-orders';
+                $idParent = $row->production_order->id;
 
-                return view('partials.datatablesActions', compact(
+                return view('partials.datatableOrderActions', compact(
                 'viewGate',
                 'editGate',
                 'deleteGate',
                 'crudRoutePart',
-                'row'
+                'parent',
+                'idParent',
+                'row',
             ));
             });
 
@@ -124,7 +128,7 @@ class RealisasiController extends Controller
                 $item->update([ 'stock' => $item->stock + $qty ]);
 
                 $po_detail = $productionOrder->production_order_details()->where('product_id', $item->id)->first();
-                
+
                 if ($po_detail) {
                     $po_detail->update([
                         'prod_qty' => DB::raw("production_order_details.prod_qty + $qty"),
@@ -240,7 +244,7 @@ class RealisasiController extends Controller
                 $item->update([ 'stock' => $item->stock + $qty ]);
 
                 $po_detail = $productionOrder->production_order_details()->where('product_id', $item->id)->first();
-                
+
                 if ($po_detail) {
                     $po_detail->update([
                         'prod_qty' => DB::raw("production_order_details.prod_qty + $qty"),

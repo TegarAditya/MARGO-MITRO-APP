@@ -37,12 +37,16 @@ class InvoiceController extends Controller
                 $editGate = 'invoice_edit';
                 $deleteGate = 'invoice_delete';
                 $crudRoutePart = 'invoices';
+                $parent = 'orders';
+                $idParent = $row->order->id;
 
-                return view('partials.datatablesActions', compact(
+                return view('partials.datatableOrderActions', compact(
                 'viewGate',
                 'editGate',
                 'deleteGate',
                 'crudRoutePart',
+                'parent',
+                'idParent',
                 'row'
             ));
             });

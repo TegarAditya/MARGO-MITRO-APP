@@ -21,9 +21,9 @@
                     <th width="10">
 
                     </th>
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.invoice.fields.id') }}
-                    </th>
+                    </th> --}}
                     <th>
                         {{ trans('cruds.invoice.fields.no_suratjalan') }}
                     </th>
@@ -95,7 +95,7 @@
     ajax: "{{ route('admin.invoices.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
-{ data: 'id', name: 'id' },
+// { data: 'id', name: 'id' },
 { data: 'no_suratjalan', name: 'no_suratjalan' },
 { data: 'no_invoice', name: 'no_invoice' },
 { data: 'order', name: 'order' },
@@ -112,7 +112,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>
