@@ -2,7 +2,6 @@
 
 namespace App\Exports\Admin;
 
-use App\Models\Invoice;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -12,11 +11,11 @@ class ReportInvoicesExport implements FromCollection, ShouldAutoSize
 {
     use Exportable;
 
-    private Collection $invoice;
+    private Collection $invoices;
 
-    public function __construct(Collection $invoice)
+    public function __construct(Collection $invoices)
     {
-        $this->invoice = $invoice;
+        $this->invoices = $invoices;
     }
 
     public function collection()
@@ -32,6 +31,7 @@ class ReportInvoicesExport implements FromCollection, ShouldAutoSize
             'salesperson' => 'Sales Person',
             'date' => 'Tanggal',
             'type' => 'Jenis',
+            'product_id' => 'ID Produk',
             'product_name' => 'Nama Produk',
             'product_price' => 'Harga Produk',
             'product_qty' => 'Qty Produk',
@@ -40,32 +40,30 @@ class ReportInvoicesExport implements FromCollection, ShouldAutoSize
         ]);
 
         $i = 0;
-        foreach ($this->invoice as $invoice) {
+        foreach ($this->invoices as $invoice) {
             $order = $invoice->order;
             $salesperson = $order->salesperson;
             $is_out = 0 < $invoice->nominal;
-            $details_count = $invoice->invoice_details->count();
 
-            $ii = 0;
             foreach ($invoice->invoice_details as $invoice_detail) {
                 $i++;
-                $ii++;
                 $product = $invoice_detail->product;
 
                 $row = [
                     'no' => $i,
-                    'id' => $ii > 1 ? '' : $invoice->id,
-                    'no_order' => $ii > 1 ? '' : $order->no_order,
-                    'no_invoice' => $ii > 1 ? '' : $invoice->no_invoice,
-                    'no_suratjalan' => $ii > 1 ? '' : $invoice->no_suratjalan,
-                    'salesperson' => $ii > 1 ? '' : $salesperson->name,
-                    'date' => $ii > 1 ? '' : $invoice->date,
-                    'type' => $ii > 1 ? '' : ($is_out ? 'Keluar' : 'Masuk'),
+                    'id' => $invoice->id,
+                    'no_order' => $order->no_order,
+                    'no_invoice' => $invoice->no_invoice,
+                    'no_suratjalan' => $invoice->no_suratjalan,
+                    'salesperson' => $salesperson->name,
+                    'date' => $invoice->date,
+                    'type' => $is_out ? 'Keluar' : 'Masuk',
+                    'product_id' => $product->id,
                     'product_name' => $product->name,
                     'product_price' => $invoice_detail->price,
-                    'product_qty' => $invoice_detail->quantity,
-                    'product_subtotal' => $invoice_detail->total,
-                    'nominal' => $ii < $details_count ? '' : $invoice->nominal,
+                    'product_qty' => abs($invoice_detail->quantity),
+                    'product_subtotal' => abs($invoice_detail->total),
+                    'nominal' => abs($invoice->nominal),
                 ];
 
                 $rows->push($row);
