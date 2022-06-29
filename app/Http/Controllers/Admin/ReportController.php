@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\Admin\ReportInvoicesExport;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
-use App\Models\InvoiceDetail;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Pembayaran;
@@ -12,7 +12,6 @@ use App\Models\Salesperson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
-use Yajra\DataTables\Facades\DataTables;
 use Symfony\Component\HttpFoundation\Response;
 use Carbon\Carbon;
 
@@ -64,6 +63,10 @@ class ReportController extends Controller
         }
 
         $invoices = $invoicesQuery->orderByDesc('date')->get();
+
+        if ($request->export) {
+            return (new ReportInvoicesExport($invoices))->download('report-invoice.xlsx');
+        }
 
         return view('admin.report.invoices', compact('orders', 'salespersons', 'invoices', 'products'));
     }
