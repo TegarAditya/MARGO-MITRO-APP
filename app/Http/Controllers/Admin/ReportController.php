@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Exports\Admin\ReportInvoicesExport;
+use App\Exports\Admin\ReportPembayaransExport;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Order;
@@ -64,7 +65,7 @@ class ReportController extends Controller
 
         $invoices = $invoicesQuery->orderByDesc('date')->get();
 
-        if ($request->export) {
+        if ($request->export === 'excel') {
             return (new ReportInvoicesExport($invoices))->download('report-invoice.xlsx');
         }
 
@@ -104,6 +105,10 @@ class ReportController extends Controller
         }
 
         $pembayarans = $pembayaransQuery->orderByDesc('tanggal')->get();
+
+        if ($request->export === 'excel') {
+            return (new ReportPembayaransExport($pembayarans))->download('report-pembayaran.xlsx');
+        }
 
         return view('admin.report.payment', compact('orders', 'salespersons', 'pembayarans'));
     }

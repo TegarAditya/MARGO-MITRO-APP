@@ -9,6 +9,8 @@
         <form action="" method="POST">
             @csrf
 
+            <input type="hidden" name="export" value="{{ request('export') }}" />
+
             <div class="row">
                 <div class="col row">
                     <div class="col-3">
@@ -71,7 +73,15 @@
             </div>
         </form>
 
-        <table class="mt-4 table table-bordered table-invoices">
+        <div class="row border-top pt-2 mt-2">
+            <div class="col-auto">
+                <a href="#" class="btn btn-default export-btn" data-export="excel">
+                    Export Excel
+                </a>
+            </div>
+        </div>
+
+        <table class="mt-3 table table-bordered table-invoices">
             <thead>
                 <tr>
                     <th></th>
@@ -234,7 +244,21 @@
             $(e.currentTarget).hide();
         });
 
-        console.log("PCIKER", picker);
+        // Export
+        var exportField = $('form').find('[name="export"]');
+
+        $('.export-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var el = $(e.currentTarget);
+            var exportType = el.data('export');
+
+            exportType && exportField.val(exportType).closest('form').trigger('submit');
+
+            setTimeout(() => {
+                exportField.val('');
+            }, 100);
+        });
     });
 })(jQuery);
 </script>
