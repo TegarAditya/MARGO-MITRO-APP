@@ -43,9 +43,13 @@ class StockMovementController extends Controller
                 if ($row->type == 'adjustment') {
                     return '<a href="'.route('admin.stock-adjustments.show', $row->reference).'">Reference</a>';
                 } else if ($row->type == 'faktur') {
-                    return '<a href="'.route('admin.stock-adjustments.show', $row->reference).'">Reference</a>';
+                    return '<a href="'.route('admin.invoices.show', $row->reference).'">Reference</a>';
                 } else if ($row->type == 'order') {
-                    return '<a href="'.route('admin.stock-adjustments.show', $row->reference).'">Reference</a>';
+                    return '<a href="'.route('admin.orders.show', $row->reference).'">Reference</a>';
+                } else if ($row->type == 'invoice') {
+                    return '<a href="'.route('admin.invoices.show', $row->reference).'">Reference</a>';
+                } else if ($row->type == 'realisasi') {
+                    return '<a href="'.route('admin.realisasis.show', $row->reference).'">Reference</a>';
                 }
 
                 return $row->reference ? $row->reference : '';

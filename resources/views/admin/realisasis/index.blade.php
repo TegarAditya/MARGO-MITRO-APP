@@ -21,9 +21,9 @@
                     <th width="10">
 
                     </th>
-                    <th>
+                    {{-- <th>
                         ID
-                    </th>
+                    </th> --}}
                     <th>
                         No. PO
                     </th>
@@ -92,7 +92,7 @@
     ajax: "{{ route('admin.realisasis.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
-{ data: 'id', name: 'id' },
+// { data: 'id', name: 'id' },
 { data: 'production_order', name: 'production_order' },
 { data: 'no_realisasi', name: 'no_realisasi' },
 { data: 'date', name: 'date' },
@@ -108,7 +108,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

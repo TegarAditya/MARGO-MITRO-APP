@@ -7,6 +7,36 @@
     </div>
 
     <div class="card-body">
+        @if ($order->id)
+            <div class="row mb-4">
+                <div class="col-6">
+                    @if ($pembayaran->id)
+                        <h4>Pembayaran No. #{{ $pembayaran->no_kwitansi }}</h4>
+                    @endif
+
+                    <div class="row">
+                        <div class="col-auto">
+                            <span class="text-xs">Order No.</span>
+                            <p class="m-0">
+                                <a href="{{ route('admin.orders.edit', $order->id) }}">#{{ $order->no_order }}</a>
+                            </p>
+                        </div>
+
+                        <div class="col-auto">
+                            <span class="text-xs">Sales Person</span>
+                            <p class="m-0">
+                                <strong>{{ $order->salesperson->name ?? '-' }}</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 text-right">
+                    <h6 class="h6 text-primary m-0">{{ $order->date }}</h6>
+                </div>
+            </div>
+        @endif
+
         @if (session()->has('error-message'))
             <p class="text-danger">
                 {{session()->get('error-message')}}

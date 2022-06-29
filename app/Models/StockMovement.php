@@ -18,6 +18,8 @@ class StockMovement extends Model
         'order'    => 'Order',
         'faktur'    => 'Sales',
         'adjustment' => 'Adjustment',
+        'invoice' => 'Invoice',
+        'realisasi' => 'Realisasi',
     ];
 
     public $table = 'stock_movements';

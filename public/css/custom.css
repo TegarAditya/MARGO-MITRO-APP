@@ -152,3 +152,7 @@ div.dt-button-collection {
     color: var(--primary);
     border-color: var(--primary);
 }
+
+.nav-treeview > .nav-item .nav-link {
+    padding-left: 2rem;
+}

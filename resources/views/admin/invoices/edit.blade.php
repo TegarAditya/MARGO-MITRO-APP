@@ -14,9 +14,18 @@
         @if ($order->id)
             <div class="row mb-4">
                 <div class="col-6">
-                    <h4>Order No. <a href="{{ route('admin.orders.edit', $order->id) }}">#{{ $order->no_order }}</a></h4>
+                    @if ($invoice->id)
+                        <h4>Invoice No. #{{ $invoice->no_invoice }}</h4>
+                    @endif
 
                     <div class="row">
+                        <div class="col-auto">
+                            <span class="text-xs">Order No.</span>
+                            <p class="m-0">
+                                <a href="{{ route('admin.orders.edit', $order->id) }}">#{{ $order->no_order }}</a>
+                            </p>
+                        </div>
+
                         <div class="col-auto">
                             <span class="text-xs">Sales Person</span>
                             <p class="m-0">
@@ -49,7 +58,7 @@
             @php
             $tabs = [
                 [ 'label' => 'Faktur', 'enabled' => true ],
-                [ 'label' => 'Riwayat', 'enabled' => $order ],
+                [ 'label' => 'Riwayat', 'enabled' => !!$order->id ],
             ];
             @endphp
             <ul class="nav nav-tabs" id="modelTabs" role="tablist">

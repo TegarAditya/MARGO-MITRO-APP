@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyPembayaranRequest;
 use App\Http\Requests\StorePembayaranRequest;
 use App\Http\Requests\UpdatePembayaranRequest;
+use App\Models\Order;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use App\Models\TagihanMovement;
@@ -32,7 +33,7 @@ class PembayaranController extends Controller
         $pembayaran = new Pembayaran();
         $tagihan = !$request->tagihan_id ? new Tagihan : Tagihan::find($request->tagihan_id);
         $pembayarans = $tagihan->pembayarans;
-        $order = $tagihan->order;
+        $order = $tagihan->order ?: new Order();
 
         if ($order) {
             $order->load('invoices', 'pembayarans');
@@ -157,14 +158,35 @@ class PembayaranController extends Controller
     {
         abort_if(Gate::denies('pembayaran_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $pembayaran->delete();
+        $tagihan = Tagihan::findOrFail($pembayaran->tagihan_id);
 
-        return back();
+        DB::beginTransaction();
+        try {
+            $tagihan->tagihan_movements()
+                ->where('type', 'pembayaran')
+                ->where('reference', $pembayaran->id)
+                ->where('tagihan_id', $tagihan->id)
+                ->delete();
+
+            $tagihan->update([
+                'saldo' => $tagihan->tagihan_movements()->sum('nominal') ?: 0,
+            ]);
+
+            $pembayaran->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.pembayarans.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function massDestroy(MassDestroyPembayaranRequest $request)
     {
-        Pembayaran::whereIn('id', request('ids'))->delete();
+        // Pembayaran::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
     }

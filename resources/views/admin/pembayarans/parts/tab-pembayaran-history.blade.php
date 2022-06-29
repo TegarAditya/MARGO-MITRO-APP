@@ -54,6 +54,7 @@
                 <th class="text-center" width="1%">Bayar</th>
                 <th class="text-center" width="1%">Diskon</th>
                 <th class="text-center" width="1%">Nominal</th>
+                <th class="text-center" width="1%">Action</th>
             </tr>
         </thead>
 
@@ -81,12 +82,18 @@
                         @endif
                     </td>
                     <td class="text-right">@money($row->nominal)</td>
+                    <td class="text-center">
+                        <a href="{{ route('admin.pembayarans.destroy', $row->id) }}" class="pembayaran-delete-btn" data-id="{{ $row->id }}">
+                            <i class="fa fa-trash text-danger"></i>
+                        </a>
+                    </td>
                 </tr>
             @empty
                 <tr>
                     <td colspan="6" class="text-center">
                         <p class="mb-0">Belum ada riwayat pembayaran</p>
                     </td>
+                    <td>&nbsp;</td>
                 </tr>
             @endforelse
         </tbody>
@@ -141,6 +148,28 @@
     $(function() {
         var form = $('#orderForm');
 
+        $('.pembayaran-delete-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var el = $(e.currentTarget);
+            var url = el.attr('href');
+            var id = el.data('id');
+
+            if (url && confirm('{{ trans('global.areYouSure') }}')) {
+                $.ajax({
+                    headers: {'x-csrf-token': _token},
+                    method: 'POST',
+                    url: url,
+                    data: { _method: 'DELETE' }
+                }).done(function () {
+                    if (id == '{{ $pembayaran->id }}') {
+                        return (location.href = '{{ route("admin.pembayarans.index") }}');
+                    }
+
+                    location.reload();
+                });
+            }
+        });
     });
 })(jQuery, window.numeral);
 </script>

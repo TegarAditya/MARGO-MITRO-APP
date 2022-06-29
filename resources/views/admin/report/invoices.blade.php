@@ -96,9 +96,6 @@
                     <th width="110" rowspan="2">
                         {{ trans('cruds.invoice.fields.date') }}
                     </th>
-                    <th width="110" rowspan="2">
-                        Masuk/Keluar
-                    </th>
                     <th colspan="3" class="text-center">
                         Products
                     </th>
@@ -167,12 +164,25 @@
                                             </p>
                                         </div>
                                     </div>
+
+                                    <div class="row pt-1 mt-1 border-top">
+                                        <div class="col-12">
+                                            <p class="pt-3 text-center mb-0 {{ $is_out ? 'text-success' : 'text-danger' }}">
+                                                <strong class="text-xs">
+                                                    @if ($is_out)
+                                                        <i class="fa fa-arrow-up"></i>
+                                                        Keluar
+                                                    @else
+                                                        <i class="fa fa-arrow-down"></i>
+                                                        Masuk
+                                                    @endif
+                                                </strong>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td rowspan="{{ $rowspan }}">
                                     {{ $invoice->date }}
-                                </td>
-                                <td rowspan="{{ $rowspan }}" class="{{ $is_out ? 'text-warning' : 'text-info' }}">
-                                    {{ $is_out ? 'Keluar' : 'Masuk' }}
                                 </td>
                             @endif
 
@@ -189,7 +199,7 @@
                             </td>
                             <td class="text-center">{{ abs($detail->quantity) }}</td>
                             <td class="text-right">@money(abs($detail->total))</td>
-                            
+
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($invoice->nominal))</td>
                             @endif
@@ -206,7 +216,7 @@
 
             <tfoot>
                 <tr>
-                    <td colspan="5" class="text-right">
+                    <td colspan="4" class="text-right">
                         <strong>Total</strong>
                     </td>
 

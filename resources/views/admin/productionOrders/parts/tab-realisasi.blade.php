@@ -17,6 +17,7 @@
                 <th rowspan="2" width="120">Tanggal</th>
                 <th colspan="3" class="text-center py-2">Produk</th>
                 <th rowspan="2" class="text-center" width="1%">Total</th>
+                <th rowspan="2" class="text-center" width="1%">Action</th>
             </tr>
 
             <tr>
@@ -36,13 +37,17 @@
                         return route('admin.realisasis.show', ['realisasi' => $row->id, 'print' => $type]);
                     };
                     $is_out = 0 < $row->nominal;
+
+                    $no = $loop->iteration;
                     @endphp
 
                     @foreach ($row->realisasi_details as $detail)
                         <tr>
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}">{{ $loop->iteration }}</td>
-                                <td rowspan="{{ $rowspan }}">{{ $row->no_realisasi }}</td>
+                                <td rowspan="{{ $rowspan }}">{{ $no }}</td>
+                                <td rowspan="{{ $rowspan }}">
+                                    <a href="{{ route('admin.realisasis.edit', $row->id) }}">{{ $row->no_realisasi }}</a>
+                                </td>
                                 <td rowspan="{{ $rowspan }}">{{ $row->date }}</td>
                             @endif
 
@@ -64,6 +69,12 @@
                             
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($row->nominal))</td>
+
+                                <td rowspan="{{ $rowspan }}" class="text-center">
+                                    <a href="{{ route('admin.realisasis.destroy', $row->id) }}" class="realisasi-delete-btn">
+                                        <i class="fa fa-trash text-danger"></i>
+                                    </a>
+                                </td>
                             @endif
                         </tr>
                     @endforeach
@@ -100,7 +111,23 @@
 (function($, numeral) {
     $(function() {
         var form = $('#modelForm');
+        orm');
 
+        $('.realisasi-delete-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var el = $(e.currentTarget);
+            var url = el.attr('href');
+
+            if (url && confirm('{{ trans('global.areYouSure') }}')) {
+                $.ajax({
+                    headers: {'x-csrf-token': _token},
+                    method: 'POST',
+                    url: url,
+                    data: { _method: 'DELETE' }
+                }).done(function () { location.reload() });
+            }
+        });
     });
 })(jQuery, window.numeral);
 </script>

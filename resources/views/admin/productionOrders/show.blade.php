@@ -15,15 +15,21 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
     <div class="card-body">
         <div class="row">
-            <div class="col">
+            {{-- <div class="col">
                 <a class="btn btn-default" href="{{ route('admin.orders.index') }}">
                     {{ trans('global.back_to_list') }}
+                </a>
+            </div> --}}
+
+            <div class="col">
+                <a class="btn btn-default" href="{{ url()->previous() }}">
+                    Back
                 </a>
             </div>
 
             <div class="col-auto">
-                <a class="btn btn-info" href="{{ route('admin.orders.edit', $productionOrder->id) }}">
-                    Edit Order
+                <a class="btn btn-info" href="{{ route('admin.production-orders.edit', $productionOrder->id) }}">
+                    Edit Production Order
                 </a>
             </div>
         </div>
@@ -147,7 +153,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                             <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
                                         </div>
                                     @endif
-                                
+
                                     <div class="col-4">
                                         <p class="mb-0 text-sm">
                                             Stock: {{ $product->stock }}
@@ -168,12 +174,12 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                                 Production Qty: {{ $po_detail->prod_qty }}
                                             </p>
                                         </div>
-                                
+
                                         <div class="col text-right" style="max-width: 240px">
                                             <p class="text-sm mb-0">Harga</p>
                                             <p class="m-0">@money($po_detail->ongkos_satuan)</p>
                                         </div>
-                                
+
                                         <div class="col text-right">
                                             <p class="text-sm mb-0">Subtotal</p>
                                             <p class="m-0">@money($po_detail->ongkos_total)</p>
@@ -229,7 +235,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                     <span>Tanggal<br />{{ $realisasi->date }}</span>
                                 </div>
                             </div>
-                            
+
                             @foreach ([
                                 [
                                     'label' => 'Realisasi Produk',

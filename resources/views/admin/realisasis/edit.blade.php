@@ -14,9 +14,24 @@
         @if ($productionOrder->id)
             <div class="row mb-4">
                 <div class="col">
-                    <h4>PO No. #{{ $productionOrder->po_number }}</h4>
+                    @if ($realisasi->id)
+                        <h4>
+                            No. Realisasi #{{ $realisasi->no_realisasi }}
+                        </h4>
+                    @endif
 
                     <div class="row">
+                        <div class="col-auto">
+                            <span class="text-xs">PO No. </span>
+                            <p class="m-0">
+                                <strong>
+                                    <a href="{{ route('admin.production-orders.edit', $productionOrder->id) }}">
+                                        #{{ $productionOrder->po_number }}
+                                    </a>
+                                </strong>
+                            </p>
+                        </div>
+
                         <div class="col-auto">
                             <span class="text-xs">Production Person</span>
                             <p class="m-0">
@@ -77,7 +92,7 @@
             @method(!$realisasi->id ? 'POST' : 'PUT')
             @csrf
 
-            @if ($production_order_id = request('production_order_id'))
+            @if ($production_order_id = request('production_order_id', $realisasi->production_order_id))
                 <input type="hidden" name="redirect" value="{{ route('admin.production-orders.edit', $production_order_id) }}" />
             @endif
 

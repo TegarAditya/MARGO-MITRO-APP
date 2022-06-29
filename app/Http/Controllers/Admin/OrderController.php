@@ -33,7 +33,7 @@ class OrderController extends Controller
             $table->editColumn('actions', function ($row) {
                 $viewGate = 'order_show';
                 $editGate = 'order_edit';
-                $deleteGate = 'order_delete';
+                $deleteGate = 'order_delete_hidden'; // 'order_delete';
                 $crudRoutePart = 'orders';
 
                 return view('partials.datatablesActions', compact(
@@ -218,7 +218,7 @@ class OrderController extends Controller
     {
         abort_if(Gate::denies('order_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $order->delete();
+        // $order->delete();
 
         return back();
     }

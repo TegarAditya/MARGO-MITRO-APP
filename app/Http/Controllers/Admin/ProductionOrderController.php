@@ -36,7 +36,7 @@ class ProductionOrderController extends Controller
             $table->editColumn('actions', function ($row) {
                 $viewGate = 'production_order_show';
                 $editGate = 'production_order_edit';
-                $deleteGate = 'production_order_delete';
+                $deleteGate = 'production_order_delete_hidden'; //order delete hidden
                 $crudRoutePart = 'production-orders';
 
                 return view('partials.datatablesActions', compact(
@@ -97,7 +97,7 @@ class ProductionOrderController extends Controller
         DB::beginTransaction();
         try {
             $productionOrder = new ProductionOrder();
-            
+
             $productionOrder->forceFill([
                 'productionperson_id' => $request->productionperson_id,
                 'date' => $request->date,

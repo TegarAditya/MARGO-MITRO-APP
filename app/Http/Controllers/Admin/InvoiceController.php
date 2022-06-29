@@ -37,12 +37,16 @@ class InvoiceController extends Controller
                 $editGate = 'invoice_edit';
                 $deleteGate = 'invoice_delete';
                 $crudRoutePart = 'invoices';
+                $parent = 'orders';
+                $idParent = $row->order->id;
 
-                return view('partials.datatablesActions', compact(
+                return view('partials.datatableOrderActions', compact(
                 'viewGate',
                 'editGate',
                 'deleteGate',
                 'crudRoutePart',
+                'parent',
+                'idParent',
                 'row'
             ));
             });
@@ -56,12 +60,12 @@ class InvoiceController extends Controller
             $table->editColumn('no_invoice', function ($row) {
                 return $row->no_invoice ? $row->no_invoice : '';
             });
-            $table->addColumn('order_date', function ($row) {
-                return $row->order ? $row->order->date : '';
+            $table->addColumn('order', function ($row) {
+                return !$row->order ? '-' : '<a href="'.route('admin.orders.show', $row->order->id).'">'.$row->order->no_order.'</a>';
             });
 
             $table->editColumn('nominal', function ($row) {
-                return $row->nominal ? $row->nominal : '';
+                return $row->nominal ? abs($row->nominal) : '';
             });
 
             $table->rawColumns(['actions', 'placeholder', 'order']);
@@ -85,7 +89,7 @@ class InvoiceController extends Controller
 
         $invoice = new Invoice();
         $invoice_details = collect([]);
-        $order = null;
+        $order = new Order();
 
         if ($order_id = request('order_id')) {
             $order = Order::with('invoices', 'tagihan')->findOrFail($order_id);
@@ -304,18 +308,55 @@ class InvoiceController extends Controller
         return view('admin.invoices.show', compact('invoice'));
     }
 
-    public function destroy(Invoice $invoice)
+    public function destroy(Request $request, Invoice $invoice)
     {
         abort_if(Gate::denies('invoice_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $invoice->delete();
+        $order = Order::findOrFail($invoice->order_id);
 
-        return back();
+        DB::beginTransaction();
+        try {
+            $invoice->load([
+                'invoice_details', 'invoice_details.product',
+            ]);
+
+            // Restore to previous data
+            foreach ($invoice->invoice_details as $invoice_detail) {
+                if ($product = $invoice_detail->product) {
+                    $product->update([
+                        'stock' => $product->stock + $invoice_detail->quantity
+                    ]);
+                }
+
+                $order->order_details()->where('product_id', $invoice_detail->product_id)->update([
+                    'moved' => DB::raw("order_details.moved - $invoice_detail->quantity"),
+                ]);
+            }
+
+            // Delete items if removed
+            $invoice->invoice_details()
+                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->forceDelete();
+            StockMovement::where('reference', $invoice->id)
+                ->where('type', 'invoice')
+                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->delete();
+
+            $invoice->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.invoices.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function massDestroy(MassDestroyInvoiceRequest $request)
     {
-        Invoice::whereIn('id', request('ids'))->delete();
+        // Invoice::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
     }

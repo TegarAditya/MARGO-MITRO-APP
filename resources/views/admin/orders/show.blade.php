@@ -7,9 +7,15 @@
 
     <div class="card-body">
         <div class="row">
-            <div class="col">
+            {{-- <div class="col">
                 <a class="btn btn-default" href="{{ route('admin.orders.index') }}">
                     {{ trans('global.back_to_list') }}
+                </a>
+            </div> --}}
+
+            <div class="col">
+                <a class="btn btn-default" href="{{ url()->previous() }}">
+                    Back
                 </a>
             </div>
 
@@ -94,7 +100,7 @@
                                         <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
                                     </div>
                                 @endif
-                            
+
                                 <div class="col-4">
                                     <p class="mb-0 text-sm">
                                         Stock: {{ $product->stock }}
@@ -115,12 +121,12 @@
                                             Terkirim: {{ $order_detail->moved }}
                                         </p>
                                     </div>
-                            
+
                                     <div class="col text-right" style="max-width: 240px">
                                         <p class="text-sm mb-0">Harga</p>
                                         <p class="m-0">@money($order_detail->price)</p>
                                     </div>
-                            
+
                                     <div class="col text-right">
                                         <p class="text-sm mb-0">Subtotal</p>
                                         <p class="m-0">@money($order_detail->total)</p>
@@ -336,7 +342,7 @@
                 </table>
 
                 <hr class="my-2 text-right ml-5 mx-0" />
-                
+
                 <div class="row text-right">
                     <div class="col text-left">
                         <h6 class="m-0">Detail Tagihan</h6>
