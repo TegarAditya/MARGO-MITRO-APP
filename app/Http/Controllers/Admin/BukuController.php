@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Excel;
-use App\Imports\ProductImport;
+use App\Imports\BukuImport;
 use Alert;
 
 class BukuController extends Controller
@@ -33,7 +33,7 @@ class BukuController extends Controller
         abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Product::with(['category', 'brand', 'unit'])->select(sprintf('%s.*', (new Product())->table));
+            $query = Product::where('category_id', 1)->with(['category', 'brand', 'unit'])->select(sprintf('%s.*', (new Product())->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -43,7 +43,7 @@ class BukuController extends Controller
                 $viewGate = 'product_show';
                 $editGate = 'product_edit';
                 $deleteGate = 'product_delete';
-                $crudRoutePart = 'products';
+                $crudRoutePart = 'buku';
 
                 return view('partials.datatablesActions', compact(
                 'viewGate',
@@ -54,15 +54,21 @@ class BukuController extends Controller
             ));
             });
 
-            $table->editColumn('slug', function ($row) {
-                return $row->slug ? $row->slug : '';
-            });
-
             $table->editColumn('name', function ($row) {
-                return $row->name ? $row->name : '';
+                if ($row->kelas && $row->halaman) {
+                    return $row->name ? $row->name .' -  KELAS '.$row->kelas->name. ' - HAL '. $row->halaman->name : '';
+                } else {
+                    return $row->name ? $row->name : '';
+                }
             });
-            $table->addColumn('category_name', function ($row) {
-                return $row->category ? $row->category->name : '';
+            $table->addColumn('jenjang_name', function ($row) {
+                return $row->jenjang ? $row->jenjang->name : '';
+            });
+            $table->addColumn('kelas_name', function ($row) {
+                return $row->kelas ? $row->kelas->name : '';
+            });
+            $table->addColumn('halaman_name', function ($row) {
+                return $row->halaman ? $row->halaman->name : '';
             });
             $table->addColumn('brand_name', function ($row) {
                 return $row->brand ? $row->brand->name : '';
@@ -74,39 +80,31 @@ class BukuController extends Controller
                 return $row->price ? 'Rp '. number_format($row->price, 0, ',', '.') : '';
             });
             $table->editColumn('stock', function ($row) {
-                return $row->stock ? $row->stock. ' '. $row->unit->name : '';
+                return $row->stock. ' '. $row->unit->name;
             });
             $table->editColumn('status', function ($row) {
                 return '<input type="checkbox" disabled ' . ($row->status ? 'checked' : null) . '>';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'category', 'brand', 'status']);
+            $table->rawColumns(['actions', 'placeholder', 'category', 'brand', 'status', 'kelas', 'jenjang', 'halaman']);
 
             return $table->make(true);
         }
 
-        $categories = Category::get();
-        $brands     = Brand::get();
-        $units      = Unit::get();
-
-        return view('admin.buku.index', compact('categories', 'brands', 'units'));
+        return view('admin.buku.index');
     }
 
     public function create()
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $categories = Category::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.buku.create', compact('brands', 'categories', 'units', 'jenjang', 'kelas', 'halaman'));
+        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman'));
     }
 
     public function store(StoreProductRequest $request)
@@ -126,24 +124,26 @@ class BukuController extends Controller
         return redirect()->route('admin.buku.index');
     }
 
-    public function edit(Product $product)
+    public function edit($id)
     {
+        $product = Product::find($id);
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $categories = Category::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $product->load('category', 'brand', 'unit');
+        $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman');
 
-        return view('admin.buku.edit', compact('brands', 'categories', 'product', 'units'));
+        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman'));
     }
 
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, $id)
     {
-        $request->request->add(['status' => 1]);
+        $product = Product::find($id);
+        // $request->request->add(['status' => 1]);
         $request->request->add(['slug' => SlugService::createSlug(Product::class, 'slug', $request->name)]);
         $product->update($request->all());
 
@@ -164,23 +164,24 @@ class BukuController extends Controller
         return redirect()->route('admin.buku.index');
     }
 
-    public function show(Product $product)
+    public function show($id)
     {
+        $product = Product::find($id);
         abort_if(Gate::denies('product_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $product->load('category', 'brand', 'unit');
+        $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman');
 
         $stockMovements = StockMovement::with(['product'])->where('product_id', $product->id)->orderBy('created_at', 'DESC')->get();
 
         return view('admin.buku.show', compact('product', 'stockMovements'));
     }
 
-    public function destroy(Product $product)
+    public function destroy($id)
     {
+        $product = Product::find($id);
         abort_if(Gate::denies('product_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $product->delete();
-
         return back();
     }
 
@@ -210,9 +211,9 @@ class BukuController extends Controller
             'import_file' => 'mimes:csv,txt,xls,xlsx',
         ]);
 
-        Excel::import(new ProductImport(), $file);
+        Excel::import(new BukuImport(), $file);
 
-        Alert::success('Success', 'Produk berhasil di import');
+        Alert::success('Success', 'Buku berhasil di import');
         return redirect()->back();
     }
 }

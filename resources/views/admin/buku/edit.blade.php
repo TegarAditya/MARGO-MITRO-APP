@@ -27,18 +27,6 @@
                 <span class="help-block">{{ trans('cruds.product.fields.description_helper') }}</span>
             </div>
             <div class="form-group">
-                <label class="required" for="category_id">{{ trans('cruds.product.fields.category') }}</label>
-                <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="category_id" id="category_id" required>
-                    @foreach($categories as $id => $entry)
-                        <option value="{{ $id }}" {{ (old('category_id') ? old('category_id') : $product->category->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('category'))
-                    <span class="text-danger">{{ $errors->first('category') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.product.fields.category_helper') }}</span>
-            </div>
-            <div class="form-group">
                 <label for="brand_id">{{ trans('cruds.product.fields.brand') }}</label>
                 <select class="form-control select2 {{ $errors->has('brand') ? 'is-invalid' : '' }}" name="brand_id" id="brand_id">
                     @foreach($brands as $id => $entry)

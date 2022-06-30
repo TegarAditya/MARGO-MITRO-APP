@@ -3,23 +3,19 @@
 @can('product_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.products.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.product.title_singular') }}
+            <a class="btn btn-success" href="{{ route('admin.bahan.create') }}">
+                {{ trans('global.add') }} {{ trans('cruds.bahan.title_singular') }}
             </a>
             <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
                 Import
             </button>
-            <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
-                {{ trans('global.app_csvImport') }}
-            </button>
-            @include('csvImport.modal', ['model' => 'Product', 'route' => 'admin.products.parseCsvImport'])
-            @include('csvImport.import_modal', ['model' => 'Product', 'route' => 'admin.products.import'])
+            @include('csvImport.import_modal', ['model' => 'Product', 'route' => 'admin.bahan.import'])
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.product.title_singular') }} {{ trans('global.list') }}
+        {{ trans('cruds.bahan.title_singular') }} {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
@@ -30,68 +26,20 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.category') }}
+                        {{ trans('cruds.bahan.fields.name') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.brand') }}
+                        {{ trans('cruds.bahan.fields.hpp') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.name') }}
+                        {{ trans('cruds.bahan.fields.price') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.slug') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.hpp') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.price') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.stock') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.status') }}
+                        {{ trans('cruds.bahan.fields.stock') }}
                     </th>
                     <th>
                         &nbsp;
                     </th>
-                </tr>
-                <tr>
-                    <td>
-                    </td>
-                    <td>
-                        <select class="search">
-                            <option value>{{ trans('global.all') }}</option>
-                            @foreach($categories as $key => $item)
-                                <option value="{{ $item->name }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="search">
-                            <option value>{{ trans('global.all') }}</option>
-                            @foreach($brands as $key => $item)
-                                <option value="{{ $item->name }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
-                    </td>
-                    <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
                 </tr>
             </thead>
         </table>
@@ -102,13 +50,13 @@
 @section('scripts')
 @parent
 <script>
-    $(function () {
+$(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 @can('product_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.products.massDestroy') }}",
+    url: "{{ route('admin.bahan.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
@@ -140,50 +88,24 @@
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.products.index') }}",
+    ajax: "{{ route('admin.bahan.index') }}",
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'category_name', name: 'category.name' },
-        { data: 'brand_name', name: 'brand.name' },
         { data: 'name', name: 'name' },
-        { data: 'slug', name: 'slug' },
         { data: 'hpp', name: 'hpp' },
         { data: 'price', name: 'price' },
         { data: 'stock', name: 'stock' },
-        { data: 'status', name: 'status' },
         { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
   let table = $('.datatable-Product').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-
-let visibleColumnsIndexes = null;
-$('.datatable thead').on('input', '.search', function () {
-      let strict = $(this).attr('strict') || false
-      let value = strict && this.value ? "^" + this.value + "$" : this.value
-
-      let index = $(this).parent().index()
-      if (visibleColumnsIndexes !== null) {
-        index = visibleColumnsIndexes[index]
-      }
-
-      table
-        .column(index)
-        .search(value, strict)
-        .draw()
-  });
-table.on('column-visibility.dt', function(e, settings, column, state) {
-      visibleColumnsIndexes = []
-      table.columns(":visible").every(function(colIdx) {
-          visibleColumnsIndexes.push(colIdx);
-      });
-  })
 });
 
 </script>

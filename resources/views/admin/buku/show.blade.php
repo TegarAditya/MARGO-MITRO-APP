@@ -3,13 +3,13 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.show') }} {{ trans('cruds.product.title') }}
+        {{ trans('global.show') }} {{ trans('cruds.buku.title') }}
     </div>
 
     <div class="card-body">
         <div class="form-group">
             <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.products.index') }}">
+                <a class="btn btn-default" href="{{ route('admin.buku.index') }}">
                     {{ trans('global.back_to_list') }}
                 </a>
             </div>
@@ -17,39 +17,7 @@
                 <tbody>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.name') }}
-                        </th>
-                        <td>
-                            {{ $product->name }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.product.fields.slug') }}
-                        </th>
-                        <td>
-                            {{ $product->slug }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.product.fields.description') }}
-                        </th>
-                        <td>
-                            {{ $product->description }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.product.fields.category') }}
-                        </th>
-                        <td>
-                            {{ $product->category->name ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.product.fields.brand') }}
+                            {{ trans('cruds.buku.fields.brand') }}
                         </th>
                         <td>
                             {{ $product->brand->name ?? '' }}
@@ -57,7 +25,63 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.hpp') }}
+                            {{ trans('cruds.buku.fields.jenjang') }}
+                        </th>
+                        <td>
+                            {{ $product->jenjang->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.buku.fields.name') }}
+                        </th>
+                        <td>
+                            {{ $product->name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.buku.fields.kelas') }}
+                        </th>
+                        <td>
+                            {{ $product->kelas->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.buku.fields.halaman') }}
+                        </th>
+                        <td>
+                            {{ $product->halaman->name ?? '' }}
+                        </td>
+                    </tr>
+                    {{-- <tr>
+                        <th>
+                            {{ trans('cruds.buku.fields.slug') }}
+                        </th>
+                        <td>
+                            {{ $product->slug }}
+                        </td>
+                    </tr> --}}
+                    <tr>
+                        <th>
+                            {{ trans('cruds.buku.fields.description') }}
+                        </th>
+                        <td>
+                            {{ $product->description }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.buku.fields.category') }}
+                        </th>
+                        <td>
+                            {{ $product->category->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.buku.fields.hpp') }}
                         </th>
                         <td>
                             @money($product->hpp)
@@ -65,7 +89,7 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.price') }}
+                            {{ trans('cruds.buku.fields.price') }}
                         </th>
                         <td>
                             @money($product->price)
@@ -73,7 +97,7 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.finishing_cost') }}
+                            {{ trans('cruds.buku.fields.finishing_cost') }}
                         </th>
                         <td>
                             @money($product->finishing_cost)
@@ -81,7 +105,7 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.stock') }}
+                            {{ trans('cruds.buku.fields.stock') }}
                         </th>
                         <td>
                             {{ $product->stock }} {{ $product->unit->name }}
@@ -89,7 +113,7 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.min_stock') }}
+                            {{ trans('cruds.buku.fields.min_stock') }}
                         </th>
                         <td>
                             {{ $product->min_stock }} {{ $product->unit->name }}
@@ -97,7 +121,7 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.foto') }}
+                            {{ trans('cruds.buku.fields.foto') }}
                         </th>
                         <td>
                             @foreach($product->foto as $key => $media)
@@ -105,14 +129,6 @@
                                     <img src="{{ $media->getUrl('thumb') }}">
                                 </a>
                             @endforeach
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.product.fields.status') }}
-                        </th>
-                        <td>
-                            <input type="checkbox" disabled="disabled" {{ $product->status ? 'checked' : '' }}>
                         </td>
                     </tr>
                 </tbody>
@@ -190,7 +206,7 @@
   $.extend(true, $.fn.dataTable.defaults, {
     orderCellsTop: true,
     order: [[ 5, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   });
   let table = $('.datatable-StockMovement:not(.ajaxTable)').DataTable({ buttons: dtButtons })
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){

@@ -72,8 +72,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('bahan/import', 'BahanController@import')->name('bahan.import');
     Route::resource('bahan', 'BahanController');
 
-
-
     // Salesperson
     Route::delete('salespeople/destroy', 'SalespersonController@massDestroy')->name('salespeople.massDestroy');
     Route::post('salespeople/media', 'SalespersonController@storeMedia')->name('salespeople.storeMedia');

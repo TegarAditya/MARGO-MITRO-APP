@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Excel;
-use App\Imports\ProductImport;
+use App\Imports\BahanImport;
 use Alert;
 
 class BahanController extends Controller
@@ -33,7 +33,7 @@ class BahanController extends Controller
         abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Product::with(['category', 'brand', 'unit'])->select(sprintf('%s.*', (new Product())->table));
+            $query = Product::where('category_id', 2)->with(['category', 'brand', 'unit'])->select(sprintf('%s.*', (new Product())->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -43,7 +43,7 @@ class BahanController extends Controller
                 $viewGate = 'product_show';
                 $editGate = 'product_edit';
                 $deleteGate = 'product_delete';
-                $crudRoutePart = 'products';
+                $crudRoutePart = 'bahan';
 
                 return view('partials.datatablesActions', compact(
                 'viewGate',
@@ -54,18 +54,8 @@ class BahanController extends Controller
             ));
             });
 
-            $table->editColumn('slug', function ($row) {
-                return $row->slug ? $row->slug : '';
-            });
-
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
-            });
-            $table->addColumn('category_name', function ($row) {
-                return $row->category ? $row->category->name : '';
-            });
-            $table->addColumn('brand_name', function ($row) {
-                return $row->brand ? $row->brand->name : '';
             });
             $table->editColumn('hpp', function ($row) {
                 return $row->hpp ? 'Rp '. number_format($row->hpp, 0, ',', '.') : '';
@@ -74,39 +64,33 @@ class BahanController extends Controller
                 return $row->price ? 'Rp '. number_format($row->price, 0, ',', '.') : '';
             });
             $table->editColumn('stock', function ($row) {
-                return $row->stock ? $row->stock. ' '. $row->unit->name : '';
+                return $row->stock. ' '. $row->unit->name;
             });
             $table->editColumn('status', function ($row) {
                 return '<input type="checkbox" disabled ' . ($row->status ? 'checked' : null) . '>';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'category', 'brand', 'status']);
+            $table->rawColumns(['actions', 'placeholder']);
 
             return $table->make(true);
         }
 
-        $categories = Category::get();
-        $brands     = Brand::get();
-        $units      = Unit::get();
-
-        return view('admin.products.index', compact('categories', 'brands', 'units'));
+        return view('admin.bahan.index');
     }
 
     public function create()
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $categories = Category::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.products.create', compact('brands', 'categories', 'units'));
+        return view('admin.bahan.create', compact('units'));
     }
 
     public function store(StoreProductRequest $request)
     {
+        $request->request->add(['status' => 1]);
+        $request->request->add(['category_id' => 2]);
         $product = Product::create($request->all());
 
         foreach ($request->input('foto', []) as $file) {
@@ -117,26 +101,24 @@ class BahanController extends Controller
             Media::whereIn('id', $media)->update(['model_id' => $product->id]);
         }
 
-        return redirect()->route('admin.products.index');
+        return redirect()->route('admin.bahan.index');
     }
 
-    public function edit(Product $product)
+    public function edit($id)
     {
+        $product = Product::find($id);
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $categories = Category::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $product->load('category', 'brand', 'unit');
+        $product->load('unit');
 
-        return view('admin.products.edit', compact('brands', 'categories', 'product', 'units'));
+        return view('admin.bahan.edit', compact('product', 'units'));
     }
 
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, $id)
     {
+        $product = Product::find($id);
         $request->request->add(['slug' => SlugService::createSlug(Product::class, 'slug', $request->name)]);
         $product->update($request->all());
 
@@ -154,26 +136,27 @@ class BahanController extends Controller
             }
         }
 
-        return redirect()->route('admin.products.index');
+        return redirect()->route('admin.bahan.index');
     }
 
-    public function show(Product $product)
+    public function show($id)
     {
+        $product = Product::find($id);
         abort_if(Gate::denies('product_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $product->load('category', 'brand', 'unit');
+        $product->load('unit');
 
         $stockMovements = StockMovement::with(['product'])->where('product_id', $product->id)->orderBy('created_at', 'DESC')->get();
 
-        return view('admin.products.show', compact('product', 'stockMovements'));
+        return view('admin.bahan.show', compact('product', 'stockMovements'));
     }
 
-    public function destroy(Product $product)
+    public function destroy($id)
     {
+        $product = Product::find($id);
         abort_if(Gate::denies('product_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $product->delete();
-
         return back();
     }
 
@@ -203,9 +186,9 @@ class BahanController extends Controller
             'import_file' => 'mimes:csv,txt,xls,xlsx',
         ]);
 
-        Excel::import(new ProductImport(), $file);
+        Excel::import(new BahanImport(), $file);
 
-        Alert::success('Success', 'Produk berhasil di import');
+        Alert::success('Success', 'Bahan berhasil di import');
         return redirect()->back();
     }
 }

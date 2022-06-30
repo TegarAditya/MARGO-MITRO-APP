@@ -183,7 +183,7 @@
                     </li>
                 @endcan
                 @can('product_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/product*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/product*") || request()->is("admin/buku*") || request()->is("admin/bahan*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-book">
 
@@ -195,12 +195,22 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is("admin/products") || request()->is("admin/products/*") ? "active" : "" }}">
+                                <a href="{{ route("admin.buku.index") }}" class="nav-link {{ request()->is("admin/buku") || request()->is("admin/buku/*") ? "active" : "" }}">
                                     <i class="fa-fw nav-icon fas fa-book">
 
                                     </i>
                                     <p>
-                                        {{ trans('cruds.product.title') }}
+                                        Buku
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route("admin.bahan.index") }}" class="nav-link {{ request()->is("admin/bahan") || request()->is("admin/bahan/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-flask">
+
+                                    </i>
+                                    <p>
+                                        Bahan
                                     </p>
                                 </a>
                             </li>

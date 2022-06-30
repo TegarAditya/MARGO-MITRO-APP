@@ -15,7 +15,7 @@
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.product.title_singular') }} {{ trans('global.list') }}
+        {{ trans('cruds.buku.title_singular') }} {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
@@ -26,68 +26,32 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.category') }}
+                        {{ trans('cruds.buku.fields.brand') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.brand') }}
+                        {{ trans('cruds.buku.fields.jenjang') }}
+                    </th>
+                    {{-- <th>
+                        {{ trans('cruds.buku.fields.kelas') }}
+                    </th> --}}
+                    <th>
+                        {{ trans('cruds.buku.fields.name') }}
+                    </th>
+                    {{-- <th>
+                        {{ trans('cruds.buku.fields.halaman') }}
+                    </th> --}}
+                    <th>
+                        {{ trans('cruds.buku.fields.hpp') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.name') }}
+                        {{ trans('cruds.buku.fields.price') }}
                     </th>
                     <th>
-                        {{ trans('cruds.product.fields.slug') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.hpp') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.price') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.stock') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.status') }}
+                        {{ trans('cruds.buku.fields.stock') }}
                     </th>
                     <th>
                         &nbsp;
                     </th>
-                </tr>
-                <tr>
-                    <td>
-                    </td>
-                    <td>
-                        <select class="search">
-                            <option value>{{ trans('global.all') }}</option>
-                            @foreach($categories as $key => $item)
-                                <option value="{{ $item->name }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="search">
-                            <option value>{{ trans('global.all') }}</option>
-                            @foreach($brands as $key => $item)
-                                <option value="{{ $item->name }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
-                    </td>
-                    <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
                 </tr>
             </thead>
         </table>
@@ -139,47 +103,25 @@
     ajax: "{{ route('admin.buku.index') }}",
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'category_name', name: 'category.name' },
         { data: 'brand_name', name: 'brand.name' },
+        { data: 'jenjang_name', name: 'jenjang_name' },
+        // { data: 'kelas_name', name: 'kelas_name' },
         { data: 'name', name: 'name' },
-        { data: 'slug', name: 'slug' },
+        // { data: 'halaman_name', name: 'halaman_name' },
         { data: 'hpp', name: 'hpp' },
         { data: 'price', name: 'price' },
         { data: 'stock', name: 'stock' },
-        { data: 'status', name: 'status' },
         { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
   let table = $('.datatable-Product').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-
-let visibleColumnsIndexes = null;
-$('.datatable thead').on('input', '.search', function () {
-      let strict = $(this).attr('strict') || false
-      let value = strict && this.value ? "^" + this.value + "$" : this.value
-
-      let index = $(this).parent().index()
-      if (visibleColumnsIndexes !== null) {
-        index = visibleColumnsIndexes[index]
-      }
-
-      table
-        .column(index)
-        .search(value, strict)
-        .draw()
-  });
-table.on('column-visibility.dt', function(e, settings, column, state) {
-      visibleColumnsIndexes = []
-      table.columns(":visible").every(function(colIdx) {
-          visibleColumnsIndexes.push(colIdx);
-      });
-  })
 });
 
 </script>
