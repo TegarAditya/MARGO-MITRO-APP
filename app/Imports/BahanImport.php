@@ -9,16 +9,12 @@ use App\Models\Unit;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class ProductImport implements ToModel, WithHeadingRow
+class BahanImport implements ToModel, WithHeadingRow
 {
-    private $categories;
-    private $brands;
     private $units;
 
     public function __construct()
     {
-        $this->categories = Category::select('id', 'name')->get();
-        $this->brands = Brand::select('id', 'name')->get();
         $this->units = Unit::select('id', 'name')->get();
     }
 
@@ -29,15 +25,12 @@ class ProductImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
-        $category = $this->categories->where('name', $row['category'])->first();
-        $brand = $this->brands->where('name', $row['brand'])->first();
         $unit = $this->units->where('name', $row['unit'])->first();
 
         return new Product([
             'name' => $row['name'],
             'description' => $row['description'],
-            'category_id' => $category->id,
-            'brand_id' => $brand->id,
+            'category_id' => 2,
             'unit_id' => $unit->id,
             'hpp' => $row['hpp'],
             'price' => $row['price'],

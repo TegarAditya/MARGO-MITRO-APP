@@ -58,6 +58,20 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('products/import', 'ProductController@import')->name('products.import');
     Route::resource('products', 'ProductController');
 
+    //Buku
+    Route::delete('buku/destroy', 'BukuController@massDestroy')->name('buku.massDestroy');
+    Route::post('buku/media', 'BukuController@storeMedia')->name('buku.storeMedia');
+    Route::post('buku/ckmedia', 'BukuController@storeCKEditorImages')->name('buku.storeCKEditorImages');
+    Route::post('buku/import', 'BukuController@import')->name('buku.import');
+    Route::resource('buku', 'BukuController');
+
+    //Bahan
+    Route::delete('bahan/destroy', 'BahanController@massDestroy')->name('bahan.massDestroy');
+    Route::post('bahan/media', 'BahanController@storeMedia')->name('bahan.storeMedia');
+    Route::post('bahan/ckmedia', 'BahanController@storeCKEditorImages')->name('bahan.storeCKEditorImages');
+    Route::post('bahan/import', 'BahanController@import')->name('bahan.import');
+    Route::resource('bahan', 'BahanController');
+
     // Salesperson
     Route::delete('salespeople/destroy', 'SalespersonController@massDestroy')->name('salespeople.massDestroy');
     Route::post('salespeople/media', 'SalespersonController@storeMedia')->name('salespeople.storeMedia');

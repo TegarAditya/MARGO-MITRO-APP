@@ -1,41 +1,41 @@
 @extends('layouts.admin')
 @section('content')
-@can('category_create')
+@can('product_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.categories.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.category.title_singular') }}
+            <a class="btn btn-success" href="{{ route('admin.bahan.create') }}">
+                {{ trans('global.add') }} {{ trans('cruds.bahan.title_singular') }}
             </a>
-            <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
-                {{ trans('global.app_csvImport') }}
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
             </button>
-            @include('csvImport.modal', ['model' => 'Category', 'route' => 'admin.categories.parseCsvImport'])
+            @include('csvImport.import_modal', ['model' => 'Product', 'route' => 'admin.bahan.import'])
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.category.title_singular') }} {{ trans('global.list') }}
+        {{ trans('cruds.bahan.title_singular') }} {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
-        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Category">
+        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Product">
             <thead>
                 <tr>
                     <th width="10">
 
                     </th>
                     <th>
-                        {{ trans('cruds.category.fields.name') }}
+                        {{ trans('cruds.bahan.fields.name') }}
                     </th>
                     <th>
-                        {{ trans('cruds.category.fields.slug') }}
+                        {{ trans('cruds.bahan.fields.hpp') }}
                     </th>
                     <th>
-                        {{ trans('cruds.category.fields.type') }}
+                        {{ trans('cruds.bahan.fields.price') }}
                     </th>
                     <th>
-                        {{ trans('cruds.category.fields.parent') }}
+                        {{ trans('cruds.bahan.fields.stock') }}
                     </th>
                     <th>
                         &nbsp;
@@ -46,19 +46,17 @@
     </div>
 </div>
 
-
-
 @endsection
 @section('scripts')
 @parent
 <script>
-    $(function () {
+$(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('category_delete')
+@can('product_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.categories.massDestroy') }}",
+    url: "{{ route('admin.bahan.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
@@ -90,25 +88,24 @@
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.categories.index') }}",
+    ajax: "{{ route('admin.bahan.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'name', name: 'name' },
-{ data: 'slug', name: 'slug' },
-{ data: 'type', name: 'type' },
-{ data: 'parent_name', name: 'parent.name' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'name', name: 'name' },
+        { data: 'hpp', name: 'hpp' },
+        { data: 'price', name: 'price' },
+        { data: 'stock', name: 'stock' },
+        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
-  let table = $('.datatable-Category').DataTable(dtOverrideGlobals);
+  let table = $('.datatable-Product').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-
 });
 
 </script>
