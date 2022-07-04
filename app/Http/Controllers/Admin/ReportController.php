@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exports\Admin\ReportInvoicesExport;
 use App\Exports\Admin\ReportPembayaransExport;
+use App\Exports\Admin\ReportRealisasisExport;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Pembayaran;
+use App\Models\ProductionOrder;
+use App\Models\Productionperson;
+use App\Models\Realisasi;
 use App\Models\Salesperson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -111,5 +115,59 @@ class ReportController extends Controller
         }
 
         return view('admin.report.payment', compact('orders', 'salespersons', 'pembayarans'));
+    }
+
+    public function realisasis(Request $request)
+    {
+        abort_if(Gate::denies('production_order_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $products = Product::get();
+        $productionOrders = ProductionOrder::get();
+        $productionpeople = Productionperson::get();
+        $realisasiQuery = Realisasi::query()->with([
+            'production_order',
+            'production_order.productionperson',
+            'realisasi_details',
+            'realisasi_details.product',
+        ]);
+
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+        $realisasiQuery->whereBetween('created_at', [$start, $end]);
+
+        if ($production_order_id = $request->production_order_id) {
+            $realisasiQuery->where('production_order_id', $production_order_id);
+        }
+
+        if ($productionperson_id = $request->productionperson_id) {
+            $realisasiQuery->whereHas('production_order', function($query) use ($productionperson_id) {
+                $query->where('productionperson_id', $productionperson_id);
+            });
+        }
+
+        if ($product_id = $request->product_id) {
+            $realisasiQuery->whereHas('realisasi_details', function($query) use ($product_id) {
+                $query->where('product_id', $product_id);
+            });
+
+            $realisasiQuery->with([
+                'realisasi_details' => function($query) use ($product_id) {
+                    $query->where('product_id', $product_id);
+                },
+            ]);
+        }
+
+        $realisasis = $realisasiQuery->orderByDesc('date')->get();
+
+        if ($request->export === 'excel') {
+            return (new ReportRealisasisExport($realisasis))->download('report-production-order.xlsx');
+        }
+
+        return view('admin.report.realisasis', compact('productionOrders', 'productionpeople', 'realisasis', 'products'));
     }
 }

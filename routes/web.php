@@ -123,6 +123,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('report/payment', 'ReportController@payment')->name('report.payment');
     Route::post('report/payment', 'ReportController@payment');
 
+    // Laporan Penerimaan
+    Route::get('report/realisasis', 'ReportController@realisasis')->name('report.realisasis');
+    Route::post('report/realisasis', 'ReportController@realisasis');
+
     // Stock Opname
     Route::delete('stock-opnames/destroy', 'StockOpnameController@massDestroy')->name('stock-opnames.massDestroy');
     Route::resource('stock-opnames', 'StockOpnameController');
