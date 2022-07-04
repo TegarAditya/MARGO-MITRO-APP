@@ -30,9 +30,9 @@
 
                     <div class="col-3">
                         <div class="form-group mb-0">
-                            <label class="small mb-0" for="productionperson_id">Sales Person</label>
+                            <label class="small mb-0" for="productionperson_id">Production Person</label>
                             <select class="form-control select2 {{ $errors->has('productionperson_id') ? 'is-invalid' : '' }}" name="productionperson_id" id="productionperson_id">
-                                <option value="">Semua Sales Person</option>
+                                <option value="">Semua Production Person</option>
                                 @foreach($productionpeople as $person)
                                     <option value="{{ $person->id }}" {{ (old('productionperson_id') ? old('productionperson_id') : (request('productionperson_id') == $person->id ? 'selected' : '')) }}>{{ $person->name }}</option>
                                 @endforeach
