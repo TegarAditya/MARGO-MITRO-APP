@@ -19,6 +19,78 @@
     </div>
 
     <div class="card-body">
+        <form id="filterform">
+            <div class="row">
+                <div class="form-group col-12">
+                    <label for="name">{{ trans('cruds.buku.fields.name') }}</label>
+                    <input class="form-control" type="text" name="name" id="name" value="{{ old('name', '') }}">
+                    @if($errors->has('name'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('name') }}
+                        </div>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.name_helper') }}</span>
+                </div>
+                <div class="form-group col-6">
+                    <label for="brand_id">{{ trans('cruds.buku.fields.brand') }}</label>
+                    <select class="form-control select2 {{ $errors->has('brand') ? 'is-invalid' : '' }}" name="brand_id" id="brand_id">
+                        @foreach($brands as $id => $entry)
+                            <option value="{{ $id }}" {{ old('brand_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('brand'))
+                        <span class="text-danger">{{ $errors->first('brand') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.brand_helper') }}</span>
+                </div>
+                <div class="form-group col-6">
+                    <label for="jenjang_id">{{ trans('cruds.buku.fields.jenjang') }}</label>
+                    <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                        @foreach($jenjang as $id => $entry)
+                            <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('jenjang'))
+                        <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
+                </div>
+
+                <div class="form-group col-6">
+                    <label for="kelas_id">{{ trans('cruds.buku.fields.kelas') }}</label>
+                    <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas_id" id="kelas_id">
+                        @foreach($kelas as $id => $entry)
+                            <option value="{{ $id }}" {{ old('kelas_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('kelas'))
+                        <span class="text-danger">{{ $errors->first('kelas') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.kelas_helper') }}</span>
+                </div>
+                <div class="form-group col-6">
+                    <label for="halaman_id">{{ trans('cruds.buku.fields.halaman') }}</label>
+                    <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id">
+                        @foreach($halaman as $id => $entry)
+                            <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('halaman'))
+                        <span class="text-danger">{{ $errors->first('halaman') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button class="btn btn-success" type="submit">
+                    Cari
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body">
         <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Product">
             <thead>
                 <tr>
@@ -100,7 +172,16 @@
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.buku.index') }}",
+    ajax: {
+        url: "{{ route('admin.buku.index') }}",
+        data: function(data) {
+            data.name = $('#name').val(),
+            data.brand = $('#brand_id').val(),
+            data.jenjang = $('#jenjang_id').val(),
+            data.kelas = $('#kelas_id').val(),
+            data.halaman = $('#halaman_id').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'brand_name', name: 'brand.name' },
@@ -122,6 +203,11 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
+
+  $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 });
 
 </script>

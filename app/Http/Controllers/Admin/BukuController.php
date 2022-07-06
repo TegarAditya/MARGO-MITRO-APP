@@ -34,6 +34,27 @@ class BukuController extends Controller
 
         if ($request->ajax()) {
             $query = Product::where('category_id', 1)->with(['category', 'brand', 'unit'])->select(sprintf('%s.*', (new Product())->table));
+
+            if (!empty($request->name)) {
+                $query->where('name','LIKE','%'.$request->name.'%');
+            }
+
+            if (!empty($request->brand)) {
+                $query->where('brand_id', $request->brand);
+            }
+
+            if (!empty($request->jenjang)) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+
+            if (!empty($request->kelas)) {
+                $query->where('kelas_id', $request->kelas);
+            }
+
+            if (!empty($request->halaman)) {
+                $query->where('halaman_id', $request->halaman);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -91,7 +112,12 @@ class BukuController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.buku.index');
+        $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.buku.index', compact('brands', 'jenjang', 'kelas', 'halaman'));
     }
 
     public function create()

@@ -68,7 +68,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('audit_log_access')
+                            {{-- @can('audit_log_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.audit-logs.index") }}" class="nav-link {{ request()->is("admin/audit-logs") || request()->is("admin/audit-logs/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-file-alt">
@@ -79,8 +79,8 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
-                            @can('user_alert_access')
+                            @endcan --}}
+                            {{-- @can('user_alert_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.user-alerts.index") }}" class="nav-link {{ request()->is("admin/user-alerts") || request()->is("admin/user-alerts/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-bell">
@@ -91,7 +91,7 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
                         </ul>
                     </li>
                 @endcan
