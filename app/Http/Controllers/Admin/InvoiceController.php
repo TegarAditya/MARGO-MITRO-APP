@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class InvoiceController extends Controller
 {
@@ -150,6 +151,8 @@ class InvoiceController extends Controller
             $invoice->invoice_details()->createMany($products->all());
 
             DB::commit();
+
+            Alert::success('Success', 'Invoice berhasil dibuat');
 
             if ($request->redirect) {
                 return redirect($request->redirect);

@@ -183,7 +183,7 @@
                     </li>
                 @endcan
                 @can('product_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/product*") || request()->is("admin/buku*") || request()->is("admin/bahan*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/product/*") || request()->is("admin/buku*") || request()->is("admin/bahan*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-book">
 
@@ -346,7 +346,7 @@
 
                                         </i>
                                         <p>
-                                            Realisasi
+                                            Realisasi Finishing
                                         </p>
                                     </a>
                                 </li>

@@ -240,7 +240,7 @@
             var diskonType = diskonTypes.filter(':checked').val();
             var diskonCalc = diskonType !== 'percent' ? (
                 diskonType !== 'value' ? 0 : diskonVal
-            ) : ((bayarVal * 100 / (100 - diskonVal)) - bayarVal);
+            ) : ((diskonVal / 100)  * bayarVal);
 
             bayarVal = (max && max < bayarVal) ? max : bayarVal;
 

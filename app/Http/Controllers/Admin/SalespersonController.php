@@ -59,7 +59,11 @@ class SalespersonController extends Controller
             $table->editColumn('area_pemasaran', function ($row) {
                 $labels = [];
                 foreach ($row->area_pemasarans as $area_pemasaran) {
-                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
+                    if ($area_pemasaran === $row->area_pemasarans->last()) {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
+                    } else {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->name);
+                    }
                 }
 
                 return implode(' ', $labels);

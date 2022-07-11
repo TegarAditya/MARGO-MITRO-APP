@@ -128,8 +128,8 @@ return [
         ],
     ],
     'brand' => [
-        'title'          => 'Brand',
-        'title_singular' => 'Brand',
+        'title'          => 'Cover',
+        'title_singular' => 'Cover',
         'fields'         => [
             'id'                => 'ID',
             'id_helper'         => ' ',
@@ -197,7 +197,7 @@ return [
             'description_helper' => ' ',
             'category'           => 'Category',
             'category_helper'    => ' ',
-            'brand'              => 'Brand',
+            'brand'              => 'Cover',
             'brand_helper'       => ' ',
             'unit'               => 'Unit',
             'unit_helper'        => ' ',
@@ -344,14 +344,14 @@ return [
         ],
     ],
     'order' => [
-        'title'          => 'Order',
-        'title_singular' => 'Order',
+        'title'          => 'Sales Order',
+        'title_singular' => 'Sales Order',
         'fields'         => [
             'id'                 => 'ID',
             'id_helper'          => ' ',
             'date'               => 'Date',
             'date_helper'        => ' ',
-            'salesperson'        => 'Sales Person',
+            'salesperson'        => 'Salesman',
             'salesperson_helper' => ' ',
             'created_at'         => 'Created at',
             'created_at_helper'  => ' ',
@@ -359,7 +359,7 @@ return [
             'updated_at_helper'  => ' ',
             'deleted_at'         => 'Deleted at',
             'deleted_at_helper'  => ' ',
-            'no_order'           => 'Order Number',
+            'no_order'           => 'SO Number',
             'no_order_helper'    => ' ',
         ],
     ],
@@ -493,7 +493,7 @@ return [
             'order_helper'       => ' ',
             'saldo'              => 'Saldo',
             'saldo_helper'       => ' ',
-            'salesperson'        => 'Sales Person',
+            'salesperson'        => 'Salesman',
             'salesperson_helper' => ' ',
             'created_at'         => 'Created at',
             'created_at_helper'  => ' ',
@@ -524,8 +524,8 @@ return [
         ],
     ],
     'pembayaran' => [
-        'title'          => 'Pembayaran',
-        'title_singular' => 'Pembayaran',
+        'title'          => 'Payment',
+        'title_singular' => 'Payment',
         'fields'         => [
             'id'                 => 'ID',
             'id_helper'          => ' ',
@@ -558,8 +558,8 @@ return [
         'title_singular' => 'Stock Opname',
     ],
     'salesOrder' => [
-        'title'          => 'Order',
-        'title_singular' => 'Order',
+        'title'          => 'Sales Order',
+        'title_singular' => 'Sales Order',
     ],
     'invoiceMenu' => [
         'title'          => 'Invoice',
@@ -570,12 +570,12 @@ return [
         'title_singular' => 'Tagihan',
     ],
     'pembayaranMenu' => [
-        'title'          => 'Pembayaran',
-        'title_singular' => 'Pembayaran',
+        'title'          => 'Payment',
+        'title_singular' => 'Payment',
     ],
     'productionperson' => [
-        'title'          => 'Produsen',
-        'title_singular' => 'Produsen',
+        'title'          => 'Subkontraktor',
+        'title_singular' => 'Subkontraktor',
         'fields'         => [
             'id'                => 'ID',
             'id_helper'         => ' ',
@@ -600,8 +600,8 @@ return [
         ],
     ],
     'productionOrder' => [
-        'title'          => 'Production Order',
-        'title_singular' => 'Production Order',
+        'title'          => 'Finishing Order',
+        'title_singular' => 'Finishing Order',
         'fields'         => [
             'id'                      => 'ID',
             'id_helper'               => ' ',
@@ -619,7 +619,7 @@ return [
             'updated_at_helper'       => ' ',
             'deleted_at'              => 'Deleted at',
             'deleted_at_helper'       => ' ',
-            'productionperson'        => 'Production Person',
+            'productionperson'        => 'Subkontraktor',
             'productionperson_helper' => ' ',
         ],
     ],
