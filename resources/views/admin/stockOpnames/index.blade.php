@@ -41,9 +41,11 @@
                     <td>
                         <select class="search">
                             <option value>{{ trans('global.all') }}</option>
-                            @foreach($categories as $key => $item)
+                            <option value="BUKU">BUKU</option>
+                            <option value="BAHAN">BAHAN</option>
+                            {{-- @foreach($categories as $key => $item)
                                 <option value="{{ $item->name }}">{{ $item->name }}</option>
-                            @endforeach
+                            @endforeach --}}
                         </select>
                     </td>
                     <td>
