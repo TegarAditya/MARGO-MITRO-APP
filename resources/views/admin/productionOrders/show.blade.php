@@ -67,6 +67,12 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                             </th>
                             <td>
                                 {{ $productionOrder->no_spk }}
+                                <a href="{{ route('admin.production-orders.show', [
+                                    'production_order' => $productionOrder->id,
+                                    'print' => 'spk'
+                                ]) }}" target="_blank" title="Cetak SPK" class="btn btn-sm btn-default border py-0 px-1">
+                                    <i class="fa fa-print text-info"></i>
+                                </a>
                             </td>
                         </tr>
                         <tr>
@@ -75,6 +81,12 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                             </th>
                             <td>
                                 {{ $productionOrder->no_kwitansi }}
+                                <a href="{{ route('admin.production-orders.show', [
+                                    'production_order' => $productionOrder->id,
+                                    'print' => 'kwitansi'
+                                ]) }}" target="_blank" title="Cetak Kwitansi" class="btn btn-sm btn-default border py-0 px-1">
+                                    <i class="fa fa-print text-info"></i>
+                                </a>
                             </td>
                         </tr>
                         <tr>

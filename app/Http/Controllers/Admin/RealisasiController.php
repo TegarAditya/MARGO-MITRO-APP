@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class RealisasiController extends Controller
 {
@@ -150,6 +151,8 @@ class RealisasiController extends Controller
 
             DB::commit();
 
+            Alert::success('Success', 'Realisasi Finishing berhasil disimpan');
+
             if ($request->redirect) {
                 return redirect($request->redirect);
             }
@@ -279,6 +282,8 @@ class RealisasiController extends Controller
 
             DB::commit();
 
+            Alert::success('Success', 'Realisasi Finishing berhasil disimpan');
+
             if ($request->redirect) {
                 return redirect($request->redirect);
             }
@@ -338,6 +343,8 @@ class RealisasiController extends Controller
             $realisasi->delete();
 
             DB::commit();
+
+            Alert::success('Success', 'Realisasi Finishing berhasil dihapus');
 
             return redirect()->route('admin.realisasis.index');
         } catch (\Exception $e) {

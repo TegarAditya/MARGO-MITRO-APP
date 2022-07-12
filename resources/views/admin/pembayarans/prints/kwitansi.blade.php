@@ -25,7 +25,7 @@ function penyebut($nilai) {
         $temp = penyebut($nilai/1000000000) . " milyar" . penyebut(fmod($nilai,1000000000));
     } else if ($nilai < 1000000000000000) {
         $temp = penyebut($nilai/1000000000000) . " trilyun" . penyebut(fmod($nilai,1000000000000));
-    }     
+    }
     return $temp;
 }
 
@@ -34,7 +34,7 @@ function terbilang($nilai) {
         $hasil = "minus ". trim(penyebut($nilai));
     } else {
         $hasil = trim(penyebut($nilai));
-    }     		
+    }
     return $hasil;
 }
 @endphp
@@ -53,7 +53,7 @@ function terbilang($nilai) {
         <tr>
             <td><strong>Tanggal</strong></td>
             <td>:</td>
-            <td>{{ $pembayaran->tanggal }}</td>
+            <td>{{ Carbon\Carbon::parse($pembayaran->tanggal)->format('d-m-Y') }}</td>
         </tr>
     </tbody>
 </table>
@@ -67,7 +67,7 @@ function terbilang($nilai) {
                 <tr>
                     <td width="180">Telah diterima dari</td>
                     <td width="12">:</td>
-                    <td style="border-bottom: 1px dotted #000"></td>
+                    <td class="px-0">{{ $pembayaran->order->salesperson->name }}</td>
                 </tr>
 
                 <tr>
@@ -116,7 +116,7 @@ function terbilang($nilai) {
                         <td width="12">:</td>
                         <td>@money($order->invoices->sum('nominal'))</td>
                     </tr>
-            
+
                     <tr>
                         <td width="120">Total Pembayaran</td>
                         <td width="8">:</td>

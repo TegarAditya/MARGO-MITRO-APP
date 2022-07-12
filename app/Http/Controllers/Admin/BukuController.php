@@ -147,6 +147,8 @@ class BukuController extends Controller
             Media::whereIn('id', $media)->update(['model_id' => $product->id]);
         }
 
+        Alert::success('Success', 'Buku berhasil disimpan');
+
         return redirect()->route('admin.buku.index');
     }
 
@@ -187,6 +189,8 @@ class BukuController extends Controller
             }
         }
 
+        Alert::success('Success', 'Buku berhasil disimpan');
+
         return redirect()->route('admin.buku.index');
     }
 
@@ -208,6 +212,8 @@ class BukuController extends Controller
         abort_if(Gate::denies('product_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $product->delete();
+
+        Alert::success('Success', 'Buku berhasil dihapus');
         return back();
     }
 

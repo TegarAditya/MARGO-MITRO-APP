@@ -104,7 +104,7 @@
                     'modal' => $item['modal'],
                     'name' => $item['name'],
                 ])
-        
+
                 <div class="product-empty">
                     <p>Belum ada produk yang ditambahkan</p>
                 </div>
@@ -134,7 +134,8 @@
         <div class="col"></div>
 
         <div class="col-auto">
-            <button type="submit" class="btn {{ !$order->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
+            {{-- {{ !$order->id ? 'btn-primary' : 'btn-secondary' }} --}}
+            <button type="submit" class="btn btn-primary">Simpan Invoice</a>
         </div>
     </div>
 </div>
@@ -204,7 +205,7 @@
                             $selected = $invoice_details->where('product_id', $product->id)->count();
 
                             $order_detail = $order_details->where('product_id', $product->id)->first();
-                            $disabled = !$order_detail ? false : ($order_detail->moved >= $order_detail->quantity);
+                            $disabled = (!$order_detail ? false : ($order_detail->moved >= $order_detail->quantity)) || ($detail->stock <= 0);
                             @endphp
                             <a
                                 href="{{ route('admin.products.show', $product->id) }}"
@@ -232,7 +233,7 @@
                                             <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
                                         </div>
                                     @endif
-                                
+
                                     <div class="col">
                                         <div class="product-content">
                                             <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
@@ -497,7 +498,8 @@
             });
 
             productTotal.html(numeral(total).format('$0,0'));
-            form.find('#total').val(total);
+            // form.find('#total').val(total);
+            form.find('[name="nominal"]').val(total);
         };
 
         modals.each(function(index, item) {
@@ -517,7 +519,7 @@
                 keyword && items.each(function(i, item) {
                     var el = $(item);
                     var search = el.data('search');
-                    
+
                     keyword.split(' ').map(function(key) {
                         search.indexOf(key) < 0 ? el.hide() : (results++);
                     });

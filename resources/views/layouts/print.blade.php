@@ -17,14 +17,14 @@
         @section('header')
             <div class="row align-items-center">
                 <div class="col-auto">
-                    <img src="{{ asset('images/app-logo.png') }}" class="print-logo" /> 
+                    <img src="{{ asset('images/app-logo.png') }}" class="print-logo" />
                 </div>
 
                 <div class="col">
                     @section('header.content')
-                        <h3 class="mb-1">{{ config('app.name') }}</h3>
+                        <h3 class="mb-1">Margo Mitro Joyo</h3>
 
-                        <p class="mb-0">Jl. Wijaya II No. 3, Jebres, Surakarta 57126</p>
+                        <p class="mb-0">Jl. Pangrango, Perdana, Pare, Kec. Pare, Kabupaten Kediri, Jawa Timur 64211</p>
                     @show
                 </div>
 

@@ -92,7 +92,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                     'modal' => $item['modal'],
                     'name' => $item['name'],
                 ])
-        
+
                 <div class="product-empty">
                     <p>Belum ada produk yang ditambahkan</p>
                 </div>
@@ -122,7 +122,8 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         <div class="col"></div>
 
         <div class="col-auto">
-            <button type="submit" class="btn {{ !$productionOrder->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
+            {{-- {{ !$productionOrder->id ? 'btn-primary' : 'btn-secondary' }} --}}
+            <button type="submit" class="btn btn-primary">Simpan Realisasi</a>
         </div>
     </div>
 </div>
@@ -221,19 +222,19 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                             <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
                                         </div>
                                     @endif
-                                
+
                                     <div class="col">
                                         <div class="product-content">
                                             <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
-                            
+
                                             <p class="mb-0 text-sm">
                                                 HPP: <span class="product-hpp">@money($product->hpp)</span>
                                             </p>
-                            
+
                                             <p class="mb-0 text-sm">
                                                 Category: <span class="product-category">{{ !$category ? '' : $category->name }}</span>
                                             </p>
-                            
+
                                             <p class="mb-0 text-sm">
                                                 Stock: <span class="product-stock">{{ $product->stock }}</span>
                                             </p>
@@ -497,7 +498,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 keyword && items.each(function(i, item) {
                     var el = $(item);
                     var search = el.data('search');
-                    
+
                     keyword.split(' ').map(function(key) {
                         search.indexOf(key) < 0 ? el.hide() : (results++);
                     });

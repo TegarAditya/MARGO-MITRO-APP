@@ -55,16 +55,16 @@
                                 {{ $pembayaran->no_kwitansi ?? '' }}
                             </td>
                             <td>
-                                {{ $pembayaran->tagihan->saldo ?? '' }}
+                                @money($pembayaran->tagihan->saldo)
                             </td>
                             <td>
-                                {{ $pembayaran->nominal ?? '' }}
+                                @money($pembayaran->nominal)
                             </td>
                             <td>
-                                {{ $pembayaran->diskon ?? '' }}
+                                @money($pembayaran->diskon)
                             </td>
                             <td>
-                                {{ $pembayaran->bayar ?? '' }}
+                                @money($pembayaran->bayar)
                             </td>
                             <td>
                                 {{ $pembayaran->tanggal ?? '' }}
@@ -143,7 +143,7 @@
     order: [[ 1, 'desc' ]],
     pageLength: 100,
   });
-  let table = $('.datatable-Pembayaran:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+  let table = $('.datatable-Pembayaran:not(.ajaxTable)').DataTable()
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();

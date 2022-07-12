@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class OrderController extends Controller
 {
@@ -53,7 +54,20 @@ class OrderController extends Controller
                 return $row->salesperson ? $row->salesperson->name : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'salesperson']);
+            $table->addColumn('salesperson_area', function ($row) {
+                $labels = [];
+                foreach ($row->salesperson->area_pemasarans as $area_pemasaran) {
+                    if ($area_pemasaran === $row->salesperson->area_pemasarans ->last()) {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
+                    } else {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->name);
+                    }
+                }
+
+                return implode(' ', $labels);
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'salesperson_name', 'salesperson_area']);
 
             return $table->make(true);
         }
@@ -112,6 +126,8 @@ class OrderController extends Controller
             ]);
 
             DB::commit();
+
+            Alert::success('Success', 'Sales Order berhasil di simpan');
 
             return redirect()->route('admin.orders.edit', $order->id);
         } catch (\Exception $e) {
@@ -196,6 +212,8 @@ class OrderController extends Controller
             $tagihan->save();
 
             DB::commit();
+
+            Alert::success('Success', 'Sales Order berhasil di simpan');
 
             return redirect()->route('admin.orders.edit', $order->id);
         } catch (\Exception $e) {

@@ -36,7 +36,9 @@
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
         <th width="1%">No.</th>
-        <th>Nama Produk</th>
+        <th>Jenjang - Kelas</th>
+        <th>Tema/Mapel</th>
+        <th width="1%" class="text-center">Hal</th>
         <th class="text-center" width="120">Order Qty</th>
     </thead>
 
@@ -48,7 +50,9 @@
             @endphp
             <tr>
                 <td>{{ $loop->iteration }}</td>
+                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
+                <td>{{ $product->hal->name ?? '' }}</td>
                 <td class="text-center text-nowrap">
                     {{ abs($selisih < 0 ? 0 : $selisih) }}{{ $selisih >= 0 ? '' : " (+".abs($selisih).")" }}
                 </td>
@@ -62,7 +66,7 @@
 <div class="row">
     <div class="col-auto align-self-end">
         <p class="mb-2">Dikeluarkan oleh,</p>
-        <p class="mb-0">Gudang</p>
+        <p class="mb-0">Margo Mitro Joyo</p>
     </div>
 
     <div class="col"></div>

@@ -84,7 +84,7 @@
 @endcan
 
   let dtOverrideGlobals = {
-    buttons: dtButtons,
+    // buttons: dtButtons,
     processing: true,
     serverSide: true,
     retrieve: true,
@@ -96,7 +96,7 @@
 { data: 'production_order', name: 'production_order' },
 { data: 'no_realisasi', name: 'no_realisasi' },
 { data: 'date', name: 'date' },
-{ data: 'nominal', name: 'nominal' },
+{ data: 'nominal', name: 'nominal', render: function(value) { return numeral(value).format('$0,0'); } },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,

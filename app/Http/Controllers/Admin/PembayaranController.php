@@ -14,6 +14,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
+use Alert;
 
 class PembayaranController extends Controller
 {
@@ -70,6 +71,8 @@ class PembayaranController extends Controller
             if ($request->redirect) {
                 return redirect($request->redirect);
             }
+
+            Alert::success('Success', 'Pembayaran berhasil di simpan');
 
             return redirect()->route('admin.pembayarans.edit', $pembayaran->id);
         } catch (\Exception $e) {
@@ -129,6 +132,8 @@ class PembayaranController extends Controller
 
             DB::commit();
 
+            Alert::success('Success', 'Pembayaran berhasil di simpan');
+
             if ($request->redirect) {
                 return redirect($request->redirect);
             }
@@ -175,6 +180,8 @@ class PembayaranController extends Controller
             $pembayaran->delete();
 
             DB::commit();
+
+            Alert::success('Success', 'Pembayaran berhasil di hapus');
 
             return redirect()->route('admin.pembayarans.index');
         } catch (\Exception $e) {

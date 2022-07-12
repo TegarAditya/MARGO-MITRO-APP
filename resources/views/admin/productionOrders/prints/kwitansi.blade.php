@@ -22,6 +22,12 @@
             <td>:</td>
             <td>{{ $productionOrder->date }}</td>
         </tr>
+
+        <tr>
+            <td><strong>Subkontraktor</strong></td>
+            <td>:</td>
+            <td>{{ $productionOrder->productionperson->name }}</td>
+        </tr>
     </tbody>
 </table>
 @stop
@@ -30,10 +36,12 @@
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
         <th width="1%">No.</th>
-        <th>Nama Produk</th>
-        <th width="1%" class="text-center">Harga</th>
+        <th>Jenjang - Kelas</th>
+        <th>Tema/Mapel</th>
+        <th width="1%" class="text-center">Hal</th>
+        <th width="15%" class="text-center">Harga</th>
         <th width="120" class="text-center">Order Qty</th>
-        <th width="1%" class="text-center">Subtotal</th>
+        <th width="20%" class="text-center">Subtotal</th>
     </thead>
 
     <tbody>
@@ -44,7 +52,9 @@
             @endphp
             <tr>
                 <td>{{ $loop->iteration }}</td>
+                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
+                <td>{{ $product->hal->name ?? '' }}</td>
                 <td class="text-right">@money($detail->ongkos_satuan)</td>
                 <td class="text-center text-nowrap">
                     {{ abs($selisih < 0 ? 0 : $selisih) }}{{ $selisih >= 0 ? '' : " (+".abs($selisih).")" }}
@@ -56,8 +66,8 @@
 
     <tfoot>
         <tr>
-            <td colspan="4" class="text-right px-3"><strong>Total</strong></td>
-            <td>@money(abs($productionOrder->total))</td>
+            <td colspan="6" class="text-center px-3"><strong>Total</strong></td>
+            <td class="text-right">@money(abs($productionOrder->total))</td>
         </tr>
     </tfoot>
 </table>
@@ -67,7 +77,7 @@
 <div class="row">
     <div class="col align-self-end">
         <p class="mb-2">Dikeluarkan oleh,</p>
-        <p class="mb-0">Gudang</p>
+        <p class="mb-0">Margo Mitro Joyo</p>
     </div>
 
     <div class="col-auto text-center">

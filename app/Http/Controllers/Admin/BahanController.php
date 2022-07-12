@@ -101,6 +101,8 @@ class BahanController extends Controller
             Media::whereIn('id', $media)->update(['model_id' => $product->id]);
         }
 
+        Alert::success('Success', 'Bahan berhasil disimpan');
+
         return redirect()->route('admin.bahan.index');
     }
 
@@ -136,6 +138,8 @@ class BahanController extends Controller
             }
         }
 
+        Alert::success('Success', 'Bahan berhasil disimpan');
+
         return redirect()->route('admin.bahan.index');
     }
 
@@ -157,6 +161,8 @@ class BahanController extends Controller
         abort_if(Gate::denies('product_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $product->delete();
+
+        Alert::success('Success', 'Bahan berhasil dihapus');
         return back();
     }
 

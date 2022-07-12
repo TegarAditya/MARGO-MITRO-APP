@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class ProductionOrderController extends Controller
 {
@@ -128,6 +129,8 @@ class ProductionOrderController extends Controller
 
             DB::commit();
 
+            Alert::success('Success', 'Finishing Order berhasil di simpan');
+
             return redirect()->route('admin.production-orders.edit', $productionOrder->id);
         } catch (\Exception $e) {
             DB::rollback();
@@ -199,6 +202,8 @@ class ProductionOrderController extends Controller
                 ->forceDelete();
 
             DB::commit();
+
+            Alert::success('Success', 'Finishing Order berhasil di simpan');
 
             return redirect()->route('admin.production-orders.edit', $productionOrder->id);
         } catch (\Exception $e) {
