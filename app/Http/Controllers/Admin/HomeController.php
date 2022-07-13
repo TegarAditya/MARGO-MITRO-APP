@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\Request;
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
 
 class HomeController
@@ -187,5 +188,10 @@ class HomeController
         }
 
         return view('home', compact('chart3', 'chart4', 'settings1', 'settings2', 'settings5', 'settings6'));
+    }
+
+    public function dashboard(Request $request)
+    {
+        return view('admin.dashboard');
     }
 }
