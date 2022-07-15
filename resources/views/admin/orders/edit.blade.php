@@ -44,22 +44,26 @@
 
             @php
             $tabs = [
-                [ 'label' => 'Detail Order', 'enabled' => true ],
-                [ 'label' => 'Faktur', 'enabled' => !!$order->id ],
-                [ 'label' => 'Pembayaran', 'enabled' => !!$order->id ],
+                [ 'id' => 'order', 'label' => 'Detail Order', 'enabled' => true ],
+                [ 'id' => 'faktur', 'label' => 'Faktur', 'enabled' => !!$order->id ],
+                [ 'id' => 'pembayaran', 'label' => 'Pembayaran', 'enabled' => !!$order->id ],
             ];
+
+            if (!isset($activeTabs)) {
+                $activeTabs = 'faktur';
+            }
             @endphp
             <ul class="nav nav-tabs" id="orderTabs" role="tablist">
                 @foreach ($tabs as $tab)
                     @php
-                    $classes = $loop->first ? ' active' : '';
+                    $classes = '';
 
                     if (!$tab['enabled']) {
                         $classes .= ' disabled';
                     }
                     @endphp
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link{{ $classes }}" id="order-tab-{{ $loop->iteration }}" data-toggle="tab" href="#order-{{ $loop->iteration }}" role="tab">
+                        <a class="nav-link{{ $classes }} {{ $activeTabs === $tab['id'] ? ' active' : '' }}" id="order-tab-{{ $loop->iteration }}" data-toggle="tab" href="#order-{{ $loop->iteration }}" role="tab">
                             {{ $loop->iteration . '. ' . $tab['label'] }}
                         </a>
                     </li>
@@ -67,15 +71,15 @@
             </ul>
 
             <div class="tab-content" id="orderTabsContent">
-                <div class="tab-pane fade show active" id="order-1" role="tabpanel">
+                <div class="tab-pane fade{{ $activeTabs === 'order' ? ' show active' : '' }}" id="order-1" role="tabpanel">
                     @include('admin.orders.parts.tab-order')
                 </div>
 
-                <div class="tab-pane fade" id="order-2" role="tabpanel">
+                <div class="tab-pane fade{{ $activeTabs === 'faktur' ? ' show active' : '' }}" id="order-2" role="tabpanel">
                     @include('admin.orders.parts.tab-faktur')
                 </div>
 
-                <div class="tab-pane fade" id="order-3" role="tabpanel">
+                <div class="tab-pane fade{{ $activeTabs === 'pembayaran' ? ' show active' : '' }}" id="order-3" role="tabpanel">
                     @include('admin.orders.parts.tab-tagihan')
                 </div>
             </div>

@@ -38,7 +38,7 @@ class SystemCalendarController extends Controller
         $invoices = Invoice::with(['order'])->get();
         foreach($invoices as $invoice) {
             $events[] = [
-                'title' => 'Faktur '. (0 < $invoice->nominal ? 'Return ' : '').'- No Invoice: '. $invoice->no_invoice . ' Sejumlah '. formatCurrency($invoice->nominal, 'IDR') .' Untuk '. $invoice->order->salesperson->name,
+                'title' => 'Faktur '. (0 < $invoice->nominal ? 'Return ' : '').'- No Invoice: '. $invoice->no_invoice . ' Sejumlah '. formatCurrency(abs($invoice->nominal), 'IDR') .' Untuk '. $invoice->order->salesperson->name,
                 'start' => $invoice->date,
                 'url' => route('admin.orders.show', $invoice->order->id)
             ];
