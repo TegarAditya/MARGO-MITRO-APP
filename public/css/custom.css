@@ -156,3 +156,22 @@ div.dt-button-collection {
 .nav-treeview > .nav-item .nav-link {
     padding-left: 2rem;
 }
+
+@media only screen and (min-width: 760px) {
+    .usetwentyfour {
+        width: 380px !important;
+    }
+
+    .datepicker, .table-condensed {
+        width: 365px;
+        font-size: x-small;
+    }
+
+    .datepicker td,th{
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
+
+

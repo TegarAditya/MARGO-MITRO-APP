@@ -28,8 +28,8 @@
             $('#calendar').fullCalendar({
                 // put your options and callbacks here
                 events: events,
-
-
+                defaultView: 'listWeek',
+                timeFormat: 'H(:mm)'
             })
         });
 </script>
