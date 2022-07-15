@@ -69,7 +69,7 @@ class PembayaranController extends Controller
             DB::commit();
 
             if ($request->redirect) {
-                return redirect($request->redirect);
+                return redirect($request->redirect)->with('activeTabs', 'invoice');
             }
 
             Alert::success('Success', 'Pembayaran berhasil di simpan');
@@ -135,7 +135,7 @@ class PembayaranController extends Controller
             Alert::success('Success', 'Pembayaran berhasil di simpan');
 
             if ($request->redirect) {
-                return redirect($request->redirect);
+                return redirect($request->redirect)->with('activeTabs', 'invoice');
             }
 
             return redirect()->route('admin.pembayarans.edit', $pembayaran->id);

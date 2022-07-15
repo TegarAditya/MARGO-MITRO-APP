@@ -50,7 +50,7 @@
             ];
 
             if (!isset($activeTabs)) {
-                $activeTabs = 'faktur';
+                $activeTabs = 'order';
             }
             @endphp
             <ul class="nav nav-tabs" id="orderTabs" role="tablist">
