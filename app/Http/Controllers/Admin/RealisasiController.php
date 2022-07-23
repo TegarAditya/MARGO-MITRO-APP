@@ -36,7 +36,7 @@ class RealisasiController extends Controller
                 $parent = 'production-orders';
                 $idParent = $row->production_order->id;
 
-                return view('partials.datatableOrderActions', compact(
+                return view('partials.datatableOrderActionsRealisasi', compact(
                 'viewGate',
                 'editGate',
                 'deleteGate',
@@ -65,7 +65,11 @@ class RealisasiController extends Controller
                 return $row->nominal ? $row->nominal : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'order']);
+            $table->editColumn('lunas', function ($row) {
+                return '<input type="checkbox" disabled ' . ($row->lunas ? 'checked' : null) . '> '.($row->lunas ? 'Sudah' : 'Belum');
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'order', 'lunas']);
 
             return $table->make(true);
         }
@@ -361,5 +365,17 @@ class RealisasiController extends Controller
         // Realisasi::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function setPaid(Request $request)
+    {
+        try {
+            $realisasi = Realisasi::find($request->id);
+            $realisasi->lunas = 1;
+            $realisasi->save();
+            return response()->json(['status' => 'success', 'message' => 'Kwitansi berhasil dibayar']);
+        } catch (Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
     }
 }

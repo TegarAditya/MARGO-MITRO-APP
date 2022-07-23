@@ -19,6 +19,7 @@
                 <th rowspan="2" width="1%">No.</th>
                 <th rowspan="2" width="120">No. Realisasi</th>
                 <th rowspan="2" width="120">Tanggal</th>
+                <th rowspan="2" width="120">Sudah Dibayar ?</th>
                 <th colspan="3" class="text-center py-2">Produk</th>
                 <th rowspan="2" class="text-center" width="1%">Total</th>
                 <th rowspan="2" class="text-center" width="1%">Action</th>
@@ -55,6 +56,13 @@
                                     </a>
                                 </td>
                                 <td rowspan="{{ $rowspan }}">{{ $row->date }}</td>
+                                <td rowspan="{{ $rowspan }}" class="text-center">
+                                    @if ($row->lunas)
+                                        <span class="text-success">Sudah</span>
+                                    @else
+                                        <span class="text-danger">Belum</span>
+                                    @endif
+                                </td>
                             @endif
 
                             <td>
@@ -72,11 +80,16 @@
                             </td>
                             <td class="text-center">{{ abs($detail->qty) }}</td>
                             <td class="text-right">@money(abs($detail->total))</td>
-                            
+
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($row->nominal))</td>
 
                                 <td rowspan="{{ $rowspan }}" class="text-center">
+                                    @if (!$row->lunas)
+                                        <a href="{{ route('admin.realisasis.paid', $row->id) }}" class="realisasi-paid-btn" data-id="{{ $row->id }}">
+                                            <i class="fa fa-money text-warning"></i>
+                                        </a>
+                                    @endif
                                     <a href="{{ route('admin.realisasis.destroy', $row->id) }}" class="realisasi-delete-btn" data-id="{{ $row->id }}">
                                         <i class="fa fa-trash text-danger"></i>
                                     </a>
@@ -131,6 +144,30 @@
                     method: 'POST',
                     url: url,
                     data: { _method: 'DELETE' }
+                }).done(function () {
+                    if (id == '{{ $realisasi->id }}') {
+                        return (location.href = '{{ route("admin.realisasis.index") }}');
+                    }
+
+                    location.reload();
+                });
+            }
+        });
+        $('.realisasi-paid-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var el = $(e.currentTarget);
+            var url = el.attr('href');
+            var id = el.data('id');
+
+            if (url && confirm('{{ trans('global.areYouSure') }}')) {
+                $.ajax({
+                    headers: {'x-csrf-token': _token},
+                    type: "POST",
+                    url: url,
+                    data: {
+                        id: id
+                    },
                 }).done(function () {
                     if (id == '{{ $realisasi->id }}') {
                         return (location.href = '{{ route("admin.realisasis.index") }}');

@@ -100,16 +100,16 @@
             <thead>
                 <tr>
                     <th rowspan="2"></th>
-                    <th rowspan="2">
+                    <th rowspan="2" class="align-middle">
                         Production Order
                     </th>
-                    <th width="110" rowspan="2">
+                    <th width="110" rowspan="2" class="align-middle">
                         Tanggal
                     </th>
                     <th colspan="3" class="text-center">
                         Products
                     </th>
-                    <th rowspan="2">
+                    <th rowspan="2" class="align-middle">
                         Nominal
                     </th>
                 </tr>
@@ -137,7 +137,7 @@
                     @foreach ($realisasi->realisasi_details as $detail)
                         <tr>
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}">{{ $no }}</td>
+                                <td rowspan="{{ $rowspan }}" class="align-middle text-center">{{ $no }}</td>
                                 <td rowspan="{{ $rowspan }}">
                                     <div class="row">
                                         <div class="col-6">
@@ -183,12 +183,12 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td rowspan="{{ $rowspan }}">
+                                <td rowspan="{{ $rowspan }}" class="align-middle text-center">
                                     {{ $realisasi->date }}
                                 </td>
                             @endif
 
-                            <td>
+                            <td class="align-middle">
                                 @if ($product = $detail->product)
                                     <p class="text-sm m-0">
                                         <span>{{ $product->name }}</span>
@@ -199,11 +199,11 @@
                                     <p class="m-0">Produk</p>
                                 @endif
                             </td>
-                            <td class="text-center">{{ abs($detail->qty) }}</td>
-                            <td class="text-right">@money(abs($detail->total))</td>
+                            <td class="text-center align-middle">{{ abs($detail->qty) }}</td>
+                            <td class="text-right align-middle">@money(abs($detail->total))</td>
 
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($realisasi->nominal))</td>
+                                <td rowspan="{{ $rowspan }}" class="align-middle text-right">@money(abs($realisasi->nominal))</td>
                             @endif
                         </tr>
                     @endforeach
@@ -218,7 +218,7 @@
 
             <tfoot>
                 <tr>
-                    <td colspan="4" class="text-right">
+                    <td colspan="4" class="text-center">
                         <strong>Total</strong>
                     </td>
 
