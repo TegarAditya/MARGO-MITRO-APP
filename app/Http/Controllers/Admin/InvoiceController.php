@@ -155,7 +155,7 @@ class InvoiceController extends Controller
             Alert::success('Success', 'Invoice berhasil dibuat');
 
             if ($request->redirect) {
-                return redirect($request->redirect);
+                return redirect($request->redirect)->with('activeTabs', 'invoice');
             }
 
             return redirect()->route('admin.invoices.edit', $invoice->id);
@@ -281,7 +281,7 @@ class InvoiceController extends Controller
             DB::commit();
 
             if ($request->redirect) {
-                return redirect($request->redirect);
+                return redirect($request->redirect)->with('activeTabs', 'invoice');
             }
 
             return redirect()->route('admin.invoices.edit', $invoice->id);

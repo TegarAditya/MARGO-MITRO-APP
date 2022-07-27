@@ -100,16 +100,16 @@
             <thead>
                 <tr>
                     <th rowspan="2"></th>
-                    <th rowspan="2">
+                    <th rowspan="2" class="align-middle">
                         {{ trans('cruds.invoice.fields.order') }}
                     </th>
-                    <th width="110" rowspan="2">
+                    <th width="110" rowspan="2" class="align-middle">
                         {{ trans('cruds.invoice.fields.date') }}
                     </th>
-                    <th colspan="3" class="text-center">
+                    <th colspan="3" class="text-center" class="align-middle">
                         Products
                     </th>
-                    <th rowspan="2">
+                    <th rowspan="2" class="align-middle">
                         {{ trans('cruds.invoice.fields.nominal') }}
                     </th>
                 </tr>
@@ -137,7 +137,7 @@
                     @foreach ($invoice->invoice_details as $detail)
                         <tr>
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}">{{ $no }}</td>
+                                <td rowspan="{{ $rowspan }}" class="align-middle text-center">{{ $no }}</td>
                                 <td rowspan="{{ $rowspan }}">
                                     <div class="row">
                                         <div class="col-6">
@@ -191,12 +191,12 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td rowspan="{{ $rowspan }}">
+                                <td rowspan="{{ $rowspan }}" class="align-middle">
                                     {{ $invoice->date }}
                                 </td>
                             @endif
 
-                            <td>
+                            <td class="align-middle">
                                 @if ($product = $detail->product)
                                     <p class="text-sm m-0">
                                         <span>{{ $product->name }}</span>
@@ -207,11 +207,11 @@
                                     <p class="m-0">Produk</p>
                                 @endif
                             </td>
-                            <td class="text-center">{{ abs($detail->quantity) }}</td>
-                            <td class="text-right">@money(abs($detail->total))</td>
+                            <td class="text-center align-middle">{{ abs($detail->quantity) }}</td>
+                            <td class="text-right align-middle">@money(abs($detail->total))</td>
 
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($invoice->nominal))</td>
+                                <td rowspan="{{ $rowspan }}" class="text-right align-middle">@money(abs($invoice->nominal))</td>
                             @endif
                         </tr>
                     @endforeach
@@ -226,11 +226,11 @@
 
             <tfoot>
                 <tr>
-                    <td colspan="4" class="text-right">
+                    <td colspan="4" class="text-center">
                         <strong>Total</strong>
                     </td>
 
-                    <td class="text-right">
+                    <td class="text-center">
                         {{ $invoices->map(function($item) {
                             return abs($item->invoice_details->sum('quantity'));
                         })->sum() }}

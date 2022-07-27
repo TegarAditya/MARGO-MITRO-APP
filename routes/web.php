@@ -153,6 +153,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('realisasis/destroy', 'RealisasiController@massDestroy')->name('realisasis.massDestroy');
     Route::post('realisasis/parse-csv-import', 'RealisasiController@parseCsvImport')->name('realisasis.parseCsvImport');
     Route::post('realisasis/process-csv-import', 'RealisasiController@processCsvImport')->name('realisasis.processCsvImport');
+    Route::post('realisasis/paid', 'RealisasiController@setPaid')->name('realisasis.paid');
     Route::resource('realisasis', 'RealisasiController');
 
     Route::get('system-calendar', 'SystemCalendarController@index')->name('systemCalendar');

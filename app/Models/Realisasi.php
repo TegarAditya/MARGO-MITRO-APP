@@ -28,6 +28,7 @@ class Realisasi extends Model
         'no_realisasi',
         'date',
         'nominal',
+        'lunas'
     ];
 
     public function production_order()

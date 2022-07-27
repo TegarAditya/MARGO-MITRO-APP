@@ -205,7 +205,7 @@
                             $selected = $invoice_details->where('product_id', $product->id)->count();
 
                             $order_detail = $order_details->where('product_id', $product->id)->first();
-                            $disabled = (!$order_detail ? false : ($order_detail->moved >= $order_detail->quantity)) || ($detail->stock <= 0);
+                            $disabled = (!$order_detail ? false : ($order_detail->moved >= $order_detail->quantity)) || ($product->stock <= 0);
                             @endphp
                             <a
                                 href="{{ route('admin.products.show', $product->id) }}"

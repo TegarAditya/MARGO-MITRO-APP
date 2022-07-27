@@ -91,17 +91,17 @@ class Product extends Model implements HasMedia
 
     public function jenjang()
     {
-        return $this->belongsTo(category::class, 'jenjang_id');
+        return $this->belongsTo(Category::class, 'jenjang_id');
     }
 
     public function kelas()
     {
-        return $this->belongsTo(category::class, 'kelas_id');
+        return $this->belongsTo(Category::class, 'kelas_id');
     }
 
     public function halaman()
     {
-        return $this->belongsTo(category::class, 'halaman_id');
+        return $this->belongsTo(Category::class, 'halaman_id');
     }
 
     public function stock_movements()

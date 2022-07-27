@@ -239,7 +239,13 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                     <p class="mb-0 text-sm">
                                         No. Realisasi
                                         <br />
-                                        <strong>{{ $realisasi->no_realisasi }}</strong>
+                                        <strong>{{ $realisasi->no_realisasi }} |
+                                        @if ($realisasi->lunas)
+                                            <span class="text-success">Sudah Dibayar</span>
+                                        @else
+                                            <span class="text-danger">Belum Dibayar</span>
+                                        @endif
+                                        </strong>
                                     </p>
                                 </div>
 

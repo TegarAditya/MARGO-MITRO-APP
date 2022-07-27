@@ -101,7 +101,7 @@
 
                 <tbody>
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td class="align-middle text-center">{{ $loop->iteration }}</td>
                         <td>
                             <div class="row">
                                 <div class="col-6">
@@ -140,11 +140,18 @@
                         </td>
                         <td>
                             <div class="row">
-                                <div class="col-12 text-right">
+                                <div class="col-6 text-right">
                                     <p class="mb-0">
                                         <strong class="text-xs">Total Tagihan</strong>
                                         <br />
                                         @money($order->invoices->sum('nominal'))
+                                    </p>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <p class="mb-0">
+                                        <strong class="text-xs">Sisa Tagihan</strong>
+                                        <br />
+                                        @money($order->sisa_tagihan)
                                     </p>
                                 </div>
                             </div>
@@ -158,18 +165,18 @@
                                 </div>
                             </div>
                         </td>
-                        <td>
+                        <td class="text-center align-middle">
                             {{ $pembayaran->tanggal }}
                         </td>
-                        <td class="text-right">@money(abs($pembayaran->nominal))</td>
-                        <td class="text-right">
+                        <td class="text-right align-middle">@money(abs($pembayaran->nominal))</td>
+                        <td class="text-right align-middle">
                             @if (!$pembayaran->diskon)
                                 <span>-</span>
                             @else
                                 <span>@money(abs($pembayaran->diskon))</span>
                             @endif
                         </td>
-                        <td class="text-right">@money(abs($pembayaran->bayar))</td>
+                        <td class="text-right align-middle">@money(abs($pembayaran->bayar))</td>
                     </tr>
                 </tbody>
             @empty

@@ -37,6 +37,9 @@
                         {{ trans('cruds.invoice.fields.nominal') }}
                     </th>
                     <th>
+                        Sudah dibayar ?
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -50,8 +53,16 @@
 @endsection
 @section('scripts')
 @parent
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     $(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 @can('invoice_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
@@ -90,6 +101,15 @@
     retrieve: true,
     aaSorting: [],
     ajax: "{{ route('admin.realisasis.index') }}",
+    columnDefs: [
+    {
+        "targets": 4,
+        "className": "text-right",
+    },
+    {
+        "targets": 5,
+        "className": "text-center",
+    }],
     columns: [
       { data: 'placeholder', name: 'placeholder' },
 // { data: 'id', name: 'id' },
@@ -97,6 +117,7 @@
 { data: 'no_realisasi', name: 'no_realisasi' },
 { data: 'date', name: 'date' },
 { data: 'nominal', name: 'nominal', render: function(value) { return numeral(value).format('$0,0'); } },
+{ data: 'lunas', name: 'lunas' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
@@ -108,6 +129,36 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
+
+  $('body').on('click', '.button-lunas', function () {
+        event.preventDefault();
+        const id = $(this).data('id');
+        swal({
+            title: 'Apakah Kwitansi sudah dibayarkan ?',
+            text: 'Apakah Kwitansi sudah dibayarkan ?',
+            icon: 'warning',
+            buttons: ["Cancel", "Yes!"],
+            showSpinner: true
+        }).then(function(value) {
+            if (value) {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('admin.realisasis.paid') }}",
+                    data: {
+                        id: id
+                    },
+                    success: function (response) {
+                        if (response.status == 'success') {
+                            table.ajax.reload();
+                            swal("Success", response.message, "success");
+                        } else {
+                            swal("Warning!", response.message, 'error');
+                        }
+                    }
+                });
+            }
+        });
+    });
 
 });
 
