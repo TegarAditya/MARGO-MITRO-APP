@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Order;
+use App\Models\Salesperson;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
+use NumberFormatter;
 
 class HomeController
 {
@@ -192,6 +196,30 @@ class HomeController
 
     public function dashboard(Request $request)
     {
-        return view('admin.dashboard');
+        $dates = explode(' - ', $request->input('date', ' - '));
+        $start_at = Date::parse($dates[0] ?: 'first day of this month')->startOf('day');
+        $end_at = Date::parse($dates[1] ?: 'last day of this month')->endOf('day');
+
+        $salespeople = Salesperson::pluck('name', 'id')->prepend("Pilih Sales", '');
+        $querySalesOrders = Order::query()
+            ->with([
+                'salesperson', 'order_details',
+                'tagihan', 'pembayarans',
+                'invoices', 'invoices.invoice_details',
+            ])
+            ->whereBetween('date', [$start_at, $end_at]);
+
+        if ($salesperson_id = $request->input('salesperson_id')) {
+            $querySalesOrders->where('salesperson_id', $salesperson_id);
+        }
+
+        $orders = $querySalesOrders->get();
+
+        // dd(
+        //     $orders->map(fn($item) => $item->invoices->sum('nominal'))->sum(),
+        //     $orders->sum('invoices.nominal')
+        // );
+
+        return view('admin.dashboard', compact('salespeople', 'start_at', 'end_at', 'orders'));
     }
 }
