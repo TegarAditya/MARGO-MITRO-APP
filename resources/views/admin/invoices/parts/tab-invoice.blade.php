@@ -400,6 +400,9 @@
                 var qty = product.find('.product-qty');
                 var actions = product.find('.product-qty-act');
                 var price = product.find('.product-price');
+                var priceText = product.find('.product-price_text');
+
+                priceText.val(numeral(price.val()).format('0,0'));
 
                 actions.on('click', function (e) {
                     var el = $(e.currentTarget);
@@ -560,10 +563,12 @@
                 .attr('min', data.max == 0 ? 0 : 1)
                 .attr('required', true);
             product.find('.product-price').val(price != 0 ? price : data.price)
+                .attr('name', name+'['+data.id+'][price]');
+            product.find('.product-price_text').val(numeral(price != 0 ? price : data.price).format('0,0'))
                 .attr('id', 'fieldPrice-'+data.id)
-                .attr('name', name+'['+data.id+'][price]')
+                .attr('name', name+'['+data.id+'][price_text]')
                 .attr('min', 1)
-                .attr('required', true)
+                .attr('required', true);
             product.find('.product-subtotal').html(numeral(data.price).format('$0,0'));
             product.find('.product-img').attr('src', data.image).parent()[!data.image ? 'hide' : 'show']();
 

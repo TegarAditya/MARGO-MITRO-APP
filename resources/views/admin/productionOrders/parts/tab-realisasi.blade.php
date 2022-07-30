@@ -111,7 +111,6 @@
 (function($, numeral) {
     $(function() {
         var form = $('#modelForm');
-        orm');
 
         $('.realisasi-delete-btn').on('click', function(e) {
             e.preventDefault();
