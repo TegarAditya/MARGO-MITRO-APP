@@ -99,13 +99,20 @@ $foto = !$product->foto ? null : $product->foto->first();
         <div class="col" style="max-width: 240px">
             <p class="mb-0 text-sm">Harga</p>
 
+            <input
+                type="hidden"
+                class="product-price"
+                name="{{ !$product->id ? null : $name.'['.$product->id.'][price]' }}"
+                value="{{ $detail->ongkos_satuan ?: 0 }}"
+            />
+
             <x-admin.form-group
                 type="text"
                 id="fieldPrice-{{ $product->id }}"
-                :name="!$product->id ? null : $name.'['.$product->id.'][price]'"
+                :name="!$product->id ? null : $name.'['.$product->id.'][price_text]'"
                 containerClass=" m-0"
                 boxClass=" px-2 py-0"
-                class="form-control-sm product-price"
+                class="form-control-sm product-price_text"
                 value="{{ $detail->ongkos_satuan ?: 0 }}"
                 min="0"
                 readonly

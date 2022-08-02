@@ -1,6 +1,7 @@
 <div class="tab-pembayaran pt-3">
     <input type="hidden" name="diskon" value="{{ $pembayaran->diskon }}" />
     <input type="hidden" name="nominal" value="{{ $pembayaran->nominal }}" />
+    <input type="hidden" name="bayar" value="{{ $pembayaran->nominal }}" />
 
     <div class="form-group">
         <label for="no_kwitansi">{{ trans('cruds.pembayaran.fields.no_kwitansi') }}</label>
@@ -74,9 +75,9 @@
         <label class="required" for="bayar">Bayar</label>
 
         <x-admin.form-group
-            type="number"
-            id="bayar"
-            name="bayar"
+            type="text"
+            id="bayar_text"
+            name="bayar_text"
             containerClass=" m-0"
             boxClass=" px-2 py-0"
             value="{{ $pembayaran->bayar }}"
@@ -179,11 +180,19 @@
         var diskonAmount = form.find('[name="diskon_amount"]');
         var diskon = form.find('[name="diskon"]');
         var bayar = form.find('[name="bayar"]');
+        var bayarText = form.find('[name="bayar_text"]');
 
         var tagihanDetail = form.find('.detail-tagihan');
         var tagihanTotal = tagihanDetail.find('.tagihan-total');
         var tagihanSaldo = tagihanDetail.find('.tagihan-saldo');
         var tagihanSisa = tagihanDetail.find('.tagihan-sisa');
+
+        bayarText.on('change keyup blur paste', function(e) {
+            var value = numeral(e.target.value);
+
+            bayarText.val(value.format('0,0'));
+            bayar.val(value.value()).trigger('change');
+        }).trigger('change');
 
         tagihan.on('change', function(e) {
             var selected = tagihan.find('option').filter(':selected');

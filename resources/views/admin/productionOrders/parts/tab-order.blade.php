@@ -422,6 +422,25 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         var productSelectItems = modals.find('.product-select-item');
         var productSelectTarget;
 
+        var calculatePrice = function() {
+            var total = 0;
+
+            allProducts.children().each(function(i, item) {
+                var product = $(item);
+                var price = parseFloat(product.find('.product-price').val() || 0);
+                var qty = product.find('input.product-qty1');
+                var qtyNum = parseInt(qty.val() || 0);
+
+                subtotal = (price * qtyNum);
+                product.find('.product-subtotal').html(numeral(subtotal).format('$0,0'));
+
+                total += subtotal;
+            });
+
+            productTotal.html(numeral(total).format('$0,0'));
+            form.find('#total').val(total);
+        };
+
         $('.product-list-group').each(function(index, item) {
             var group = $(item);
             var products = group.find('.product-list');
@@ -432,6 +451,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 var qty = product.find('.product-qty');
                 var actions = product.find('.product-qty-act');
                 var price = product.find('.product-price');
+                var priceText = product.find('.product-price_text');
 
                 actions.on('click', function (e) {
                     var el = $(e.currentTarget);
@@ -447,6 +467,13 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 qty.add(price).on('change keyup blur', function(e) {
                     calculatePrice();
                 });
+
+                priceText.on('change keyup blur', function(e) {
+                    var value = numeral(e.target.value);
+
+                    priceText.val(value.format('$0,0'));
+                    price.val(value.value()).trigger('change');
+                }).trigger('change');
 
                 product.find('.product-delete').on('click', function(e) {
                     e.preventDefault();
@@ -496,25 +523,6 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 placeholder,
             });
         });
-
-        var calculatePrice = function() {
-            var total = 0;
-
-            allProducts.children().each(function(i, item) {
-                var product = $(item);
-                var price = parseFloat(product.find('.product-price').val() || 0);
-                var qty = product.find('input.product-qty1');
-                var qtyNum = parseInt(qty.val() || 0);
-
-                subtotal = (price * qtyNum);
-                product.find('.product-subtotal').html(numeral(subtotal).format('$0,0'));
-
-                total += subtotal;
-            });
-
-            productTotal.html(numeral(total).format('$0,0'));
-            form.find('#total').val(total);
-        };
 
         type.on('change', function(e) {
             var value = e.currentTarget.value;
@@ -587,9 +595,12 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 .attr('name', name+'['+data.id+'][prod]')
                 .attr('required', true);
             product.find('.product-price').val(price != 0 ? price : data.price)
+                .attr('name', name+'['+data.id+'][price]');
+            product.find('.product-price_text').val(price != 0 ? price : data.price)
                 .attr('id', 'fieldPrice-'+data.id)
-                .attr('name', name+'['+data.id+'][price]')
+                .attr('name', name+'['+data.id+'][price_text]')
                 .attr('required', true)
+                .trigger('change');
             product.find('.product-subtotal').html(numeral(data.price).format('$0,0'));
             product.find('.product-img').attr('src', data.image).parent()[!data.image ? 'hide' : 'show']();
 

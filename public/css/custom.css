@@ -66,6 +66,14 @@ table.dataTable thead .sorting_desc {
     border-radius: 3px;
 }
 
+.rounded-lg {
+    border-radius: .5rem !important;
+}
+
+.rounded-xl {
+    border-radius: .75rem !important;
+}
+
 .searchable-title {
     font-weight: bold;
 }
