@@ -197,4 +197,18 @@ class PembayaranController extends Controller
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+    public function general(Request $request)
+    {
+        abort_if(Gate::denies('pembayaran_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $order = Order::with('tagihan')->whereHas('tagihan', function($q){
+            $q->whereRaw('tagihan > saldo')
+            ->whereRaw('total > tagihan ');
+         })->get();
+
+        //  dd($order);
+
+        return view('admin.pembayarans.general');
+    }
 }

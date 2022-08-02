@@ -15,6 +15,54 @@
     </div>
 
     <div class="card-body">
+        <form id="filterform">
+            <div class="row mb-5">
+                <div class="col row">
+
+                    <div class="col-6">
+                        <div class="form-group mb-0">
+                            <label class="small mb-0" for="salesperson_id">Sales Person</label>
+                            <select class="form-control select2 {{ $errors->has('salesperson_id') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id">
+                                @foreach($salespersons as $id => $entry)
+                                    <option value="{{ $id }}" {{ old('salesperson_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('salesperson_id'))
+                                <span class="text-danger">{{ $errors->first('salesperson_id') }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <x-admin.form-group
+                            type="text"
+                            id="date"
+                            name="date"
+                            containerClass=" m-0"
+                            boxClass=" px-2 py-1"
+                            class="form-control-sm product-price"
+                            value="{{ request('date', old('date'))}}"
+                            placeholder="Pilih Tanggal"
+                        >
+                            <x-slot name="label">
+                                <label class="small mb-0" for="date">Tanggal</label>
+                            </x-slot>
+
+                            <x-slot name="right">
+                                <button type="button" class="btn btn-sm border-0 btn-default px-2 date-clear" data-action="+" style="display:{{ !request('date', old('date')) ? 'none' : 'block' }}">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </x-slot>
+                        </x-admin.form-group>
+                    </div>
+                </div>
+
+                <div class="col-auto align-self-end">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
+
         <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Order">
             <thead>
                 <tr>
@@ -34,6 +82,9 @@
                         Area Pemasaran
                     </th>
                     <th>
+                        Status
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -47,6 +98,8 @@
 @endsection
 @section('scripts')
 @parent
+<script src="https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.umd.min.js"></script>
+
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
@@ -57,14 +110,21 @@
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.orders.index') }}",
+    ajax: {
+        url: "{{ route('admin.orders.index') }}",
+        data: function(data) {
+            data.date = $('#date').val(),
+            data.sales = $('#salesperson_id').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'no_order', name: 'no_order' },
-        { data: 'date', name: 'date' },
-        { data: 'salesperson_name', name: 'salesperson.name' },
-        { data: 'salesperson_area', name: 'salesperson.area' },
-        { data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'no_order', name: 'no_order', class: 'text-center'  },
+        { data: 'date', name: 'date', class: 'text-center'  },
+        { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center'  },
+        { data: 'salesperson_area', name: 'salesperson.area', class: 'text-center'  },
+        { data: 'lunas', name: 'lunas', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center'  }
     ],
     orderCellsTop: true,
     order: [[ 2, 'desc' ]],
@@ -76,7 +136,41 @@
           .columns.adjust();
   });
 
+    $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 });
+</script>
+<script>
+(function($) {
+    $(function() {
+        var picker = new easepick.create({
+            element: $('#date').get(0),
+            css: [
+                'https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.css',
+            ],
+            plugins: ['RangePlugin', 'LockPlugin'],
+            RangePlugin: {
+                tooltip: true,
+            },
+            LockPlugin: {
+                maxDate: new Date(),
+            },
+        });
 
+        picker.on('select', function(e) {
+            $('#date').trigger('change');
+            $('.date-clear').show();
+        });
+
+        $('.date-clear').on('click', function(e) {
+            e.preventDefault();
+
+            picker.clear();
+            $(e.currentTarget).hide();
+        });
+    });
+})(jQuery);
 </script>
 @endsection

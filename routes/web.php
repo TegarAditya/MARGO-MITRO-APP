@@ -113,6 +113,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Pembayaran
     Route::delete('pembayarans/destroy', 'PembayaranController@massDestroy')->name('pembayarans.massDestroy');
+    Route::get('pembayarans/general', 'PembayaranController@general')->name('pembayarans.general');
     Route::resource('pembayarans', 'PembayaranController');
 
     // Laporan Pengiriman

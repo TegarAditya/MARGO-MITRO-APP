@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Alert;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -26,6 +27,20 @@ class OrderController extends Controller
 
         if ($request->ajax()) {
             $query = Order::with(['salesperson'])->select(sprintf('%s.*', (new Order())->table));
+
+            if (!empty($request->date)) {
+                $dates = explode(' - ', $request->date);
+
+                $start = Date::parse($dates[0])->startOfDay();
+                $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+
+                $query->whereBetween('date', [$start, $end]);
+            }
+
+            if (!empty($request->sales)) {
+                $query->where('salesperson_id', $request->sales);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -50,6 +65,11 @@ class OrderController extends Controller
                 return $row->no_order ? $row->no_order : '';
             });
 
+            $table->addColumn('lunas', function ($row) {
+                return '<span class="badge badge-'. ($row->lunas ? 'success' : 'danger') .'">'. ($row->lunas ? 'Lunas' : 'Belum Lunas'). '</span>
+                    <br><span class="badge badge-'. ($row->selesai ? 'success' : 'danger') .'">'. ($row->selesai ? 'Selesai' : 'Belum Selesai'). '</span>';
+            });
+
             $table->addColumn('salesperson_name', function ($row) {
                 return $row->salesperson ? $row->salesperson->name : '';
             });
@@ -67,12 +87,14 @@ class OrderController extends Controller
                 return implode(' ', $labels);
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'salesperson_name', 'salesperson_area']);
+            $table->rawColumns(['actions', 'placeholder', 'salesperson_name', 'salesperson_area', 'lunas']);
 
             return $table->make(true);
         }
 
-        return view('admin.orders.index');
+        $salespersons = Salesperson::pluck('name', 'id')->prepend('Semua Sales Person', '');
+
+        return view('admin.orders.index', compact('salespersons'));
     }
 
     public function create()
@@ -122,6 +144,7 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'salesperson_id' => $order->salesperson_id,
                 'total' => $order_details->sum('total'),
+                'tagihan' => 0,
                 'saldo' => 0, // $order_details->sum('total'),
             ]);
 
@@ -208,6 +231,7 @@ class OrderController extends Controller
             ]);
 
             $tagihan->total = $order_details->sum('total');
+            $tagihan->tagihan = $order->invoices()->sum('nominal') ?: 0;
             $tagihan->saldo = $tagihan->tagihan_movements()->sum('nominal') ?: 0;
             $tagihan->save();
 

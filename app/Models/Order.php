@@ -34,6 +34,11 @@ class Order extends Model
         'deleted_at',
     ];
 
+    protected $appended = [
+        'lunas',
+        'selesai'
+    ];
+
     public function getDateAttribute($value)
     {
         return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
@@ -93,5 +98,19 @@ class Order extends Model
         }
 
         return $this->invoices()->sum('nominal') - $this->pembayarans()->sum('nominal');
+    }
+
+    public function getLunasAttribute() {
+        if ($this->tagihan->tagihan === $this->tagihan->saldo) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getSelesaiAttribute() {
+        if ($this->tagihan->total === $this->tagihan->tagihan) {
+            return true;
+        }
+        return false;
     }
 }

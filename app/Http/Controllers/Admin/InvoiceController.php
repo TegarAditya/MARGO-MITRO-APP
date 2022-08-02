@@ -121,6 +121,10 @@ class InvoiceController extends Controller
                 'order_id' => $request->order_id,
             ]);
 
+            $order->tagihan()->update([
+                'tagihan' => $order->invoices()->sum('nominal') ?: 0
+            ]);
+
             $products = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request, $multiplier) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
@@ -213,6 +217,10 @@ class InvoiceController extends Controller
                 'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
             ])->save();
+
+            $order->tagihan()->update([
+                'tagihan' => $order->invoices()->sum('nominal') ?: 0
+            ]);
 
             $invoice->load([
                 'invoice_details', 'invoice_details.product',
@@ -346,6 +354,10 @@ class InvoiceController extends Controller
                 ->delete();
 
             $invoice->delete();
+
+            $order->tagihan()->update([
+                'tagihan' => $order->invoices()->sum('nominal') ?: 0
+            ]);
 
             DB::commit();
 

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddTagihansTotalColumn extends Migration
+class AddTagihanColumnToTagihansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddTagihansTotalColumn extends Migration
     public function up()
     {
         Schema::table('tagihans', function (Blueprint $table) {
-            $table->double('total')->default(0)->after('id');
+            $table->double('tagihan')->default(0)->after('total');
         });
     }
 
@@ -26,7 +26,7 @@ class AddTagihansTotalColumn extends Migration
     public function down()
     {
         Schema::table('tagihans', function (Blueprint $table) {
-            $table->dropColumn('total');
+            $table->dropColumn('tagihan');
         });
     }
 }
