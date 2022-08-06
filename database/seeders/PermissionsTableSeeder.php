@@ -462,6 +462,26 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 113,
                 'title' => 'profile_password_edit',
             ],
+            [
+                'id'    => 114,
+                'title' => 'custom_price_create',
+            ],
+            [
+                'id'    => 115,
+                'title' => 'custom_price_edit',
+            ],
+            [
+                'id'    => 116,
+                'title' => 'custom_price_show',
+            ],
+            [
+                'id'    => 117,
+                'title' => 'custom_price_delete',
+            ],
+            [
+                'id'    => 118,
+                'title' => 'custom_price_access',
+            ],
         ];
 
         Permission::insert($permissions);

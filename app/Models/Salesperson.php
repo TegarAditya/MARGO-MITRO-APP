@@ -78,4 +78,14 @@ class Salesperson extends Model implements HasMedia
             $model->code = 'MKT-'. str_pad($number, 6, '0', STR_PAD_LEFT);
         });
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function tagihans()
+    {
+        return $this->hasMany(Tagihan::class);
+    }
 }

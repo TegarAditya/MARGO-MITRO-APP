@@ -1,7 +1,7 @@
 @php
 /**
  * Item Product
- * 
+ *
  * @var $detail App\Models\InvoiceDetail
  */
 
@@ -90,6 +90,13 @@ $name = !isset($name) ? 'products' : $name;
                 class="product-price"
                 name="{{ !$product->id ? null : $name.'['.$product->id.'][price]' }}"
                 value="{{ $detail->price ?: 0 }}"
+            />
+
+            <input
+                type="hidden"
+                class="product-order"
+                name="{{ !$product->id ? null : $name.'['.$product->id.'][order_id]' }}"
+                value="{{ $detail->order_id }}"
             />
 
             <x-admin.form-group

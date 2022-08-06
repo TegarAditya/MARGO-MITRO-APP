@@ -31,6 +31,7 @@ class Pembayaran extends Model
         'diskon',
         'bayar',
         'tanggal',
+        'note',
         'created_at',
         'updated_at',
         'deleted_at',

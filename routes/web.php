@@ -93,6 +93,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Invoice
     Route::delete('invoices/destroy', 'InvoiceController@massDestroy')->name('invoices.massDestroy');
+    Route::get('invoices/retur', 'InvoiceController@fakturRetur')->name('invoices.retur');
+    Route::post('invoices/retursave', 'InvoiceController@fakturReturSave')->name('invoices.saveretur');
     Route::resource('invoices', 'InvoiceController');
 
     // Invoice Detail
@@ -117,6 +119,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Pembayaran
     Route::delete('pembayarans/destroy', 'PembayaranController@massDestroy')->name('pembayarans.massDestroy');
     Route::get('pembayarans/general', 'PembayaranController@general')->name('pembayarans.general');
+    Route::post('pembayarans/general', 'PembayaranController@generalSave')->name('pembayarans.general.save');
+    Route::get('pembayarans/ajax/getTagihan', 'PembayaranController@getTagihan')->name('pembayarans.ajax.tagihan');
     Route::resource('pembayarans', 'PembayaranController');
 
     // Laporan Pengiriman
@@ -151,6 +155,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Production Order Detail
     Route::delete('production-order-details/destroy', 'ProductionOrderDetailController@massDestroy')->name('production-order-details.massDestroy');
     Route::resource('production-order-details', 'ProductionOrderDetailController');
+
+    // Custom Price
+    Route::delete('custom-prices/destroy', 'CustomPriceController@massDestroy')->name('custom-prices.massDestroy');
+    Route::post('custom-prices/parse-csv-import', 'CustomPriceController@parseCsvImport')->name('custom-prices.parseCsvImport');
+    Route::post('custom-prices/process-csv-import', 'CustomPriceController@processCsvImport')->name('custom-prices.processCsvImport');
+    Route::resource('custom-prices', 'CustomPriceController');
 
     // Realisasi
     Route::delete('realisasis/destroy', 'RealisasiController@massDestroy')->name('realisasis.massDestroy');

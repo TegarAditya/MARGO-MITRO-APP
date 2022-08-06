@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Models\Salesperson;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -374,5 +375,121 @@ class InvoiceController extends Controller
         // Invoice::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function fakturRetur(Request $request)
+    {
+        abort_if(Gate::denies('invoice_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $sales = Salesperson::with('tagihans')->whereHas('tagihans', function($q){
+            $q->whereRaw('tagihan > saldo')
+            ->whereRaw('total > tagihan ');
+         })->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        if ($request->salesman) {
+            $sales_id = $request->salesman;
+            $order_details = OrderDetail::with(['product', 'product.media'])
+                ->where('moved', '>', 0)
+                ->whereHas('product')
+                ->whereHas('order', function($q) use ($sales_id){
+                    $q->where('salesperson_id', $sales_id);
+                })
+                ->orderByDesc('moved')
+                ->get()
+                ->unique('product_id')
+                ->values();
+        } else {
+            $orders = collect([]);
+            $order_details = collect([]);
+        }
+
+        $invoice = new Invoice();
+        $invoice_details = collect([]);
+
+        return view('admin.invoices.return', compact('order_details', 'invoice', 'invoice_details', 'sales'));
+    }
+
+    public function fakturReturSave(Request $request)
+    {
+        // dd($request->all());
+        $request->validate([
+            'date' => 'required|date',
+            'products' => 'required|array|min:1',
+        ]);
+
+        $collection = collect($request->products);
+
+        $all = $collection->map(function ($item, $key) {
+            return [
+                'nominal' => $item['qty'] * $item['price'],
+                'qty' => $item['qty'],
+                'price' => $item['price'],
+                'order_id' => $item['order_id'],
+                'product_id' => $key
+            ];
+        });
+
+        $row = $all->groupBy('order_id');
+        $multiplier = -1;
+
+        DB::beginTransaction();
+        try {
+            foreach($row as $key => $value) {
+                $order = Order::findOrFail($key);
+
+                foreach($value as $element) {
+                    $invoice = Invoice::create([
+                        'no_suratjalan' => Invoice::generateNoSJ(),
+                        'no_invoice' => Invoice::generateNoInvoice(),
+                        'date' => $request->date,
+                        'nominal' => $multiplier * (float) $value->sum('nominal'),
+                        'order_id' => $order->id
+                    ]);
+
+                    $order->tagihan()->update([
+                        'tagihan' => $order->invoices()->sum('nominal') ?: 0
+                    ]);
+
+                    $products = Product::where('id', $element['product_id'])->get()->map(function($item) use ($invoice, $order, $element, $multiplier) {
+                        $qty = (int) $element['qty'] ?: 0;
+                        $price = (float) $element['price'] ?: 0;
+
+                        $qty = $qty * $multiplier;
+
+                        $item->stock_movements()->create([
+                            'reference' => $invoice->id,
+                            'type' => 'invoice',
+                            'quantity' => -1 * $qty,
+                            'product_id' => $item->id,
+                        ]);
+                        $item->update([ 'stock' => $item->stock - $qty ]);
+
+                        $order->order_details()->where('product_id', $item->id)->update([
+                            'moved' => DB::raw("order_details.moved + $qty"),
+                        ]);
+
+                        return [
+                            'product_id' => $item->id,
+                            'invoice_id' => $invoice->id,
+                            'quantity' => $qty,
+                            'price' => $price,
+                            'total' => $qty * $price,
+                        ];
+                    });
+
+                    $invoice->invoice_details()->createMany($products->all());
+                }
+            }
+
+            DB::commit();
+
+            Alert::success('Success', 'Invoice berhasil dibuat');
+
+            return redirect()->route('admin.invoices.retur');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 }

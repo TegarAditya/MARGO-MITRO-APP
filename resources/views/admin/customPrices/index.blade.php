@@ -1,46 +1,41 @@
 @extends('layouts.admin')
 @section('content')
-@can('invoice_create')
+@can('custom_price_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.invoices.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.invoice.title_singular') }}
+            <a class="btn btn-success" href="{{ route('admin.custom-prices.create') }}">
+                {{ trans('global.add') }} {{ trans('cruds.customPrice.title_singular') }}
             </a>
-            <a class="btn btn-success" href="{{ route('admin.invoices.retur') }}">
-                {{ trans('global.add') }} Faktur Retur
-            </a>
+            <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
+                {{ trans('global.app_csvImport') }}
+            </button>
+            @include('csvImport.modal', ['model' => 'CustomPrice', 'route' => 'admin.custom-prices.parseCsvImport'])
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.invoice.title_singular') }} {{ trans('global.list') }}
+        {{ trans('cruds.customPrice.title_singular') }} {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
-        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Invoice">
+        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-CustomPrice">
             <thead>
                 <tr>
                     <th width="10">
 
                     </th>
-                    {{-- <th>
-                        {{ trans('cruds.invoice.fields.id') }}
-                    </th> --}}
                     <th>
-                        {{ trans('cruds.invoice.fields.date') }}
+                        {{ trans('cruds.customPrice.fields.nama') }}
                     </th>
                     <th>
-                        {{ trans('cruds.invoice.fields.order') }}
+                        {{ trans('cruds.customPrice.fields.kategori') }}
                     </th>
                     <th>
-                        {{ trans('cruds.invoice.fields.no_suratjalan') }}
+                        {{ trans('cruds.category.fields.type') }}
                     </th>
                     <th>
-                        {{ trans('cruds.invoice.fields.no_invoice') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.invoice.fields.nominal') }}
+                        {{ trans('cruds.customPrice.fields.harga') }}
                     </th>
                     <th>
                         &nbsp;
@@ -59,11 +54,11 @@
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('invoice_delete')
+@can('custom_price_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.invoices.massDestroy') }}",
+    url: "{{ route('admin.custom-prices.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
@@ -90,32 +85,30 @@
 @endcan
 
   let dtOverrideGlobals = {
-    // buttons: dtButtons,
+    buttons: dtButtons,
     processing: true,
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.invoices.index') }}",
+    ajax: "{{ route('admin.custom-prices.index') }}",
     columns: [
-        { data: 'placeholder', name: 'placeholder' },
-        // { data: 'id', name: 'id' },
-        { data: 'date', name: 'date', class: 'text-center' },
-        { data: 'order', name: 'order', class: 'text-center' },
-        { data: 'no_suratjalan', name: 'no_suratjalan', class: 'text-center' },
-        { data: 'no_invoice', name: 'no_invoice', class: 'text-center' },
-        { data: 'nominal', name: 'nominal', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
-        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
+      { data: 'placeholder', name: 'placeholder' },
+{ data: 'nama', name: 'nama' },
+{ data: 'kategori_name', name: 'kategori.name' },
+{ data: 'kategori.type', name: 'kategori.type' },
+{ data: 'harga', name: 'harga' },
+{ data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
     pageLength: 100,
   };
-  let table = $('.datatable-Invoice').DataTable(dtOverrideGlobals);
+  let table = $('.datatable-CustomPrice').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-
+  
 });
 
 </script>

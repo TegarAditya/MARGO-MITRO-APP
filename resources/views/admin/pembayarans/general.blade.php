@@ -13,34 +13,37 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route('admin.pembayarans.store') }}" enctype="multipart/form-data" id="pembayaranForm">
+        <form method="POST" action="{{ route('admin.pembayarans.general.save') }}" enctype="multipart/form-data" id="pembayaranForm">
             @csrf
 
             <div class="tab-pembayaran pt-3">
                 <input type="hidden" name="diskon" value="0" />
                 <input type="hidden" name="nominal" value="0" />
+                <input type="hidden" name="bayar" value="0" />
 
                 <div class="form-group">
                     <label for="no_kwitansi">{{ trans('cruds.pembayaran.fields.no_kwitansi') }}</label>
-                    <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', "Random") }}" readonly placeholder="Otomatis">
+                    <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="" readonly placeholder="Otomatis">
                     @if($errors->has('no_kwitansi'))
                         <span class="text-danger">{{ $errors->first('no_kwitansi') }}</span>
                     @endif
                     <span class="help-block">{{ trans('cruds.pembayaran.fields.no_kwitansi_helper') }}</span>
                 </div>
                 <div class="form-group">
-                    <label class="required" for="tagihan_id">Order</label>
-                    <select class="form-control select2 {{ $errors->has('tagihan') ? 'is-invalid' : '' }}" name="tagihan_id" id="tagihan_id" required>
-                        <option value="">Please Select</option>
+                    <label class="required" for="sales_id">Salesman</label>
+                    <select class="form-control select2 {{ $errors->has('sales_id') ? 'is-invalid' : '' }}" name="sales_id" id="sales_id" required>
+                        @foreach($sales as $id => $entry)
+                            <option value="{{ $id }}" {{ old('sales_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
                     </select>
-                    @if($errors->has('tagihan'))
-                        <span class="text-danger">{{ $errors->first('tagihan') }}</span>
+                    @if($errors->has('sales_id'))
+                        <span class="text-danger">{{ $errors->first('sales_id') }}</span>
                     @endif
-                    <span class="help-block">{{ trans('cruds.pembayaran.fields.tagihan_helper') }}</span>
+                    <span class="help-block"></span>
                 </div>
 
                 <div class="detail-tagihan mb-3" style="display: none; margin-top: -.5rem">
-                    <p class="mb-0 font-weight-bold">Detail Order</p>
+                    <p class="mb-0 font-weight-bold">Detail Tagihan</p>
 
                     <div class="row">
                         <div class="col-auto">
@@ -63,7 +66,7 @@
                             <p class="mb-0">
                                 <small class="font-weight-bold">Sisa Tagihan</small>
                                 <br />
-                                <span class="tagihan-sisa">x</span>
+                                <span class="tagihan-sisa"></span>
                             </p>
                         </div>
                     </div>
@@ -73,12 +76,12 @@
                     <label class="required" for="bayar">Bayar</label>
 
                     <x-admin.form-group
-                        type="number"
-                        id="bayar"
-                        name="bayar"
+                        type="text"
+                        id="bayar_text"
+                        name="bayar_text"
                         containerClass=" m-0"
                         boxClass=" px-2 py-0"
-                        value=""
+                        value="0"
                         data-editable="true"
                         min="1"
                     >
@@ -116,7 +119,7 @@
                         </div>
                     @endforeach
 
-                    <div class="col-12 mt-2 diskon-nominal" style="display:block">
+                    <div class="col-12 mt-2 diskon-nominal" style="display:none">
                         <p class="mb-0 text-sm">Nominal Diskon</p>
 
                         <x-admin.form-group
@@ -144,7 +147,7 @@
                         name="nominal_text"
                         containerClass=" m-0"
                         boxClass=" px-2 py-0"
-                        value="Rp{{ number_format(0, 0, ',', '.') }}"
+                        value="Rp {{ number_format(0, 0, ',', '.') }}"
                         min="1"
                         readonly
                     />
@@ -170,58 +173,35 @@
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
 (function($) {
     $(function() {
-        var form = $('#pembayaranForm');
-        var tabs = form.find('#modelTabs');
-        var tabsContent = form.find('#modelTabsContent');
-        var tabsNavs = form.find('.modelTabs-nav');
-
-        tabsNavs.on('click', function(e) {
-            e.preventDefault();
-
-            tabs.find('[href="'+$(e.currentTarget).attr('href')+'"]').filter(':not(.disabled)').tab('show');
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
         });
-    });
-})(jQuery);
-</script>
-<script>
-(function($) {
-    $(function() {
+
         var form = $('#pembayaranForm');
-        var tagihan = form.find('[name="tagihan_id"]');
         var nominal = form.find('[name="nominal"]');
         var nominalText = form.find('[name="nominal_text"]');
         var diskonTypes = form.find('[name="diskon_type"]');
         var diskonAmount = form.find('[name="diskon_amount"]');
         var diskon = form.find('[name="diskon"]');
         var bayar = form.find('[name="bayar"]');
+        var bayarText = form.find('[name="bayar_text"]');
 
         var tagihanDetail = form.find('.detail-tagihan');
         var tagihanTotal = tagihanDetail.find('.tagihan-total');
         var tagihanSaldo = tagihanDetail.find('.tagihan-saldo');
         var tagihanSisa = tagihanDetail.find('.tagihan-sisa');
 
-        tagihan.on('change', function(e) {
-            var selected = tagihan.find('option').filter(':selected');
-            var total = Math.abs(selected.data('total'));
-            var saldo = Math.abs(selected.data('saldo'));
-            var sisa = Math.abs(selected.data('sisa'));
-
-            if (!isNaN(total) && !isNaN(saldo) && !isNaN(sisa)) {
-                if (bayar.data('editable')) {
-                    bayar.attr('max', sisa);
-                    sisa < parseFloat(bayar.val()) && bayar.val(sisa).trigger('change');
-                }
-
-                tagihanDetail.show();
-                tagihanTotal.html(numeral(total).format('$0,0'));
-                tagihanSaldo.html(numeral(saldo).format('$0,0'));
-                tagihanSisa.html(numeral(sisa).format('$0,0'));
-            } else {
-                tagihanDetail.hide();
-            }
+        bayarText.on('change keyup blur paste', function(e) {
+            var value = numeral(e.target.value);
+            console.log(value.format('0,0'));
+            bayarText.val(value.format('0,0'));
+            bayar.val(value.value()).trigger('change');
         }).trigger('change');
 
         diskonTypes.on('change', function(e) {
@@ -275,7 +255,42 @@
             diskon.val(diskonRp);
             diskonAmount.val(diskonVal);
         });
+
+        $('#sales_id').on('select2:select', function (e) {
+            var data = e.params.data;
+            $.ajax({
+                type: "GET",
+                url: "{{ route('admin.pembayarans.ajax.tagihan') }}",
+                data: {
+                    sales_id: data.id
+                },
+                success: function (response) {
+                    if (response.status == 'success') {
+                        var total = Math.abs(response.data.tagihan);
+                        var saldo = Math.abs(response.data.saldo);
+                        var sisa = Math.abs(response.data.sisa);
+
+                        if (!isNaN(total) && !isNaN(saldo) && !isNaN(sisa)) {
+                            if (bayar.data('editable')) {
+                                bayar.attr('max', sisa);
+                                sisa < parseFloat(bayar.val()) && bayar.val(sisa).trigger('change');
+                            }
+
+                            tagihanDetail.show();
+                            tagihanTotal.html(numeral(total).format('$0,0'));
+                            tagihanSaldo.html(numeral(saldo).format('$0,0'));
+                            tagihanSisa.html(numeral(sisa).format('$0,0'));
+                        } else {
+                            tagihanDetail.hide();
+                        }
+                    } else {
+                        swal("Warning!", response.message, 'error');
+                    }
+                }
+            });
+        });
     });
 })(jQuery);
 </script>
+
 @endpush

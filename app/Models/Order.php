@@ -101,14 +101,14 @@ class Order extends Model
     }
 
     public function getLunasAttribute() {
-        if ($this->tagihan->tagihan === $this->tagihan->saldo) {
+        if ((float) $this->tagihan->tagihan <= (float) $this->tagihan->saldo) {
             return true;
         }
         return false;
     }
 
     public function getSelesaiAttribute() {
-        if ($this->tagihan->total === $this->tagihan->tagihan) {
+        if ((float) $this->tagihan->total <= (float) $this->tagihan->tagihan) {
             return true;
         }
         return false;
