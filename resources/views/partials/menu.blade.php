@@ -96,7 +96,7 @@
                     </li>
                 @endcan
                 @can('master_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/brands*") ? "menu-open" : "" }} {{ request()->is("admin/cities*") ? "menu-open" : "" }} {{ request()->is("admin/categories*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/brands*") ? "menu-open" : "" }} {{ request()->is("admin/cities*") ? "menu-open" : "" }} {{ request()->is("admin/categories*") ? "menu-open" : "" }} {{ request()->is("admin/custom-prices*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-cogs">
 
