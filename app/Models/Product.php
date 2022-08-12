@@ -24,6 +24,7 @@ class Product extends Model implements HasMedia
 
     protected $appends = [
         'foto',
+        'nama_buku'
     ];
 
     protected $dates = [
@@ -42,6 +43,7 @@ class Product extends Model implements HasMedia
         'jenjang_id',
         'kelas_id',
         'halaman_id',
+        'isi_id',
         'hpp',
         'price',
         'stock',
@@ -104,6 +106,11 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Category::class, 'halaman_id');
     }
 
+    public function isi()
+    {
+        return $this->belongsTo(Category::class, 'isi_id');
+    }
+
     public function stock_movements()
     {
         return $this->hasMany(StockMovement::class);
@@ -119,6 +126,19 @@ class Product extends Model implements HasMedia
         });
 
         return $files;
+    }
+
+    public function getNamaBukuAttribute()
+    {
+        $nama = $this->name;
+        if ($this->kelas) {
+            $nama .= ' -  KELAS '. $this->kelas->name;
+        }
+        if ($this->halaman) {
+            $nama .= ' -  HAL '. $this->halaman->name;
+        }
+
+        return $nama;
     }
 
     protected function serializeDate(DateTimeInterface $date)

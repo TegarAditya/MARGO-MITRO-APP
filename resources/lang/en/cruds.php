@@ -267,6 +267,8 @@ return [
             'halaman_helper'    => ' ',
             'kelas'             => 'Kelas',
             'kelas_helper'      => ' ',
+            'isi'             => 'Isi',
+            'isi_helper'      => ' ',
         ],
     ],
     'bahan' => [

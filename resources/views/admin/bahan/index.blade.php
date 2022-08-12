@@ -92,10 +92,10 @@ $(function () {
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'name', name: 'name' },
-        { data: 'hpp', name: 'hpp' },
-        { data: 'price', name: 'price' },
-        { data: 'stock', name: 'stock' },
-        { data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'hpp', name: 'hpp', class: 'text-right' },
+        { data: 'price', name: 'price', class: 'text-right' },
+        { data: 'stock', name: 'stock', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

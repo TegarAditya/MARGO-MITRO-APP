@@ -10,6 +10,9 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\Salesperson;
+use App\Models\CustomPrice;
+use App\Models\Brand;
+use App\Models\Category;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -97,14 +100,45 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('salespersons'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         abort_if(Gate::denies('order_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $products = Product::with(['media', 'category'])->get();
+        $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $customprices = CustomPrice::pluck('nama', 'id')->prepend('Normal Price', '');
+        $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.orders.create', compact('salespeople', 'products'));
+        if ($request->cover || $request->isi || $request->jenjang) {
+            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang']);
+            if ($request->cover) {
+                $query->where('brand_id', $request->cover);
+            }
+            if ($request->isi) {
+                $query->where('isi_id', $request->isi);
+            }
+            if ($request->jenjang) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+            $products = $query->get();
+        } else {
+            $products = collect([]);
+        }
+
+        if ($request->custom_price) {
+            $custom = CustomPrice::find($request->custom_price);
+            $harga = $custom->harga;
+            $kategori = $custom->kategori_id;
+            $products->map(function($product) use($harga, $kategori) {
+                if ($product->halaman_id == $kategori) {
+                    $product->price = $harga;
+                }
+                return $product;
+            });
+        }
+
+        return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -160,12 +194,32 @@ class OrderController extends Controller
         }
     }
 
-    public function edit(Order $order)
+    public function edit(Order $order, Request $request)
     {
         abort_if(Gate::denies('order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $products = Product::with(['media', 'category'])->get();
+        $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $customprices = CustomPrice::pluck('nama', 'id')->prepend('Normal Price', '');
+        $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        if ($request->cover || $request->isi || $request->jenjang) {
+            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang']);
+            if ($request->cover) {
+                $query->where('brand_id', $request->cover);
+            }
+            if ($request->isi) {
+                $query->where('isi_id', $request->isi);
+            }
+
+            if ($request->jenjang) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+            $products = $query->get();
+        } else {
+            $products = collect([]);
+        }
 
         $order->load([
             'salesperson',
@@ -176,7 +230,19 @@ class OrderController extends Controller
             'invoices',
         ]);
 
-        return view('admin.orders.edit', compact('order', 'salespeople', 'products'));
+        if ($request->custom_price) {
+            $custom = CustomPrice::find($request->custom_price);
+            $harga = $custom->harga;
+            $kategori = $custom->kategori_id;
+            $products->map(function($product) use($harga, $kategori) {
+                if ($product->halaman_id == $kategori) {
+                    $product->price = $harga;
+                }
+                return $product;
+            });
+        }
+
+        return view('admin.orders.edit', compact('order', 'salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order)

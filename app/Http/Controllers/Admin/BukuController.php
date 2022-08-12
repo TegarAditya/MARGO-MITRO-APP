@@ -55,6 +55,10 @@ class BukuController extends Controller
                 $query->where('halaman_id', $request->halaman);
             }
 
+            if (!empty($request->isi)) {
+                $query->where('isi_id', $request->isi);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -92,7 +96,7 @@ class BukuController extends Controller
                 return $row->halaman ? $row->halaman->name : '';
             });
             $table->addColumn('brand_name', function ($row) {
-                return $row->brand ? $row->brand->name : '';
+                return ($row->brand ? $row->brand->name : ''). ' - '. ($row->isi ? $row->isi->name : '');
             });
             $table->editColumn('hpp', function ($row) {
                 return $row->hpp ? 'Rp '. number_format($row->hpp, 0, ',', '.') : '';
@@ -116,8 +120,9 @@ class BukuController extends Controller
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.buku.index', compact('brands', 'jenjang', 'kelas', 'halaman'));
+        return view('admin.buku.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi'));
     }
 
     public function create()
@@ -129,8 +134,9 @@ class BukuController extends Controller
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman'));
+        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi'));
     }
 
     public function store(StoreProductRequest $request)
@@ -162,10 +168,11 @@ class BukuController extends Controller
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman');
 
-        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman'));
+        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi'));
     }
 
     public function update(UpdateProductRequest $request, $id)
@@ -199,7 +206,7 @@ class BukuController extends Controller
         $product = Product::find($id);
         abort_if(Gate::denies('product_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman');
+        $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman', 'isi');
 
         $stockMovements = StockMovement::with(['product'])->where('product_id', $product->id)->orderBy('created_at', 'DESC')->get();
 

@@ -1,125 +1,198 @@
 <div class="order-product pt-3">
-    <div class="row">
-        <div class="col-6">
-            <div class="form-group">
-                <label for="no_order">No. Order</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $order->no_order) }}" readonly placeholder="(Otomatis)">
-                @if($errors->has('no_order'))
-                    <span class="text-danger">{{ $errors->first('no_order') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.order.fields.date_helper') }}</span>
+    <form method="GET" action="{{ !$order->id ? route('admin.orders.create') : route("admin.orders.edit", [$order->id]) }}" enctype="multipart/form-data" id="pilihForm">
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="custom_price">Custom Price</label>
+                    <select class="form-control select2 {{ $errors->has('custom_price') ? 'is-invalid' : '' }}" name="custom_price" id="custom_price">
+                        @foreach($customprices as $id => $entry)
+                            <option value="{{ $id }}" {{ request('custom_price') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('custom_price'))
+                        <span class="text-danger">{{ $errors->first('custom_price') }}</span>
+                    @endif
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="required" for="cover">Cover</label>
+                    <select class="form-control select2 {{ $errors->has('cover') ? 'is-invalid' : '' }}" name="cover" id="cover" required>
+                        @foreach($covers as $id => $entry)
+                            <option value="{{ $id }}" {{ request('cover') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('cover'))
+                        <span class="text-danger">{{ $errors->first('cover') }}</span>
+                    @endif
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="required" for="isi">Isi</label>
+                    <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi" id="isi" required>
+                        @foreach($isi as $id => $entry)
+                            <option value="{{ $id }}" {{ request('isi') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('isi'))
+                        <span class="text-danger">{{ $errors->first('isi') }}</span>
+                    @endif
+                    <span class="help-block"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="required" for="jenjang">{{ trans('cruds.buku.fields.jenjang') }} {{ old('jenjang') }}</label>
+                    <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang" id="jenjang" required>
+                        @foreach($jenjang as $id => $entry)
+                            <option value="{{ $id }}" {{ request('jenjang') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('jenjang'))
+                        <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
+                </div>
             </div>
         </div>
-    </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Pilih</a>
+                </div>
+            </div>
+        </div>
+    </form>
+    <hr style="margin: .5em -15px;border-color:#ccc" />
+    <form method="POST" action="{{ !$order->id ? route('admin.orders.store') : route("admin.orders.update", [$order->id]) }}" enctype="multipart/form-data" id="orderForm">
+        @method(!$order->id ? 'POST' : 'PUT')
+        @csrf
 
-    <div class="row">
-        <div class="col-6">
-            <div class="form-group">
-                <label class="required" for="date">{{ trans('cruds.order.fields.date') }}</label>
-                <input class="form-control date h-auto py-1 {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $order->date) }}" required>
-                @if($errors->has('date'))
-                    <span class="text-danger">{{ $errors->first('date') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.order.fields.date_helper') }}</span>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="no_order">No. Order</label>
+                    <input class="form-control h-auto py-1 {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $order->no_order) }}" readonly placeholder="(Otomatis)">
+                    @if($errors->has('no_order'))
+                        <span class="text-danger">{{ $errors->first('no_order') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.order.fields.date_helper') }}</span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="required" for="date">{{ trans('cruds.order.fields.date') }}</label>
+                    <input class="form-control date h-auto py-1 {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $order->date) }}" required>
+                    @if($errors->has('date'))
+                        <span class="text-danger">{{ $errors->first('date') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.order.fields.date_helper') }}</span>
+                </div>
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="form-group">
-                <label class="required" for="salesperson_id">{{ trans('cruds.order.fields.salesperson') }}</label>
-                <select class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" required>
-                    @foreach($salespeople as $id => $entry)
-                        <option value="{{ $id }}" {{ (old('salesperson_id') ? old('salesperson_id') : $order->salesperson->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('salesperson'))
-                    <span class="text-danger">{{ $errors->first('salesperson') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.order.fields.salesperson_helper') }}</span>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="required" for="salesperson_id">{{ trans('cruds.order.fields.salesperson') }}</label>
+                    <select class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" required>
+                        @foreach($salespeople as $id => $entry)
+                            <option value="{{ $id }}" {{ (old('salesperson_id') ? old('salesperson_id') : $order->salesperson->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('salesperson'))
+                        <span class="text-danger">{{ $errors->first('salesperson') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.order.fields.salesperson_helper') }}</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    @foreach ([
-        [
-            'label' => 'Produk Dipilih',
-            'items' => $order->order_details,
-            'modal' => '#productModal',
-            'name' => 'products',
-        ],
-    ] as $item)
-        <hr style="margin: .5em -15px;border-color:#ccc" />
+        @foreach ([
+            [
+                'label' => 'Produk Dipilih',
+                'items' => $order->order_details,
+                'modal' => '#productModal',
+                'name' => 'products',
+            ],
+        ] as $item)
+            <hr style="margin: .5em -15px;border-color:#ccc" />
 
-        <div class="product-list-group">
-            <h5 class="product-group-title">{{ $item['label'] }}</h5>
+            <div class="product-list-group">
+                <h5 class="product-group-title">{{ $item['label'] }}</h5>
 
-            <div class="product-list">
-                @if ($item['items']->count())
-                    @each('admin.orders.parts.item-product', $item['items'], 'detail')
-                @endif
+                <div class="product-list">
+                    @if ($item['items']->count())
+                        @each('admin.orders.parts.item-product', $item['items'], 'detail')
+                    @endif
 
-                @include('admin.orders.parts.item-product', [
-                    'detail' => new App\Models\OrderDetail,
-                    'modal' => $item['modal'],
-                    'name' => $item['name'],
-                ])
-            </div>
+                    @include('admin.orders.parts.item-product', [
+                        'detail' => new App\Models\OrderDetail,
+                        'modal' => $item['modal'],
+                        'name' => $item['name'],
+                    ])
+                </div>
 
-            <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
-                <div class="row justify-content-center d-none">
-                    <div class="col-auto">
-                        <button type="button" class="btn py-1 border product-add">
-                            <i class="fa fa-plus text-sm mr-1"></i>
+                <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
+                    <div class="row justify-content-center d-none">
+                        <div class="col-auto">
+                            <button type="button" class="btn py-1 border product-add">
+                                <i class="fa fa-plus text-sm mr-1"></i>
 
-                            <span>Tambah Produk</span>
-                        </button>
+                                <span>Tambah Produk</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    @if($errors->has($item['name']))
+                        <span class="text-danger">{{ $errors->first($item['name']) }}</span>
+                    @endif
+                </div>
+
+                <div class="product-faker d-none">
+                    @include('admin.orders.parts.item-product', [
+                        'detail' => new App\Models\OrderDetail,
+                        'modal' => $item['modal'],
+                        'name' => $item['name'],
+                    ])
+
+                    <div class="product-empty">
+                        <p>Belum ada produk yang ditambahkan</p>
                     </div>
                 </div>
+            </div>
+        @endforeach
 
-                @if($errors->has($item['name']))
-                    <span class="text-danger">{{ $errors->first($item['name']) }}</span>
+        <div class="product-summary" style="display: {{ !$order->order_details->count() ? 'none' : 'block' }}">
+            <div class="row border-top pt-2">
+                <div class="col text-right">
+                    <p class="mb-0">
+                        <span class="text-sm">Grand Total</span>
+                        <br />
+                        <strong class="product-total">@money(data_get($order, 'tagihan.total', 0))</strong>
+                    </p>
+                </div>
+
+                @if (!$order->id)
+                    <div class="col-auto opacity-0 pl-5 order-action-placeholder" style="pointer-events: none">
+                        <button type="button" class="btn py-1"></button>
+                    </div>
                 @endif
             </div>
+        </div>
 
-            <div class="product-faker d-none">
-                @include('admin.orders.parts.item-product', [
-                    'detail' => new App\Models\OrderDetail,
-                    'modal' => $item['modal'],
-                    'name' => $item['name'],
-                ])
-        
-                <div class="product-empty">
-                    <p>Belum ada produk yang ditambahkan</p>
-                </div>
+        <div class="row mt-4">
+            <div class="col"></div>
+
+            <div class="col-auto">
+                {{-- <button type="submit" class="btn {{ !$order->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a> --}}
+                <button type="submit" class="btn btn-primary">Simpan Order</a>
             </div>
         </div>
-    @endforeach
-
-    <div class="product-summary" style="display: {{ !$order->order_details->count() ? 'none' : 'block' }}">
-        <div class="row border-top pt-2">
-            <div class="col text-right">
-                <p class="mb-0">
-                    <span class="text-sm">Grand Total</span>
-                    <br />
-                    <strong class="product-total">@money(data_get($order, 'tagihan.total', 0))</strong>
-                </p>
-            </div>
-
-            @if (!$order->id)
-                <div class="col-auto opacity-0 pl-5 order-action-placeholder" style="pointer-events: none">
-                    <button type="button" class="btn py-1"></button>
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col"></div>
-
-        <div class="col-auto">
-            <button type="submit" class="btn {{ !$order->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
-        </div>
-    </div>
+    </form>
 </div>
 
 @push('footer')
@@ -129,6 +202,7 @@
         'id' => 'productModal',
         'label' => 'Semua Bahan',
         'items' => $products,
+        // 'hargax' =>
     ],
 ] as $modal)
     <div class="modal fade product-modal" id="{{ $modal['id'] }}" tabindex="-1" role="dialog">
@@ -179,9 +253,15 @@
                         @foreach ($modal['items'] as $product)
                             @php
                             $category = $product->category;
+                            $cover = $product->brand;
+                            $isi = $product->isi;
+                            $jenjang = $product->jenjang;
                             $search = implode(' ', [
-                                $product->name,
+                                $product->nama_buku,
                                 !$category ? '' : $category->name,
+                                !$cover ? '' : $cover->name,
+                                !$isi ? '' : $isi->name,
+                                !$jenjang ? '' : $jenjang->name,
                             ]);
                             $selected = $order->order_details->where('product_id', $product->id)->count();
                             @endphp
@@ -206,19 +286,23 @@
                                             <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
                                         </div>
                                     @endif
-                                
+
                                     <div class="col">
                                         <div class="product-content">
-                                            <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
-                            
+                                            <h6 class="text-sm product-name mb-1">{{ $product->nama_buku }}</h6>
+
                                             <p class="mb-0 text-sm">
                                                 HPP: <span class="product-hpp">@money($product->hpp)</span>
                                             </p>
-                            
+
                                             <p class="mb-0 text-sm">
-                                                Category: <span class="product-category">{{ !$category ? '' : $category->name }}</span>
+                                                Cover - Isi : <span class="product-category">{{ !$cover ? '' : $cover->name }} - {{ !$isi ? '' : $isi->name }}</span>
                                             </p>
-                            
+
+                                            <p class="mb-0 text-sm">
+                                                Jenjang: <span class="product-category">{{ !$jenjang ? '' : $jenjang->name }}</span>
+                                            </p>
+
                                             <p class="mb-0 text-sm">
                                                 Stock: <span class="product-stock">{{ $product->stock }}</span>
                                             </p>
@@ -476,7 +560,7 @@
                 keyword && items.each(function(i, item) {
                     var el = $(item);
                     var search = el.data('search');
-                    
+
                     keyword.split(' ').map(function(key) {
                         search.indexOf(key) < 0 ? el.hide() : (results++);
                     });

@@ -70,7 +70,7 @@
                 <td class="text-center">{{ $loop->iteration }}</td>
                 <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
-                <td>{{ $product->hal->name ?? '' }}</td>
+                <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
                 <td class="text-right">@money($invoice_detail->price)</td>
                 <td class="text-center">{{ abs($invoice_detail->quantity) }}</td>
                 <td class="text-right">@money(abs($invoice_detail->total))</td>

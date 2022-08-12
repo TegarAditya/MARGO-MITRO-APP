@@ -20,6 +20,7 @@ class Category extends Model
         'kelas'   => 'Kelas',
         'halaman' => 'Halaman',
         'jenjang' => 'Jenjang',
+        'isi' => 'Isi',
         'bahan' => 'Bahan',
     ];
 

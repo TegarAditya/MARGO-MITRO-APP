@@ -38,6 +38,18 @@
                 <span class="help-block">{{ trans('cruds.buku.fields.brand_helper') }}</span>
             </div>
             <div class="form-group">
+                <label class="required" for="isi_id">{{ trans('cruds.buku.fields.isi') }}</label>
+                <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id" id="isi_id" required>
+                    @foreach($isi as $id => $entry)
+                        <option value="{{ $id }}" {{ old('isi_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('isi_id'))
+                    <span class="text-danger">{{ $errors->first('isi_id') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.buku.fields.isi_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label class="required" for="jenjang_id">{{ trans('cruds.buku.fields.jenjang') }}</label>
                 <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" required>
                     @foreach($jenjang as $id => $entry)

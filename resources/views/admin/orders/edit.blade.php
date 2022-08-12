@@ -31,59 +31,53 @@
             </div>
         @endif
 
-
         @if (session()->has('error-message'))
             <p class="text-danger">
                 {{session()->get('error-message')}}
             </p>
         @endif
 
-        <form method="POST" action="{{ !$order->id ? route('admin.orders.store') : route("admin.orders.update", [$order->id]) }}" enctype="multipart/form-data" id="orderForm">
-            @method(!$order->id ? 'POST' : 'PUT')
-            @csrf
+        @php
+        $tabs = [
+            [ 'id' => 'order', 'label' => 'Detail Order', 'enabled' => true ],
+            [ 'id' => 'faktur', 'label' => 'Faktur', 'enabled' => !!$order->id ],
+            [ 'id' => 'pembayaran', 'label' => 'Pembayaran', 'enabled' => !!$order->id ],
+        ];
 
-            @php
-            $tabs = [
-                [ 'id' => 'order', 'label' => 'Detail Order', 'enabled' => true ],
-                [ 'id' => 'faktur', 'label' => 'Faktur', 'enabled' => !!$order->id ],
-                [ 'id' => 'pembayaran', 'label' => 'Pembayaran', 'enabled' => !!$order->id ],
-            ];
+        if (!isset($activeTabs)) {
+            $activeTabs = 'order';
+        }
+        @endphp
+        <ul class="nav nav-tabs" id="orderTabs" role="tablist">
+            @foreach ($tabs as $tab)
+                @php
+                $classes = '';
 
-            if (!isset($activeTabs)) {
-                $activeTabs = 'order';
-            }
-            @endphp
-            <ul class="nav nav-tabs" id="orderTabs" role="tablist">
-                @foreach ($tabs as $tab)
-                    @php
-                    $classes = '';
+                if (!$tab['enabled']) {
+                    $classes .= ' disabled';
+                }
+                @endphp
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link{{ $classes }} {{ $activeTabs === $tab['id'] ? ' active' : '' }}" id="order-tab-{{ $loop->iteration }}" data-toggle="tab" href="#order-{{ $loop->iteration }}" role="tab">
+                        {{ $loop->iteration . '. ' . $tab['label'] }}
+                    </a>
+                </li>
+            @endforeach
+        </ul>
 
-                    if (!$tab['enabled']) {
-                        $classes .= ' disabled';
-                    }
-                    @endphp
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link{{ $classes }} {{ $activeTabs === $tab['id'] ? ' active' : '' }}" id="order-tab-{{ $loop->iteration }}" data-toggle="tab" href="#order-{{ $loop->iteration }}" role="tab">
-                            {{ $loop->iteration . '. ' . $tab['label'] }}
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-
-            <div class="tab-content" id="orderTabsContent">
-                <div class="tab-pane fade{{ $activeTabs === 'order' ? ' show active' : '' }}" id="order-1" role="tabpanel">
-                    @include('admin.orders.parts.tab-order')
-                </div>
-
-                <div class="tab-pane fade{{ $activeTabs === 'faktur' ? ' show active' : '' }}" id="order-2" role="tabpanel">
-                    @include('admin.orders.parts.tab-faktur')
-                </div>
-
-                <div class="tab-pane fade{{ $activeTabs === 'pembayaran' ? ' show active' : '' }}" id="order-3" role="tabpanel">
-                    @include('admin.orders.parts.tab-tagihan')
-                </div>
+        <div class="tab-content" id="orderTabsContent">
+            <div class="tab-pane fade{{ $activeTabs === 'order' ? ' show active' : '' }}" id="order-1" role="tabpanel">
+                @include('admin.orders.parts.tab-order')
             </div>
-        </form>
+
+            <div class="tab-pane fade{{ $activeTabs === 'faktur' ? ' show active' : '' }}" id="order-2" role="tabpanel">
+                @include('admin.orders.parts.tab-faktur')
+            </div>
+
+            <div class="tab-pane fade{{ $activeTabs === 'pembayaran' ? ' show active' : '' }}" id="order-3" role="tabpanel">
+                @include('admin.orders.parts.tab-tagihan')
+            </div>
+        </div>
     </div>
 </div>
 @endsection

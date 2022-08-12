@@ -112,6 +112,18 @@ class CategoryTableSeeder extends Seeder
                 'parent_id' => 1,
             ],
             [
+                'name'  => '64',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', '64'),
+                'type'  => 'halaman',
+                'parent_id' => 1,
+            ],
+            [
+                'name'  => 'BUPIN',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', 'BUPIN'),
+                'type'  => 'isi',
+                'parent_id' => 1,
+            ],
+            [
                 'name'  => 'KERTAS',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'KERTAS'),
                 'type'  => 'bahan',

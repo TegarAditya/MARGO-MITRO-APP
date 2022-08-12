@@ -1,12 +1,15 @@
 @php
 /**
  * Item Product
- * 
+ *
  * @var $detail App\Models\OrderDetail
  */
 
 $product = $detail->product ?: new App\Models\Product;
 $category = $product->category;
+$cover = $product->brand;
+$isi = $product->isi;
+$jenjang = $product->jenjang;
 
 $stock = $product->stock ?: 0;
 $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
@@ -29,14 +32,18 @@ $name = !isset($name) ? 'products' : $name;
         <div class="col product-col-main {{ !$product->id ? 'align-self-center' : '' }}">
             @if ($product->id)
                 <div class="product-content">
-                    <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
+                    <h6 class="text-sm product-name mb-1">{{ $product->nama_buku }}</h6>
 
                     <p class="mb-0 text-sm">
                         HPP: <span class="product-hpp">@money($product->hpp)</span>
                     </p>
 
                     <p class="mb-0 text-sm">
-                        Category: <span class="product-category">{{ !$category ? '' : $category->name }}</span>
+                        Cover - Isi : <span class="product-category">{{ !$cover ? '' : $cover->name }} - {{ !$isi ? '' : $isi->name }}</span>
+                    </p>
+
+                    <p class="mb-0 text-sm">
+                        Jenjang: <span class="product-category">{{ !$jenjang ? '' : $jenjang->name }}</span>
                     </p>
 
                     <p class="mb-0 text-sm">

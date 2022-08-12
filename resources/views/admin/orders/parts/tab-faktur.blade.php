@@ -82,7 +82,7 @@
                             <td>
                                 @if ($product = $detail->product)
                                     <p class="m-0">
-                                        <span>{{ $product->name }}</span>
+                                        <span>{{ $product->nama_buku }}</span>
                                         <br />
                                         <span class="text-xs text-muted">
                                             @money($detail->price)
@@ -94,7 +94,7 @@
                             </td>
                             <td class="text-center">{{ abs($detail->quantity) }}</td>
                             <td class="text-right">@money(abs($detail->total))</td>
-                            
+
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($row->nominal))</td>
 

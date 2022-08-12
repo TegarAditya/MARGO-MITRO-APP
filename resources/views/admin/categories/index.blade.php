@@ -34,9 +34,9 @@
                     <th>
                         {{ trans('cruds.category.fields.type') }}
                     </th>
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.category.fields.parent') }}
-                    </th>
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -92,12 +92,12 @@
     aaSorting: [],
     ajax: "{{ route('admin.categories.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'name', name: 'name' },
-{ data: 'slug', name: 'slug' },
-{ data: 'type', name: 'type' },
-{ data: 'parent_name', name: 'parent.name' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'name', name: 'name' },
+        { data: 'slug', name: 'slug' },
+        { data: 'type', name: 'type', class: 'text-center' },
+        // { data: 'parent_name', name: 'parent.name' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center'  }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

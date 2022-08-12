@@ -67,7 +67,7 @@
                 <td class="px-3">{{ $loop->iteration }}</td>
                 <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
-                <td>{{ $product->hal->name ?? '' }}</td>
+                <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
                 <td class="px-3 text-center">{{ abs($invoice_detail->quantity) }}</td>
             </tr>
         @endforeach

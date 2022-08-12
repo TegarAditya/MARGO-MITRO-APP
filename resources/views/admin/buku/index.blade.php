@@ -44,6 +44,18 @@
                     <span class="help-block">{{ trans('cruds.buku.fields.brand_helper') }}</span>
                 </div>
                 <div class="form-group col-6">
+                    <label for="isi_id">{{ trans('cruds.buku.fields.isi') }}</label>
+                    <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id" id="isi_id">
+                        @foreach($isi as $id => $entry)
+                            <option value="{{ $id }}" {{ old('isi_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('isi'))
+                        <span class="text-danger">{{ $errors->first('isi') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.isi_helper') }}</span>
+                </div>
+                <div class="form-group col-6">
                     <label for="jenjang_id">{{ trans('cruds.buku.fields.jenjang') }}</label>
                     <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
                         @foreach($jenjang as $id => $entry)
@@ -98,7 +110,7 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.buku.fields.brand') }}
+                        {{ trans('cruds.buku.fields.brand') }} - Isi
                     </th>
                     <th>
                         {{ trans('cruds.buku.fields.jenjang') }}
@@ -115,13 +127,13 @@
                     <th>
                         {{ trans('cruds.buku.fields.hpp') }}
                     </th>
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.buku.fields.price') }}
-                    </th>
+                    </th> --}}
                     <th>
                         {{ trans('cruds.buku.fields.stock') }}
                     </th>
-                    <th>
+                    <th width="12%">
                         &nbsp;
                     </th>
                 </tr>
@@ -177,6 +189,7 @@
         data: function(data) {
             data.name = $('#name').val(),
             data.brand = $('#brand_id').val(),
+            data.isi = $('#isi_id').val(),
             data.jenjang = $('#jenjang_id').val(),
             data.kelas = $('#kelas_id').val(),
             data.halaman = $('#halaman_id').val()
@@ -184,15 +197,15 @@
     },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'brand_name', name: 'brand.name' },
-        { data: 'jenjang_name', name: 'jenjang_name' },
+        { data: 'brand_name', name: 'brand.name', class: 'text-center' },
+        { data: 'jenjang_name', name: 'jenjang_name', class: 'text-center' },
         // { data: 'kelas_name', name: 'kelas_name' },
         { data: 'name', name: 'name' },
         // { data: 'halaman_name', name: 'halaman_name' },
-        { data: 'hpp', name: 'hpp' },
-        { data: 'price', name: 'price' },
-        { data: 'stock', name: 'stock' },
-        { data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'hpp', name: 'hpp', class: 'text-right' },
+        // { data: 'price', name: 'price' },
+        { data: 'stock', name: 'stock', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

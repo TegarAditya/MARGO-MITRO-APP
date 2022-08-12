@@ -198,9 +198,15 @@
                             @php
                             $product = $detail->product;
                             $category = $product->category;
+                            $cover = $product->brand;
+                            $isi = $product->isi;
+                            $jenjang = $product->jenjang;
                             $search = implode(' ', [
-                                $product->name,
+                                $product->nama_buku,
                                 !$category ? '' : $category->name,
+                                !$cover ? '' : $cover->name,
+                                !$isi ? '' : $isi->name,
+                                !$jenjang ? '' : $jenjang->name,
                             ]);
                             $selected = $invoice_details->where('product_id', $product->id)->count();
 
@@ -236,17 +242,25 @@
 
                                     <div class="col">
                                         <div class="product-content">
-                                            <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
+                                            <h6 class="text-sm product-name mb-1">{{ $product->nama_buku }}</h6>
 
                                             <p class="mb-0 text-sm">
+                                                Cover - Isi : <span class="product-category">{{ !$cover ? '' : $cover->name }} - {{ !$isi ? '' : $isi->name }}</span>
+                                            </p>
+
+                                            <p class="mb-0 text-sm">
+                                                Jenjang: <span class="product-category">{{ !$jenjang ? '' : $jenjang->name }}</span>
+                                            </p>
+
+                                            <p class="mb-0 text-sm text-bold">
                                                 Order Qty: <span class="product-qty-max">{{ $order_detail->quantity ?? '' }}</span>
                                             </p>
 
-                                            <p class="mb-0 text-sm">
+                                            <p class="mb-0 text-sm text-bold">
                                                 Stock: <span class="product-stock">{{ $product->stock }}</span>
                                             </p>
 
-                                            <p class="mb-0 text-sm">
+                                            <p class="mb-0 text-sm text-bold">
                                                 Terkirim: <span class="product-moved">{{ $order_detail->moved ?? '' }}</span>
                                             </p>
                                         </div>

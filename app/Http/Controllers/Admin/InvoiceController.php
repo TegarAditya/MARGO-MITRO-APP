@@ -62,6 +62,10 @@ class InvoiceController extends Controller
             $table->editColumn('no_invoice', function ($row) {
                 return $row->no_invoice ? $row->no_invoice : '';
             });
+            $table->editColumn('date', function ($row) {
+                $is_out = ($row->nominal > 0 ? true : false);
+                return $row->date .'<span class="ml-1 '. ($is_out ? 'text-success' : 'text-danger' ).'">'. ($is_out ? '<i class="fa fa-arrow-up"></i>' : '<i class="fa fa-arrow-down"></i>' ) .'</span> ';
+            });
             $table->addColumn('order', function ($row) {
                 return !$row->order ? '-' : '<a href="'.route('admin.orders.show', $row->order->id).'">'.$row->order->no_order.'</a>';
             });
@@ -70,7 +74,7 @@ class InvoiceController extends Controller
                 return $row->nominal ? abs($row->nominal) : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'order']);
+            $table->rawColumns(['actions', 'placeholder', 'order', 'date']);
 
             return $table->make(true);
         }
@@ -82,8 +86,10 @@ class InvoiceController extends Controller
     {
         abort_if(Gate::denies('invoice_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $orders = Order::get()->mapWithKeys(function($item) {
-            return [$item->id => $item->no_order];
+        $orders = Order::with('salesperson')->whereHas('tagihan', function($q){
+            $q->whereRaw('total > tagihan ');
+        })->get()->mapWithKeys(function($item) {
+            return [$item->id => $item->no_order .' - '.$item->salesperson->name ];
         })->prepend(trans('global.pleaseSelect'), '');
         $order_details = OrderDetail::with(['product', 'product.media'])
             ->whereHas('product')

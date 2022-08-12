@@ -86,6 +86,14 @@
                     </tr>
                     <tr>
                         <th class="text-left" width="20%" style="padding-left: 20px">
+                            {{ trans('cruds.buku.fields.isi') }}
+                        </th>
+                        <td>
+                            {{ $product->isi->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-left" width="20%" style="padding-left: 20px">
                             {{ trans('cruds.buku.fields.jenjang') }}
                         </th>
                         <td>
