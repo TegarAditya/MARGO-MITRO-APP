@@ -196,9 +196,14 @@ class HomeController
 
     public function dashboard(Request $request)
     {
-        $dates = explode(' - ', $request->input('date', ' - '));
-        $start_at = Date::parse($dates[0] ?: 'first day of this month')->startOf('day');
-        $end_at = Date::parse($dates[1] ?: 'last day of this month')->endOf('day');
+        if ($request->input('date')) {
+            $dates = explode(' - ', $request->input('date', ' - '));
+            $start_at = Date::parse($dates[0] ?: 'first day of this month')->startOf('day');
+            $end_at = Date::parse($dates[1] ?: 'last day of this month')->endOf('day');
+        } else {
+            $start_at = Date::parse('first day of this month')->startOf('day');
+            $end_at = Date::parse('last day of this month')->endOf('day');
+        }
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend("Pilih Sales", '');
         $querySalesOrders = Order::query()
