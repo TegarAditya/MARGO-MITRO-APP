@@ -16,12 +16,14 @@ class BukuImport implements ToModel, WithHeadingRow
     private $halaman;
     private $brands;
     private $units;
+    private $isi;
 
     public function __construct()
     {
         $this->jenjang = Category::select('id', 'name')->where('type', 'jenjang')->get();
         $this->kelas = Category::select('id', 'name')->where('type', 'kelas')->get();
         $this->halaman = Category::select('id', 'name')->where('type', 'halaman')->get();
+        $this->isi = Category::select('id', 'name')->where('type', 'isi')->get();
         $this->brands = Brand::select('id', 'name')->get();
         $this->units = Unit::select('id', 'name')->get();
     }
@@ -36,7 +38,8 @@ class BukuImport implements ToModel, WithHeadingRow
         $jenjang = $this->jenjang->where('name', $row['jenjang'])->first();
         $kelas = $this->kelas->where('name', $row['kelas'])->first();
         $halaman = $this->halaman->where('name', $row['halaman'])->first();
-        $brand = $this->brands->where('name', $row['brand'])->first();
+        $isi = $this->isi->where('name', $row['isi'])->first();
+        $brand = $this->brands->where('name', $row['cover'])->first();
         $unit = $this->units->where('name', $row['unit'])->first();
 
         return new Product([
@@ -48,6 +51,7 @@ class BukuImport implements ToModel, WithHeadingRow
             'jenjang_id' => $jenjang->id,
             'kelas_id' => $kelas->id,
             'halaman_id' => $halaman->id,
+            'isi_id' => $isi->id,
             'hpp' => $row['hpp'],
             'price' => $row['price'],
             'finishing_cost' => $row['finishing_cost'],

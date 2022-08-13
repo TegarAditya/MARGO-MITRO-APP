@@ -9,6 +9,9 @@
             <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
                 Import
             </button>
+            <a class="btn btn-success" href="{{ public_path('template/Template_Import_Buku.csv') }}">
+                Download Template Import
+            </a>
             @include('csvImport.import_modal', ['model' => 'Product', 'route' => 'admin.buku.import'])
         </div>
     </div>
