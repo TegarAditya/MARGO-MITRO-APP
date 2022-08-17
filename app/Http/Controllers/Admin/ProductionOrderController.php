@@ -12,12 +12,17 @@ use App\Models\Product;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use App\Models\Productionperson;
+use App\Models\Order;
+use App\Models\Salesperson;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Alert;
+use Illuminate\Support\Facades\Date;
+use LaravelDaily\LaravelCharts\Classes\LaravelChart;
+use NumberFormatter;
 
 class ProductionOrderController extends Controller
 {
@@ -69,6 +74,35 @@ class ProductionOrderController extends Controller
         }
 
         return view('admin.productionOrders.index');
+    }
+
+    public function dashboard(Request $request)
+    {
+        if ($request->input('date')) {
+            $dates = explode(' - ', $request->input('date', ' - '));
+            $start_at = Date::parse($dates[0] ?: 'first day of this month')->startOf('day');
+            $end_at = Date::parse($dates[1] ?: 'last day of this month')->endOf('day');
+        } else {
+            $start_at = Date::parse('first day of this month')->startOf('day');
+            $end_at = Date::parse('last day of this month')->endOf('day');
+        }
+
+        $salespeople = Salesperson::pluck('name', 'id')->prepend("Pilih Sales", '');
+        $querySalesOrders = Order::query()
+            ->with([
+                'salesperson', 'order_details',
+                'tagihan', 'pembayarans',
+                'invoices', 'invoices.invoice_details',
+            ])
+            ->whereBetween('date', [$start_at, $end_at]);
+
+        if ($salesperson_id = $request->input('salesperson_id')) {
+            $querySalesOrders->where('salesperson_id', $salesperson_id);
+        }
+
+        $orders = $querySalesOrders->get();
+
+        return view('admin.productionOrders.dashboard', compact('salespeople', 'start_at', 'end_at', 'orders'));
     }
 
     public function create()

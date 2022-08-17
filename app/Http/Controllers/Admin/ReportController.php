@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\Admin\ReportOrdersExport;
 use App\Exports\Admin\ReportInvoicesExport;
 use App\Exports\Admin\ReportPembayaransExport;
 use App\Exports\Admin\ReportRealisasisExport;
@@ -22,10 +23,39 @@ use Carbon\Carbon;
 
 class ReportController extends Controller
 {
+    public function orders(Request $request)
+    {
+        $salespersons = Salesperson::get();
+
+        $ordersQuery = Order::query()->with([
+            'order_details',
+            'salesperson',
+        ]);
+
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+        $ordersQuery->whereBetween('date', [$start, $end]);
+
+        if ($salesperson_id = $request->salesperson_id) {
+            $ordersQuery->where('salesperson_id', $salesperson_id);
+        }
+
+        $orders = $ordersQuery->orderByDesc('date')->get();
+
+        if ($request->export === 'excel') {
+            return (new ReportOrdersExport($orders))->download('report-orders.xlsx');
+        }
+
+        return view('admin.report.orders', compact('orders', 'salespersons'));
+    }
+
     public function invoices(Request $request)
     {
-        abort_if(Gate::denies('invoice_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
         $products = Product::get();
         $orders = Order::get();
         $salespersons = Salesperson::get();
@@ -43,7 +73,7 @@ class ReportController extends Controller
             $start = Carbon::now()->startOfMonth();
             $end = Carbon::now();
         }
-        $invoicesQuery->whereBetween('created_at', [$start, $end]);
+        $invoicesQuery->whereBetween('date', [$start, $end]);
 
         if ($order_id = $request->order_id) {
             $invoicesQuery->where('order_id', $order_id);
@@ -138,7 +168,7 @@ class ReportController extends Controller
             $start = Carbon::now()->startOfMonth();
             $end = Carbon::now();
         }
-        $realisasiQuery->whereBetween('created_at', [$start, $end]);
+        $realisasiQuery->whereBetween('date', [$start, $end]);
 
         if ($production_order_id = $request->production_order_id) {
             $realisasiQuery->where('production_order_id', $production_order_id);

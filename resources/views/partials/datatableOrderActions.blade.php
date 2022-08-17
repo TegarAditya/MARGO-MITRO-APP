@@ -2,7 +2,7 @@
     {{-- <a class="btn btn-xs btn-primary" href="{{ route('admin.' . $parent . '.show', $idParent) }}">
         {{ trans('global.view') }}
     </a> --}}
-    <a class="px-1" href="{{ route('admin.' . $parent . '.show', $idParent) }}" title="show">
+    <a class="px-1" href="{{ route('admin.' . $parent . '.show', $idParent) }}" title="Show">
         <i class="fas fa-eye text-success  fa-lg"></i>
     </a>
 
@@ -12,7 +12,7 @@
         {{ trans('global.edit') }}
     </a> --}}
 
-    <a class="px-1" href="{{ route('admin.' . $crudRoutePart . '.edit', $row->id) }}" title="edit">
+    <a class="px-1" href="{{ route('admin.' . $crudRoutePart . '.edit', $row->id) }}" title="Edit">
         <i class="fas fa-edit  fa-lg"></i>
     </a>
 @endcan

@@ -13,6 +13,8 @@ use App\Models\Salesperson;
 use App\Models\CustomPrice;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Invoice;
+use App\Models\Pembayaran;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -55,7 +57,7 @@ class OrderController extends Controller
                 $deleteGate = 'order_delete_hidden'; // 'order_delete';
                 $crudRoutePart = 'orders';
 
-                return view('partials.datatablesActions', compact(
+                return view('partials.datatablesActionsOrderIndex', compact(
                 'viewGate',
                 'editGate',
                 'deleteGate',
@@ -336,5 +338,28 @@ class OrderController extends Controller
         Order::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function print_estimasi(Request $request)
+    {
+        $order = Order::findOrFail($request->id);
+
+        $details = OrderDetail::where('order_id', $order->id)
+                ->with(['product' => function ($q) {
+                    $q->orderBy('jenjang_id');
+                }])
+                ->get();
+        return view('admin.orders.prints.estimasi', compact('order', 'details'));
+    }
+
+    public function print_saldo(Request $request)
+    {
+        $order = Order::findOrFail($request->id);
+        $order->load('salesperson');
+
+        $invoices = Invoice::where('order_id', $order->id)->get();
+        $pembayarans = Pembayaran::where('order_id', $order->id)->get();
+
+        return view('admin.orders.prints.saldo', compact('order', 'invoices', 'pembayarans'));
     }
 }

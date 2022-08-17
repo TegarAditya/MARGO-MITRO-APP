@@ -86,6 +86,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Order
     Route::delete('orders/destroy', 'OrderController@massDestroy')->name('orders.massDestroy');
+    Route::get('orders/estimasi/{id}', 'OrderController@print_estimasi')->name('orders.estimasi');
+    Route::get('orders/saldo/{id}', 'OrderController@print_saldo')->name('orders.saldo');
     Route::resource('orders', 'OrderController');
 
     // Order Detail
@@ -123,6 +125,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('pembayarans/ajax/getTagihan', 'PembayaranController@getTagihan')->name('pembayarans.ajax.tagihan');
     Route::resource('pembayarans', 'PembayaranController');
 
+    // Laporan Pemesanan
+    Route::get('report/orders', 'ReportController@orders')->name('report.orders');
+    Route::post('report/orders', 'ReportController@orders');
+
     // Laporan Pengiriman
     Route::get('report/invoices', 'ReportController@invoices')->name('report.invoices');
     Route::post('report/invoices', 'ReportController@invoices');
@@ -150,6 +156,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('production-orders/destroy', 'ProductionOrderController@massDestroy')->name('production-orders.massDestroy');
     Route::post('production-orders/parse-csv-import', 'ProductionOrderController@parseCsvImport')->name('production-orders.parseCsvImport');
     Route::post('production-orders/process-csv-import', 'ProductionOrderController@processCsvImport')->name('production-orders.processCsvImport');
+    Route::get('production-orders/dashboard', 'ProductionOrderController@dashboard')->name('production-orders.dashboard');
     Route::resource('production-orders', 'ProductionOrderController');
 
     // Production Order Detail

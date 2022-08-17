@@ -377,6 +377,16 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
+                                <a href="{{ route("admin.report.orders") }}" class="nav-link {{ request()->is("admin/report/orders") || request()->is("admin/report/orders/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-print">
+
+                                    </i>
+                                    <p>
+                                        History Pemesanan
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route("admin.report.invoices") }}" class="nav-link {{ request()->is("admin/report/invoices") || request()->is("admin/report/invoices/*") ? "active" : "" }}">
                                     <i class="fa-fw nav-icon fas fa-print">
 
