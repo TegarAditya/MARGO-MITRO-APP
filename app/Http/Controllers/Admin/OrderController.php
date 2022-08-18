@@ -151,6 +151,11 @@ class OrderController extends Controller
             'products' => 'required|array|min:1',
         ]);
 
+        $custom_price = $request->custom_price;
+        $cover = $request->cover;
+        $isi = $request->isi;
+        $jenjang = $request->jenjang;
+
         DB::beginTransaction();
         try {
             $order = Order::create([
@@ -188,7 +193,7 @@ class OrderController extends Controller
 
             Alert::success('Success', 'Sales Order berhasil di simpan');
 
-            return redirect()->route('admin.orders.edit', $order->id);
+            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang]);
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -255,6 +260,11 @@ class OrderController extends Controller
             'products' => 'required|array|min:1',
         ]);
 
+        $custom_price = $request->custom_price;
+        $cover = $request->cover;
+        $isi = $request->isi;
+        $jenjang = $request->jenjang;
+
         DB::beginTransaction();
         try {
             $order->forceFill([
@@ -307,7 +317,7 @@ class OrderController extends Controller
 
             Alert::success('Success', 'Sales Order berhasil di simpan');
 
-            return redirect()->route('admin.orders.edit', $order->id);
+            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang]);
         } catch (\Exception $e) {
             DB::rollback();
 

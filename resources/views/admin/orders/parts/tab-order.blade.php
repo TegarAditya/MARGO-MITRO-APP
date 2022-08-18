@@ -71,6 +71,11 @@
         @method(!$order->id ? 'POST' : 'PUT')
         @csrf
 
+        <input type="hidden" name="custom_price" value="{{ request('custom_price') }}">
+        <input type="hidden" name="cover" value="{{ request('cover') }}">
+        <input type="hidden" name="isi" value="{{ request('isi') }}">
+        <input type="hidden" name="jenjang" value="{{ request('jenjang') }}">
+
         <div class="row">
             <div class="col-6">
                 <div class="form-group">
