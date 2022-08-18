@@ -82,16 +82,18 @@
                     @php
                     $product = $order_detail->product;
                     $category = $product->category;
+                    $jenjang = $product->jenjang;
 
                     $stock = $product->stock ?: 0;
                     @endphp
 
                     <div class="card">
                         <div class="card-body px-3 py-2">
-                            <h6 class="text-sm product-name mb-0">{{ $product->name }}</h6>
+                            <h6 class="text-sm product-name mb-0">{{ $product->nama_buku }}</h6>
 
                             <p class="mb-2 text-sm">
-                                Category: {{ !$category ? 'Tidak ada' : $category->name }}
+                                {{-- Category: {{ !$category ? 'Tidak ada' : $category->name }} --}}
+                                Jenjang: {{ !$jenjang ? 'Tidak ada' : $jenjang->name }}
                             </p>
 
                             <div class="row">
@@ -209,10 +211,11 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center" width="1%">No.</th>
-                                        <th>Nama</th>
-                                        <th class="text-center px-3" width="1%">Harga</th>
+                                        <th>Jenjang</th>
+                                        <th>Tema/Mapel</th>
+                                        <th class="text-center px-3" width="15%">Harga</th>
                                         <th class="text-center px-3" width="1%">Qty</th>
-                                        <th class="text-center px-3" width="1%">Subtotal</th>
+                                        <th class="text-center px-3" width="20%">Subtotal</th>
                                     </tr>
                                 </thead>
 
@@ -223,21 +226,22 @@
                                         @endphp
                                         <tr>
                                             <td class="text-right px-3">{{ $loop->iteration }}.</td>
-                                            <td>{{ $product->name }}</td>
+                                            <td class="text-center">{{ $product->jenjang->name ?? '' }}</td>
+                                            <td>{{ $product->nama_buku }}</td>
                                             <td class="text-right px-3">@money(abs($invoice_detail->price))</td>
                                             <td class="text-center px-3">{{ abs($invoice_detail->quantity) }}</td>
                                             <td class="text-right px-3">@money(abs($invoice_detail->total))</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="px-3" colspan="5">Tidak ada produk</td>
+                                            <td class="px-3" colspan="6">Tidak ada produk</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
 
                                 <tfoot>
                                     <tr>
-                                        <td class="text-right px-3" colspan="4">Total</td>
+                                        <td class="text-center px-3" colspan="5"><strong>Total</strong></td>
                                         <td class="text-right px-3">
                                             <strong>@money(abs($invoice->nominal))</strong>
                                         </td>
@@ -274,9 +278,9 @@
                             <th class="text-center" width="1%">No.</th>
                             <th>No. Kwitansi</th>
                             <th class="text-center px-3" width="100">Tanggal</th>
-                            <th class="text-center px-3" width="1%">Nominal</th>
-                            <th class="text-center px-3" width="1%">Diskon</th>
-                            <th class="text-center px-3" width="1%">Bayar</th>
+                            <th class="text-center px-3" width="15%">Nominal</th>
+                            <th class="text-center px-3" width="10%">Diskon</th>
+                            <th class="text-center px-3" width="15%">Bayar</th>
                         </tr>
                     </thead>
 
