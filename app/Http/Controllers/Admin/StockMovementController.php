@@ -58,7 +58,7 @@ class StockMovementController extends Controller
                 return $row->type ? StockMovement::TYPE_SELECT[$row->type] : '';
             });
             $table->addColumn('product_name', function ($row) {
-                return $row->product ? $row->product->name : '';
+                return $row->product ? $row->product->nama_buku : '';
             });
 
             $table->editColumn('quantity', function ($row) {

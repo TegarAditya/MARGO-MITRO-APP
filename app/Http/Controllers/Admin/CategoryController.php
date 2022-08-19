@@ -69,7 +69,7 @@ class CategoryController extends Controller
     {
         abort_if(Gate::denies('category_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $parents = Category::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $parents = Category::whereIn('slug', ['buku', 'bahan'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.categories.create', compact('parents'));
     }

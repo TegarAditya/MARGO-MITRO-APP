@@ -32,7 +32,7 @@
             </div>
             <div class="form-group">
                 <label class="required" for="harga">{{ trans('cruds.customPrice.fields.harga') }}</label>
-                <input class="form-control {{ $errors->has('harga') ? 'is-invalid' : '' }}" type="number" name="harga" id="harga" value="{{ old('harga', $customPrice->harga) }}" step="0.01" required>
+                <input class="form-control {{ $errors->has('harga') ? 'is-invalid' : '' }}" type="number" name="harga" id="harga" value="{{ old('harga', $customPrice->harga) }}" step="1" required>
                 @if($errors->has('harga'))
                     <span class="text-danger">{{ $errors->first('harga') }}</span>
                 @endif

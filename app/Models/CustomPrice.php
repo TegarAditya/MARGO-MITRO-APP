@@ -31,6 +31,10 @@ class CustomPrice extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'harga' => 'double',
+    ];
+
     public function kategori()
     {
         return $this->belongsTo(Category::class, 'kategori_id');

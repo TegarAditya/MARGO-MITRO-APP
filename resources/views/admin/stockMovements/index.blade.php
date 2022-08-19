@@ -28,7 +28,7 @@
                         {{ trans('cruds.stockMovement.fields.created_at') }}
                     </th>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td>
 
                     </td>
@@ -54,7 +54,7 @@
                     </td>
                     <td>
                     </td>
-                </tr>
+                </tr> --}}
             </thead>
         </table>
     </div>
@@ -81,12 +81,12 @@
         { data: 'reference', name: 'reference' },
         { data: 'type', name: 'type' },
         { data: 'product_name', name: 'product.name' },
-        { data: 'quantity', name: 'quantity' },
+        { data: 'quantity', name: 'quantity', class:'text-center' },
         { data: 'created_at', name: 'created_at' },
     ],
     orderCellsTop: true,
     order: [[ 4, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
   let table = $('.datatable-StockMovement').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){

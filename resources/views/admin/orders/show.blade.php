@@ -116,7 +116,7 @@
                                 <div class="col row align-items-end align-self-center">
                                     <div class="col" style="max-width: 120px">
                                         <p class="mb-0 text-sm">
-                                            Order Qty: {{ $order_detail->quantity }}
+                                            Pesanan: {{ $order_detail->quantity }}
                                         </p>
 
                                         <p class="mb-0 text-sm">
@@ -241,7 +241,7 @@
 
                                 <tfoot>
                                     <tr>
-                                        <td class="text-center px-3" colspan="5"><strong>Total</strong></td>
+                                        <td class="text-center px-3" colspan="4"><strong>Total</strong></td>
                                         <td class="text-right px-3">
                                             <strong>@money(abs($invoice->nominal))</strong>
                                         </td>

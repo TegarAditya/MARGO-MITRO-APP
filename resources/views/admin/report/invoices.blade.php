@@ -13,7 +13,7 @@
 
             <div class="row">
                 <div class="col row">
-                    <div class="col-3">
+                    <div class="col-4">
                         <div class="form-group mb-0">
                             <label class="small mb-0" for="order_id">{{ trans('cruds.invoice.fields.order') }}</label>
                             <select class="form-control select2 {{ $errors->has('order_id') ? 'is-invalid' : '' }}" name="order_id" id="order_id">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
 
-                    <div class="col-3">
+                    <div class="col-4">
                         <div class="form-group mb-0">
                             <label class="small mb-0" for="salesperson_id">Sales Person</label>
                             <select class="form-control select2 {{ $errors->has('salesperson_id') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id">
@@ -43,22 +43,7 @@
                         </div>
                     </div>
 
-                    <div class="col-3">
-                        <div class="form-group mb-0">
-                            <label class="small mb-0" for="product_id">Produk</label>
-                            <select class="form-control select2 {{ $errors->has('product_id') ? 'is-invalid' : '' }}" name="product_id" id="product_id">
-                                <option value="">Semua Produk</option>
-                                @foreach($products as $product)
-                                    <option value="{{ $product->id }}" {{ (old('product_id') ? old('product_id') : (request('product_id') == $product->id ? 'selected' : '')) }}>{{ $product->name }}</option>
-                                @endforeach
-                            </select>
-                            @if($errors->has('product_id'))
-                                <span class="text-danger">{{ $errors->first('product_id') }}</span>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="col-3">
+                    <div class="col-4">
                         <x-admin.form-group
                             type="text"
                             id="date"
@@ -99,25 +84,21 @@
         <table class="mt-3 table table-bordered table-invoices">
             <thead>
                 <tr>
-                    <th rowspan="2"></th>
-                    <th rowspan="2" class="align-middle">
+                    <th></th>
+                    <th>
                         {{ trans('cruds.invoice.fields.order') }}
                     </th>
-                    <th width="110" rowspan="2" class="align-middle">
+                    <th width="120">
                         {{ trans('cruds.invoice.fields.date') }}
                     </th>
-                    <th colspan="3" class="text-center" class="align-middle">
+                    <th class="text-center">
                         Products
                     </th>
-                    <th rowspan="2" class="align-middle">
-                        {{ trans('cruds.invoice.fields.nominal') }}
-                    </th>
-                </tr>
-
-                <tr>
-                    <th width="150">Name</th>
                     <th>Qty</th>
                     <th>Subtotal</th>
+                    <th>
+                        {{ trans('cruds.invoice.fields.nominal') }}
+                    </th>
                 </tr>
             </thead>
 
@@ -174,32 +155,23 @@
                                             </p>
                                         </div>
                                     </div>
-
-                                    <div class="row pt-1 mt-1 border-top">
-                                        <div class="col-12">
-                                            <p class="pt-3 text-center mb-0 {{ $is_out ? 'text-success' : 'text-danger' }}">
-                                                <strong class="text-xs">
-                                                    @if ($is_out)
-                                                        <i class="fa fa-arrow-up"></i>
-                                                        Keluar
-                                                    @else
-                                                        <i class="fa fa-arrow-down"></i>
-                                                        Masuk
-                                                    @endif
-                                                </strong>
-                                            </p>
-                                        </div>
-                                    </div>
                                 </td>
                                 <td rowspan="{{ $rowspan }}" class="align-middle">
                                     {{ $invoice->date }}
+                                    <span class="ml-1 {{ $is_out ? 'text-success' : 'text-danger' }}">
+                                        @if ($is_out)
+                                            <i class="fa fa-arrow-up"></i>
+                                        @else
+                                            <i class="fa fa-arrow-down"></i>
+                                        @endif
+                                    </span>
                                 </td>
                             @endif
 
                             <td class="align-middle">
                                 @if ($product = $detail->product)
                                     <p class="text-sm m-0">
-                                        <span>{{ $product->name }}</span>
+                                        <span>{{ $product->nama_buku }}</span>
                                         <br />
                                         <span class="text-xs text-muted">@money($detail->price)</span>
                                     </p>

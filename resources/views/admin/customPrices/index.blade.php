@@ -31,9 +31,9 @@
                     <th>
                         {{ trans('cruds.customPrice.fields.kategori') }}
                     </th>
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.category.fields.type') }}
-                    </th>
+                    </th> --}}
                     <th>
                         {{ trans('cruds.customPrice.fields.harga') }}
                     </th>
@@ -94,21 +94,20 @@
     columns: [
       { data: 'placeholder', name: 'placeholder' },
 { data: 'nama', name: 'nama' },
-{ data: 'kategori_name', name: 'kategori.name' },
-{ data: 'kategori.type', name: 'kategori.type' },
-{ data: 'harga', name: 'harga' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+{ data: 'kategori_name', name: 'kategori.name', class:'text-center' },
+{ data: 'harga', name: 'harga', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+{ data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
   let table = $('.datatable-CustomPrice').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

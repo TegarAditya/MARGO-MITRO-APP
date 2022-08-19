@@ -48,12 +48,9 @@ class CustomPriceController extends Controller
                 return $row->nama ? $row->nama : '';
             });
             $table->addColumn('kategori_name', function ($row) {
-                return $row->kategori ? $row->kategori->name : '';
+                return $row->kategori ? (Category::TYPE_SELECT[$row->kategori->type]. ' ' .$row->kategori->name) : '';
             });
 
-            $table->editColumn('kategori.type', function ($row) {
-                return $row->kategori ? (is_string($row->kategori) ? $row->kategori : $row->kategori->type) : '';
-            });
             $table->editColumn('harga', function ($row) {
                 return $row->harga ? $row->harga : '';
             });
@@ -70,7 +67,7 @@ class CustomPriceController extends Controller
     {
         abort_if(Gate::denies('custom_price_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $kategoris = Category::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kategoris = Category::whereIn('type', ['halaman'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.customPrices.create', compact('kategoris'));
     }

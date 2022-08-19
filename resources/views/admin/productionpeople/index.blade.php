@@ -94,14 +94,14 @@
     ajax: "{{ route('admin.productionpeople.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
-{ data: 'code', name: 'code' },
+{ data: 'code', name: 'code', class:'text-center' },
 { data: 'name', name: 'name' },
-{ data: 'type', name: 'type' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+{ data: 'type', name: 'type', class:'text-center' },
+{ data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
   let table = $('.datatable-Productionperson').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){

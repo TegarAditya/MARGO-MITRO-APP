@@ -13,7 +13,7 @@
 
             <div class="row">
                 <div class="col row">
-                    <div class="col-3">
+                    <div class="col-4">
                         <div class="form-group mb-0">
                             <label class="small mb-0" for="order_id">{{ trans('cruds.invoice.fields.order') }}</label>
                             <select class="form-control select2 {{ $errors->has('order_id') ? 'is-invalid' : '' }}" name="order_id" id="order_id">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
 
-                    <div class="col-3">
+                    <div class="col-4">
                         <div class="form-group mb-0">
                             <label class="small mb-0" for="salesperson_id">Sales Person</label>
                             <select class="form-control select2 {{ $errors->has('salesperson_id') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id">
@@ -43,7 +43,7 @@
                         </div>
                     </div>
 
-                    <div class="col-3">
+                    <div class="col-4">
                         <x-admin.form-group
                             type="text"
                             id="date"

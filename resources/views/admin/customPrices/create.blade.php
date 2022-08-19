@@ -21,7 +21,7 @@
                 <label class="required" for="kategori_id">{{ trans('cruds.customPrice.fields.kategori') }}</label>
                 <select class="form-control select2 {{ $errors->has('kategori') ? 'is-invalid' : '' }}" name="kategori_id" id="kategori_id" required>
                     @foreach($kategoris as $id => $entry)
-                        <option value="{{ $id }}" {{ old('kategori_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        <option value="{{ $id }}" {{ old('kategori_id') == $id ? 'selected' : '' }}>{{ $entry }} Halaman</option>
                     @endforeach
                 </select>
                 @if($errors->has('kategori'))
@@ -31,7 +31,7 @@
             </div>
             <div class="form-group">
                 <label class="required" for="harga">{{ trans('cruds.customPrice.fields.harga') }}</label>
-                <input class="form-control {{ $errors->has('harga') ? 'is-invalid' : '' }}" type="number" name="harga" id="harga" value="{{ old('harga', '0') }}" step="0.01" required>
+                <input class="form-control {{ $errors->has('harga') ? 'is-invalid' : '' }}" type="number" name="harga" id="harga" value="{{ old('harga', '0') }}" step="1" required>
                 @if($errors->has('harga'))
                     <span class="text-danger">{{ $errors->first('harga') }}</span>
                 @endif

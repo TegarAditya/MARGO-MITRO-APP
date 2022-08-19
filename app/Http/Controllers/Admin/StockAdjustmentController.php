@@ -51,7 +51,7 @@ class StockAdjustmentController extends Controller
                 return $row->operation ? StockAdjustment::OPERATION_SELECT[$row->operation] : '';
             });
             $table->addColumn('product_name', function ($row) {
-                return $row->product ? $row->product->name : '';
+                return $row->product ? $row->product->nama_buku : '';
             });
 
             $table->editColumn('quantity', function ($row) {

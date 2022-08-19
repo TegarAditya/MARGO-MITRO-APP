@@ -66,16 +66,16 @@ let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
     ajax: "{{ route('admin.stock-adjustments.index') }}",
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'date', name: 'date' },
-        { data: 'operation', name: 'operation' },
+        { data: 'date', name: 'date', class:'text-center' },
+        { data: 'operation', name: 'operation', class:'text-center' },
         { data: 'product_name', name: 'product.name' },
-        { data: 'quantity', name: 'quantity' },
+        { data: 'quantity', name: 'quantity', class:'text-center' },
         { data: 'note', name: 'note' },
-        { data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
   let table = $('.datatable-StockAdjustment').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
