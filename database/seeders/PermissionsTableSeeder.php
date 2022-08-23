@@ -482,6 +482,26 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 118,
                 'title' => 'custom_price_access',
             ],
+            [
+                'id'    => 118,
+                'title' => 'semester_create',
+            ],
+            [
+                'id'    => 119,
+                'title' => 'semester_edit',
+            ],
+            [
+                'id'    => 120,
+                'title' => 'semester_show',
+            ],
+            [
+                'id'    => 121,
+                'title' => 'semester_delete',
+            ],
+            [
+                'id'    => 122,
+                'title' => 'semester_access',
+            ],
         ];
 
         Permission::insert($permissions);

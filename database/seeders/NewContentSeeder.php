@@ -14,26 +14,39 @@ class NewContentSeeder extends Seeder
      */
     public function run()
     {
+        // $permissions = [
+        //     [
+        //         'title' => 'custom_price_create',
+        //     ],
+        //     [
+        //         'title' => 'custom_price_edit',
+        //     ],
+        //     [
+        //         'title' => 'custom_price_show',
+        //     ],
+        //     [
+        //         'title' => 'custom_price_delete',
+        //     ],
+        //     [
+        //         'title' => 'custom_price_access',
+        //     ],
+        // ];
+
         $permissions = [
             [
-                'id'    => 114,
-                'title' => 'custom_price_create',
+                'title' => 'semester_create',
             ],
             [
-                'id'    => 115,
-                'title' => 'custom_price_edit',
+                'title' => 'semester_edit',
             ],
             [
-                'id'    => 116,
-                'title' => 'custom_price_show',
+                'title' => 'semester_show',
             ],
             [
-                'id'    => 117,
-                'title' => 'custom_price_delete',
+                'title' => 'semester_delete',
             ],
             [
-                'id'    => 118,
-                'title' => 'custom_price_access',
+                'title' => 'semester_access',
             ],
         ];
 

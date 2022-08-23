@@ -96,7 +96,7 @@
                     </li>
                 @endcan
                 @can('master_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/brands*") ? "menu-open" : "" }} {{ request()->is("admin/cities*") ? "menu-open" : "" }} {{ request()->is("admin/categories*") ? "menu-open" : "" }} {{ request()->is("admin/custom-prices*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/brands*") ? "menu-open" : "" }} {{ request()->is("admin/cities*") ? "menu-open" : "" }} {{ request()->is("admin/categories*") ? "menu-open" : "" }} {{ request()->is("admin/custom-prices*") ? "menu-open" : "" }} {{ request()->is("admin/semesters*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-cogs">
 
@@ -107,6 +107,18 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @can('semester_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.semesters.index") }}" class="nav-link {{ request()->is("admin/semesters") || request()->is("admin/semesters/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon far fa-clock">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.semester.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('unit_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.units.index") }}" class="nav-link {{ request()->is("admin/units") || request()->is("admin/units/*") ? "active" : "" }}">
