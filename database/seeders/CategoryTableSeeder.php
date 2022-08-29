@@ -100,6 +100,42 @@ class CategoryTableSeeder extends Seeder
                 'parent_id' => 1,
             ],
             [
+                'name'  => '7',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', '6'),
+                'type'  => 'kelas',
+                'parent_id' => 1,
+            ],
+            [
+                'name'  => '8',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', '6'),
+                'type'  => 'kelas',
+                'parent_id' => 1,
+            ],
+            [
+                'name'  => '9',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', '6'),
+                'type'  => 'kelas',
+                'parent_id' => 1,
+            ],
+            [
+                'name'  => '10',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', '6'),
+                'type'  => 'kelas',
+                'parent_id' => 1,
+            ],
+            [
+                'name'  => '11',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', '6'),
+                'type'  => 'kelas',
+                'parent_id' => 1,
+            ],
+            [
+                'name'  => '12',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', '6'),
+                'type'  => 'kelas',
+                'parent_id' => 1,
+            ],
+            [
                 'name'  => '64',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', '64'),
                 'type'  => 'halaman',
@@ -108,12 +144,6 @@ class CategoryTableSeeder extends Seeder
             [
                 'name'  => '96',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', '96'),
-                'type'  => 'halaman',
-                'parent_id' => 1,
-            ],
-            [
-                'name'  => '64',
-                'slug'  => SlugService::createSlug(Category::class, 'slug', '64'),
                 'type'  => 'halaman',
                 'parent_id' => 1,
             ],

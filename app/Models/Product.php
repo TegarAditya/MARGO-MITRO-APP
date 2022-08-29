@@ -20,6 +20,12 @@ class Product extends Model implements HasMedia
     use HasFactory;
     use Sluggable;
 
+    public const TIPE_PG_SELECT = [
+        'pg'     => 'PG',
+        'kunci'  => 'KUNCI',
+        'non_pg' => 'NON PG',
+    ];
+
     public $table = 'products';
 
     protected $appends = [
@@ -44,6 +50,9 @@ class Product extends Model implements HasMedia
         'kelas_id',
         'halaman_id',
         'isi_id',
+        'tipe_pg',
+        'pg_id',
+        'kunci_id',
         'hpp',
         'price',
         'stock',
@@ -109,6 +118,16 @@ class Product extends Model implements HasMedia
     public function isi()
     {
         return $this->belongsTo(Category::class, 'isi_id');
+    }
+
+    public function pg()
+    {
+        return $this->belongsTo(Product::class, 'pg_id');
+    }
+
+    public function kunci()
+    {
+        return $this->belongsTo(Product::class, 'kunci_id');
     }
 
     public function stock_movements()

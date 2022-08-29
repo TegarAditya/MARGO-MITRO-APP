@@ -57,6 +57,7 @@ class BukuImport implements ToModel, WithHeadingRow
             'finishing_cost' => $row['finishing_cost'],
             'stock' => $row['stock'],
             'min_stock' => $row['min_stock'],
+            'tipe_pg' => $row['tipe_pg'],
             'status' => 1
         ]);
     }

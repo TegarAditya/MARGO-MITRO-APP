@@ -90,10 +90,10 @@
     columns: [
       { data: 'placeholder', name: 'placeholder' },
 { data: 'name', name: 'name' },
-{ data: 'start_date', name: 'start_date' },
-{ data: 'end_date', name: 'end_date' },
-{ data: 'status', name: 'status' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+{ data: 'start_date', name: 'start_date', class: 'text-center' },
+{ data: 'end_date', name: 'end_date', class: 'text-center' },
+{ data: 'status', name: 'status', class: 'text-center' },
+{ data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

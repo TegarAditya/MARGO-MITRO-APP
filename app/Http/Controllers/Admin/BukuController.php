@@ -135,8 +135,10 @@ class BukuController extends Controller
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $pg = Product::where('tipe_pg', 'pg')->get()->pluck('nama_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kunci = Product::where('tipe_pg', 'kunci')->get()->pluck('nama_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi'));
+        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci'));
     }
 
     public function store(StoreProductRequest $request)
@@ -169,10 +171,12 @@ class BukuController extends Controller
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $pg = Product::where('tipe_pg', 'pg')->get()->pluck('nama_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kunci = Product::where('tipe_pg', 'kunci')->get()->pluck('nama_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman');
 
-        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi'));
+        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci'));
     }
 
     public function update(UpdateProductRequest $request, $id)

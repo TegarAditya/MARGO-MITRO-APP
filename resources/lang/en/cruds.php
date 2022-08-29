@@ -221,6 +221,8 @@ return [
             'foto_helper'        => ' ',
             'finishing_cost'        => 'Finishing Cost',
             'finishing_cost_helper' => ' ',
+            'tipe_pg'               => 'Tipe PG',
+            'tipe_pg_helper'        => ' ',
         ],
     ],
     'buku' => [
@@ -363,6 +365,8 @@ return [
             'deleted_at_helper'  => ' ',
             'no_order'           => 'SO Number',
             'no_order_helper'    => ' ',
+            'semester'           => 'Semester',
+            'semester_helper'    => ' ',
         ],
     ],
     'orderDetail' => [

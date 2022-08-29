@@ -25,6 +25,10 @@ class UpdateOrderRequest extends FormRequest
                 'required',
                 'integer',
             ],
+            'semester_id' => [
+                'required',
+                'integer',
+            ],
         ];
     }
 }

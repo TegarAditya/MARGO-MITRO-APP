@@ -29,6 +29,7 @@ class Order extends Model
         'no_order',
         'date',
         'salesperson_id',
+        'semester_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -74,18 +75,23 @@ class Order extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
     }
 
-    public static function generateNoOrder()
+    public static function generateNoOrder($semester)
     {
         $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
 
         $order_number = !$data ? 1 : ($data + 1);
 
-        $prefix = 'ORD'.Date::now()->format('dm');
+        $prefix = 'ORD/MMJ/'.Date::now()->format('m').'/';
         $code = $prefix.sprintf("%04d", $order_number);
 
         return $code;

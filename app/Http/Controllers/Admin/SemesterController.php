@@ -48,7 +48,7 @@ class SemesterController extends Controller
                 return '<input type="checkbox" disabled ' . ($row->status ? 'checked' : null) . '>';
             });
 
-            $table->rawColumns(['actions', 'placeholder']);
+            $table->rawColumns(['actions', 'placeholder', 'status']);
 
             return $table->make(true);
         }

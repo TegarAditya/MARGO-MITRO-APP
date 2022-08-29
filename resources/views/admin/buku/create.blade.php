@@ -98,6 +98,43 @@
                 <span class="help-block">{{ trans('cruds.buku.fields.unit_helper') }}</span>
             </div>
             <div class="form-group">
+                <label>{{ trans('cruds.product.fields.tipe_pg') }}</label>
+                <select class="form-control {{ $errors->has('tipe_pg') ? 'is-invalid' : '' }}" name="tipe_pg" id="tipe_pg">
+                    <option value disabled {{ old('tipe_pg', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                    @foreach(App\Models\Product::TIPE_PG_SELECT as $key => $label)
+                        <option value="{{ $key }}" {{ old('tipe_pg', 'non_pg') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('tipe_pg'))
+                    <span class="text-danger">{{ $errors->first('tipe_pg') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.product.fields.tipe_pg_helper') }}</span>
+            </div>
+            <div class="form-group" id="div_pg">
+                <label class="required" for="pg_id">Pegangan Guru(PG)</label>
+                <select class="form-control select2 {{ $errors->has('pg_id') ? 'is-invalid' : '' }}" name="pg_id" id="pg_id">
+                    @foreach($pg as $id => $entry)
+                        <option value="{{ $id }}" {{ old('pg_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('pg_id'))
+                    <span class="text-danger">{{ $errors->first('pg_id') }}</span>
+                @endif
+                <span class="help-block"></span>
+            </div>
+            <div class="form-group" id="div_kunci">
+                <label class="required" for="kunci_id">Kunci Jawaban</label>
+                <select class="form-control select2 {{ $errors->has('kunci_id') ? 'is-invalid' : '' }}" name="kunci_id" id="kunci_id">
+                    @foreach($kunci as $id => $entry)
+                        <option value="{{ $id }}" {{ old('kunci_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('kunci_id'))
+                    <span class="text-danger">{{ $errors->first('kunci_id') }}</span>
+                @endif
+                <span class="help-block"></span>
+            </div>
+            <div class="form-group">
                 <label for="hpp">{{ trans('cruds.buku.fields.hpp') }}</label>
                 <input class="form-control {{ $errors->has('hpp') ? 'is-invalid' : '' }}" type="number" name="hpp" id="hpp" value="{{ old('hpp', '') }}" step="0.01">
                 @if($errors->has('hpp'))
@@ -230,5 +267,27 @@ Dropzone.options.fotoDropzone = {
          return _results
      }
 }
+</script>
+<script>
+(function($) {
+    $(function() {
+        var tipe_pg = $('#tipe_pg');
+        var pg = $('#div_pg');
+        var kunci = $('#div_kunci');
+
+        tipe_pg.on('change', function(e) {
+            let value = e.target.value;
+            if (value !== 'non_pg') {
+                pg.hide();
+                kunci.hide();
+                $('#pg_id').val('').trigger('change');
+                $('#kunci_id').val('').trigger('change');
+            } else {
+                pg.show();
+                kunci.show();
+            }
+        }).trigger('change');
+    });
+})(jQuery);
 </script>
 @endsection

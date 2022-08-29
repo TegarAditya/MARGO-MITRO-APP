@@ -29,6 +29,7 @@ class Semester extends Model
         'name',
         'start_date',
         'end_date',
+        'status',
         'created_at',
         'updated_at',
         'deleted_at',
