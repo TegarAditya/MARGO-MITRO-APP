@@ -483,23 +483,23 @@ class PermissionsTableSeeder extends Seeder
                 'title' => 'custom_price_access',
             ],
             [
-                'id'    => 118,
+                'id'    => 119,
                 'title' => 'semester_create',
             ],
             [
-                'id'    => 119,
+                'id'    => 120,
                 'title' => 'semester_edit',
             ],
             [
-                'id'    => 120,
+                'id'    => 121,
                 'title' => 'semester_show',
             ],
             [
-                'id'    => 121,
+                'id'    => 122,
                 'title' => 'semester_delete',
             ],
             [
-                'id'    => 122,
+                'id'    => 123,
                 'title' => 'semester_access',
             ],
         ];

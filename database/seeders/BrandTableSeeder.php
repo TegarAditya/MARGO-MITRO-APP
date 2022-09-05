@@ -25,6 +25,38 @@ class BrandTableSeeder extends Seeder
                 'name'  => 'MP',
                 'slug'  => SlugService::createSlug(Brand::class, 'slug', 'MP'),
             ],
+            [
+                'name'  => 'MIKA',
+                'slug'  => SlugService::createSlug(Brand::class, 'slug', 'MIKA'),
+            ],
+            [
+                'name'  => 'MASTER',
+                'slug'  => SlugService::createSlug(Brand::class, 'slug', 'MASTER'),
+            ],
+            [
+                'name'  => 'MGMP KEDIRI',
+                'slug'  => SlugService::createSlug(Brand::class, 'slug', 'MGMP KEDIRI'),
+            ],
+            [
+                'name'  => 'MGMP SRAGEN',
+                'slug'  => SlugService::createSlug(Brand::class, 'slug', 'MGMP SRAGEN'),
+            ],
+            [
+                'name'  => 'GEMILANG',
+                'slug'  => SlugService::createSlug(Brand::class, 'slug', 'GEMILANG'),
+            ],
+            [
+                'name'  => 'PELANGI',
+                'slug'  => SlugService::createSlug(Brand::class, 'slug', 'PELANGI'),
+            ],
+            [
+                'name'  => 'PANDAWA',
+                'slug'  => SlugService::createSlug(Brand::class, 'slug', 'PANDAWA'),
+            ],
+            [
+                'name'  => 'SIPINTAR',
+                'slug'  => SlugService::createSlug(Brand::class, 'slug', 'SIPINTAR'),
+            ],
         ];
 
         Brand::insert($brands);
