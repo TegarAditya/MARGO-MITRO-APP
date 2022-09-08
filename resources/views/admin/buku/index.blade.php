@@ -24,7 +24,7 @@
     <div class="card-body">
         <form id="filterform">
             <div class="row">
-                <div class="col-6">
+                {{-- <div class="col-6">
                     <div class="form-group">
                         <label for="name">{{ trans('cruds.buku.fields.name') }}</label>
                         <input class="form-control" type="text" name="name" id="name" value="{{ old('name', '') }}">
@@ -35,8 +35,8 @@
                         @endif
                         <span class="help-block">{{ trans('cruds.buku.fields.name_helper') }}</span>
                     </div>
-                </div>
-                <div class="col-3">
+                </div> --}}
+                <div class="col-4">
                     <div class="form-group">
                         <label for="brand_id">{{ trans('cruds.buku.fields.brand') }}</label>
                         <select class="form-control select2 {{ $errors->has('brand') ? 'is-invalid' : '' }}" name="brand_id" id="brand_id">
@@ -50,7 +50,7 @@
                         <span class="help-block">{{ trans('cruds.buku.fields.brand_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-3">
+                <div class="col-4">
                     <div class="form-group">
                         <label for="isi_id">{{ trans('cruds.buku.fields.isi') }}</label>
                         <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id" id="isi_id">
