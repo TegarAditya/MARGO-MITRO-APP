@@ -1,61 +1,72 @@
 <div class="tab-invoice pt-3">
     <input type="hidden" name="nominal" value="{{ $invoice->nominal }}" />
 
-    <div class="form-group">
-        <label class="required" for="no_suratjalan">{{ trans('cruds.invoice.fields.no_suratjalan') }}</label>
-        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', $invoice->no_suratjalan) }}" readonly placeholder="(Otomatis)">
-        @if($errors->has('no_suratjalan'))
-            <span class="text-danger">{{ $errors->first('no_suratjalan') }}</span>
-        @endif
-        <span class="help-block">{{ trans('cruds.invoice.fields.no_suratjalan_helper') }}</span>
-    </div>
-    <div class="form-group">
-        <label class="required" for="no_invoice">{{ trans('cruds.invoice.fields.no_invoice') }}</label>
-        <input class="form-control {{ $errors->has('no_invoice') ? 'is-invalid' : '' }}" type="text" name="no_invoice" id="no_invoice" value="{{ old('no_invoice', $invoice->no_invoice) }}" readonly placeholder="(Otomatis)">
-        @if($errors->has('no_invoice'))
-            <span class="text-danger">{{ $errors->first('no_invoice') }}</span>
-        @endif
-        <span class="help-block">{{ trans('cruds.invoice.fields.no_invoice_helper') }}</span>
-    </div>
-    <div class="form-group">
-        <label class="required" for="order_id">{{ trans('cruds.invoice.fields.order') }}</label>
-        <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="order_id" id="order_id" required>
-            @foreach($orders as $id => $entry)
-                <option value="{{ $id }}" {{ (old('order_id') ? old('order_id') : $invoice->order->id ?? '') == $id ? 'selected' : (
-                    request('order_id') == $id ? 'selected' : ''
-                ) }}>{{ $entry }}</option>
-            @endforeach
-        </select>
-        @if($errors->has('order'))
-            <span class="text-danger">{{ $errors->first('order') }}</span>
-        @endif
-        <span class="help-block">{{ trans('cruds.invoice.fields.order_helper') }}</span>
-    </div>
-    <div class="form-group">
-        <label class="required" for="date">{{ trans('cruds.invoice.fields.date') }}</label>
-        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $invoice->date) }}" required>
-        @if($errors->has('date'))
-            <span class="text-danger">{{ $errors->first('date') }}</span>
-        @endif
-        <span class="help-block">{{ trans('cruds.invoice.fields.date_helper') }}</span>
-    </div>
-
-    @if ($type = !$invoice->id ? -1 : (0 > (int) $invoice->nominal ? 1 : -1))
-        <div class="form-group">
-            <label class="required" for="invoice_type">Jenis Invoice</label>
-            <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="invoice_type" id="invoice_type" required>
-                @foreach([
-                    -1 => 'Invoice Keluar',
-                    1 => 'Invoice Masuk'
-                ] as $id => $entry)
-                    <option value="{{ $id }}" {{ (old('invoice_type') ? old('invoice_type') : $type ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                @endforeach
-            </select>
-            @if($errors->has('invoice_type'))
-                <span class="text-danger">{{ $errors->first('invoice_type') }}</span>
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label class="required" for="no_suratjalan">{{ trans('cruds.invoice.fields.no_suratjalan') }}</label>
+                <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', $invoice->no_suratjalan) }}" readonly placeholder="(Otomatis)">
+                @if($errors->has('no_suratjalan'))
+                    <span class="text-danger">{{ $errors->first('no_suratjalan') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.invoice.fields.no_suratjalan_helper') }}</span>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label class="required" for="no_invoice">{{ trans('cruds.invoice.fields.no_invoice') }}</label>
+                <input class="form-control {{ $errors->has('no_invoice') ? 'is-invalid' : '' }}" type="text" name="no_invoice" id="no_invoice" value="{{ old('no_invoice', $invoice->no_invoice) }}" readonly placeholder="(Otomatis)">
+                @if($errors->has('no_invoice'))
+                    <span class="text-danger">{{ $errors->first('no_invoice') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.invoice.fields.no_invoice_helper') }}</span>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label class="required" for="order_id">{{ trans('cruds.invoice.fields.order') }}</label>
+                <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="order_id" id="order_id" required>
+                    @foreach($orders as $id => $entry)
+                        <option value="{{ $id }}" {{ (old('order_id') ? old('order_id') : $invoice->order->id ?? '') == $id ? 'selected' : (
+                            request('order_id') == $id ? 'selected' : ''
+                        ) }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('order'))
+                    <span class="text-danger">{{ $errors->first('order') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.invoice.fields.order_helper') }}</span>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label class="required" for="date">{{ trans('cruds.invoice.fields.date') }}</label>
+                <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $invoice->date) }}" required>
+                @if($errors->has('date'))
+                    <span class="text-danger">{{ $errors->first('date') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.invoice.fields.date_helper') }}</span>
+            </div>
+        </div>
+        <div class="col-6">
+            @if ($type = !$invoice->id ? -1 : (0 > (int) $invoice->nominal ? 1 : -1))
+                <div class="form-group">
+                    <label class="required" for="invoice_type">Jenis Invoice</label>
+                    <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="invoice_type" id="invoice_type" required>
+                        @foreach([
+                            -1 => 'Invoice Keluar',
+                            1 => 'Invoice Masuk'
+                        ] as $id => $entry)
+                            <option value="{{ $id }}" {{ (old('invoice_type') ? old('invoice_type') : $type ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('invoice_type'))
+                        <span class="text-danger">{{ $errors->first('invoice_type') }}</span>
+                    @endif
+                </div>
             @endif
         </div>
-    @endif
+    </div>
 
     @foreach ([
         [
@@ -210,8 +221,14 @@
                             ]);
                             $selected = $invoice_details->where('product_id', $product->id)->count();
 
-                            $order_detail = $order_details->where('product_id', $product->id)->first();
-                            $disabled = (!$order_detail ? false : ($order_detail->moved >= $order_detail->quantity)) || ($product->stock <= 0);
+                            $order_detail = $order_details->where('product_id', $product->id);
+                            $sum_qty = $order_detail->sum('quantity');
+                            $sum_moved = $order_detail->sum('moved');
+                            $sum_total = $order_detail->sum('total');
+
+                            $bonus = $detail->bonus ?: null;
+
+                            $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty)) || ($product->stock <= 0);
                             @endphp
                             <a
                                 href="{{ route('admin.products.show', $product->id) }}"
@@ -221,10 +238,16 @@
                                 data-price="{{ $product->price }}"
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
+                                @if($bonus)
+                                    data-pg="{{ $bonus->product->id }}"
+                                    data-pgqty="{{ $bonus->quantity }}"
+                                    data-pgmoved="{{ $bonus->moved }}"
+                                    data-pgmax="{{ $bonus->quantity - $bonus->moved }}"
+                                @endif
                                 @if ($detail)
-                                    data-qty="{{ $detail->quantity }}"
-                                    data-moved="{{ $detail->moved }}"
-                                    data-max="{{ $detail->quantity - $detail->moved }}"
+                                    data-qty="{{ $sum_qty }}"
+                                    data-moved="{{ $sum_moved }}"
+                                    data-max="{{ $sum_qty - $sum_moved }}"
                                 @endif
                                 @if ($foto = $product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
@@ -253,7 +276,7 @@
                                             </p>
 
                                             <p class="mb-0 text-sm text-bold">
-                                                Order Qty: <span class="product-qty-max">{{ $order_detail->quantity ?? '' }}</span>
+                                                Order Qty: <span class="product-qty-max">{{ $sum_qty ?? '' }}</span>
                                             </p>
 
                                             <p class="mb-0 text-sm text-bold">
@@ -261,8 +284,25 @@
                                             </p>
 
                                             <p class="mb-0 text-sm text-bold">
-                                                Terkirim: <span class="product-moved">{{ $order_detail->moved ?? '' }}</span>
+                                                Terkirim: <span class="product-moved">{{ $sum_moved ?? '' }}</span>
                                             </p>
+                                        </div>
+                                        <div style="display: none">
+                                            <div class="product-pg">
+                                                <h6 class="text-sm product-name mb-1">Product PG/Kunci</h6>
+
+                                                <p class="mb-0 text-sm">
+                                                    Order Qty: <span class="product-qty-max">{{ !$bonus ? '' : $bonus->quantity }}</span>
+                                                </p>
+
+                                                <p class="mb-0 text-sm">
+                                                    Stock: <span class="product-stock">{{ !$bonus ? '' :  $bonus->product->stock }}</span>
+                                                </p>
+
+                                                <p class="mb-0 text-sm">
+                                                    Terkirim: <span class="product-moved">{{ !$bonus ? '' : $bonus->moved }}</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -286,101 +326,101 @@
 
 @push('styles')
 <style>
-.product-group-title {
-    position: sticky;
-    position: -webkit-sticky;
-    top: 0;
-    z-index: 100;
-    background-color: #fff;
-    padding: .25em .5em;
-    margin-left: -.5em;
-    margin-right: -.5em;
-}
+    .product-group-title {
+        position: sticky;
+        position: -webkit-sticky;
+        top: 0;
+        z-index: 100;
+        background-color: #fff;
+        padding: .25em .5em;
+        margin-left: -.5em;
+        margin-right: -.5em;
+    }
 
-.product-pp.disabled > .select2,
-.product-pp.disabled > select {
-    opacity: 0.5;
-    pointer-events: none;
-}
+    .product-pp.disabled > .select2,
+    .product-pp.disabled > select {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 
-.product-list > .item-product:last-child .product-delete {
-    opacity: 0.5;
-    pointer-events: none;
-    background-color: #aeaeae;
-    border-color: #969696;
-}
+    .product-list > .item-product:last-child .product-delete {
+        opacity: 0.5;
+        pointer-events: none;
+        background-color: #aeaeae;
+        border-color: #969696;
+    }
 
-.product-list > .item-product:last-child > .product-col-content {
-    opacity: 0.66;
-    pointer-events: none;
-}
+    .product-list > .item-product:last-child > .product-col-content {
+        opacity: 0.66;
+        pointer-events: none;
+    }
 
-.product-action {
-    position: sticky;
-    position: -webkit-sticky;
-    z-index: 10;
-    bottom: 0;
-    background-color: #fff;
-    margin: 0 -1rem;
-    padding: 0 1rem;
-}
+    .product-action {
+        position: sticky;
+        position: -webkit-sticky;
+        z-index: 10;
+        bottom: 0;
+        background-color: #fff;
+        margin: 0 -1rem;
+        padding: 0 1rem;
+    }
 
-.item-product {
-    padding: .5rem 0;
-    transition: 250ms ease-in-out;
-}
+    .item-product {
+        padding: .5rem 0;
+        transition: 250ms ease-in-out;
+    }
 
-.item-product + .item-product {
-    border-top: 1px solid #cecece;
-}
+    .item-product + .item-product {
+        border-top: 1px solid #cecece;
+    }
 
-.item-product.highlight {
-    background-color: rgba(32, 201, 151, .25);
-}
+    .item-product.highlight {
+        background-color: rgba(32, 201, 151, .25);
+    }
 
-.product-searchbar {
-    position: sticky;
-    position: -webkit-sticky;
-    top: 0;
-    z-index: 100;
-    background-color: #fff;
-    padding: .5rem 0;
-}
+    .product-searchbar {
+        position: sticky;
+        position: -webkit-sticky;
+        top: 0;
+        z-index: 100;
+        background-color: #fff;
+        padding: .5rem 0;
+    }
 
-.product-select-item {
-    display: block;
-    border: 1px solid #eee;
-    border-radius: .25rem;
-    padding: .5rem .5rem;
-    background-color: #fff;
-    color: #323232
-}
+    .product-select-item {
+        display: block;
+        border: 1px solid #eee;
+        border-radius: .25rem;
+        padding: .5rem .5rem;
+        background-color: #fff;
+        color: #323232
+    }
 
-.product-select-item:not(.selected):hover {
-    border: 1px solid #cfcfcf;
-    background-color: #fafafa;
-    color: var(--blue);
-}
+    .product-select-item:not(.selected):hover {
+        border: 1px solid #cfcfcf;
+        background-color: #fafafa;
+        color: var(--blue);
+    }
 
-.product-select-item.selected {
-    border-color: var(--success);
-    background-color: #eafdef;
-    pointer-events: none;
-}
+    .product-select-item.selected {
+        border-color: var(--success);
+        background-color: #eafdef;
+        pointer-events: none;
+    }
 
-.product-select-item.disabled {
-    border-color: #727272;
-    background-color: #eee;
-    pointer-events: none;
-}
+    .product-select-item.disabled {
+        border-color: #727272;
+        background-color: #eee;
+        pointer-events: none;
+    }
 
-.product-select-item + .product-select-item {
-    margin-top: .5rem;
-}
+    .product-select-item + .product-select-item {
+        margin-top: .5rem;
+    }
 
-.select2-container--default .select2-results__option[aria-disabled=true] {
-    display: none;
-}
+    .select2-container--default .select2-results__option[aria-disabled=true] {
+        display: none;
+    }
 </style>
 @endpush
 
@@ -413,8 +453,10 @@
             var bindProduct = function(product) {
                 var qty = product.find('.product-qty');
                 var actions = product.find('.product-qty-act');
+                var actionsPg = product.find('.product-bonus-act');
                 var price = product.find('.product-price');
                 var priceText = product.find('.product-price_text');
+                var bonus = product.find('.product-bonus');
 
                 priceText.val(numeral(price.val()).format('0,0'));
 
@@ -427,6 +469,16 @@
 
                     target.filter(':not([readonly])').val(value).trigger('change');
                     calculatePrice();
+                });
+
+                actionsPg.on('click', function (e) {
+                    var el = $(e.currentTarget);
+                    var target = product.find(el.data('target'));
+                    var qtyNum = parseInt(target.val());
+                    var calc = qtyNum + (el.data('action') === '-' ? -1 : 1);
+                    var value = calc <= 0 ? 0 : calc;
+
+                    target.filter(':not([readonly])').val(value).trigger('change');
                 });
 
                 qty.on('change blur', function(e) {
@@ -448,6 +500,11 @@
 
                 qty.add(price).on('change keyup blur', function(e) {
                     calculatePrice();
+                });
+
+                qty.on('keyup blur', function(e) {
+                    let bonus_qty = Math.ceil(qty.val()/33.34);
+                    bonus.val(bonus_qty).trigger('change');
                 });
 
                 product.find('.product-delete').on('click', function(e) {
@@ -558,8 +615,10 @@
             var product = productSelectTarget || $('');
             var selected = $(e.currentTarget);
             var content = selected.find('.product-content').clone();
+            var contentBonus = selected.find('.product-pg').clone();
             var qty = product.find('.product-qty').val();
             var price = product.find('.product-price').val();
+            var bonus = product.find('.product-bonus').val();
             var name = product.data('name');
             var data = selected.data();
 
@@ -585,6 +644,20 @@
                 .attr('required', true);
             product.find('.product-subtotal').html(numeral(data.price).format('$0,0'));
             product.find('.product-img').attr('src', data.image).parent()[!data.image ? 'hide' : 'show']();
+
+            //bonus
+            product.find('.div-product-pg').html(contentBonus);
+
+            if (data.pg) {
+                product.find('.div-product-pg').show();
+                product.find('.div-product-bonus').show();
+                product.find('.product-bonus').val(bonus || 0)
+                    .attr('id', 'fieldBonus-'+data.id)
+                    .attr('name', name+'['+data.id+'][bonus]')
+                    .attr('min', data.pgmax == 0 ? 0 : 1)
+                    .attr('max', data.pgmax)
+                    .attr('required', true);
+            }
 
             productSearchClear.trigger('click');
             modals.modal('hide');

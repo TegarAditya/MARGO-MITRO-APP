@@ -7,9 +7,22 @@
 
 $product = $detail->product ?: new App\Models\Product;
 $category = $product->category;
+$cover = $product->brand;
+$isi = $product->isi;
+$jenjang = $product->jenjang;
 
 $order_detail = $detail->order_detail ?: null;
 $qtyMax = !$order_detail ? $product->stock : $order_detail->quantity;
+
+if ($order_detail) {
+    $bonus = $order_detail->bonus ?: null;
+    $productBonus = !$bonus ? null : $bonus->product;
+    $maxBonus = !$bonus ? 0 : $bonus->quantity;
+} else {
+    $bonus = null;
+    $productBonus = null;
+    $maxBonus = 1;
+}
 
 $foto = !$product->foto ? null : $product->foto->first();
 
@@ -29,7 +42,15 @@ $name = !isset($name) ? 'products' : $name;
         <div class="col product-col-main {{ !$product->id ? 'align-self-center' : '' }}">
             @if ($product->id)
                 <div class="product-content">
-                    <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
+                    <h6 class="text-sm product-name mb-1">{{ $product->nama_buku }}</h6>
+
+                    <p class="mb-0 text-sm">
+                        Cover - Isi : <span class="product-category">{{ !$cover ? '' : $cover->name }} - {{ !$isi ? '' : $isi->name }}</span>
+                    </p>
+
+                    <p class="mb-0 text-sm">
+                        Jenjang: <span class="product-category">{{ !$jenjang ? '' : $jenjang->name }}</span>
+                    </p>
 
                     <p class="mb-0 text-sm">
                         Order Qty: <span class="product-qty-max">{{ $order_detail->quantity ?? '' }}</span>
@@ -112,6 +133,52 @@ $name = !isset($name) ? 'products' : $name;
             >
                 <x-slot name="left">
                     <span class="text-sm mr-1">Rp</span>
+                </x-slot>
+            </x-admin.form-group>
+        </div>
+
+        <div class="col div-product-pg" style="max-width: 200px; display : {{ !$bonus ? 'none' : 'block' }};">
+            <div class="product-pg text-center">
+                <h6 class="text-sm product-name mb-1">Product PG/Kunci</h6>
+
+                <p class="mb-0 text-sm">
+                    Order Qty: <span class="product-qty-max">{{ $bonus->quantity ?? '' }}</span>
+                </p>
+
+                <p class="mb-0 text-sm">
+                    Stock: <span class="product-stock">{{ $productBonus->stock ?? '' }}</span>
+                </p>
+
+                <p class="mb-0 text-sm">
+                    Terkirim: <span class="product-moved">{{ $bonus->moved ?? '' }}</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="col div-product-bonus" style="max-width: 120px; display : {{ !$bonus ? 'none' : 'block' }};">
+            <p class="mb-0 text-sm">Qty PG/Kunci</p>
+
+            <x-admin.form-group
+                type="number"
+                id="fieldBonus-{{ $product->id }}"
+                name="{{ (!$bonus? null: $name).'['.$product->id.'][bonus]' }}"
+                containerClass=" m-0"
+                boxClass=" p-0"
+                class="form-control-sm hide-arrows text-center product-bonus product-bonus1"
+                value="{{ !$bonus? 0 : abs($bonus->quantity) }}"
+                min="0"
+                max="{{ $maxBonus }}"
+            >
+                <x-slot name="left">
+                    <button type="button" class="btn btn-sm border-0 px-2 product-bonus-act" data-target=".product-bonus1" data-action="-">
+                        &minus;
+                    </button>
+                </x-slot>
+
+                <x-slot name="right">
+                    <button type="button" class="btn btn-sm border-0 px-2 product-bonus-act" data-target=".product-bonus1" data-action="+">
+                        &plus;
+                    </button>
                 </x-slot>
             </x-admin.form-group>
         </div>

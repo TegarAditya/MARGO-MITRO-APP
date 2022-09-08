@@ -56,12 +56,23 @@
         <th>Tema/Mapel</th>
         <th width="1%" class="text-center">Hal</th>
         <th class="px-3" width="1%">Qty</th>
+        <th class="px-3" width="1%">PG/Kunci</th>
+        <th class="px-3" width="1%">Qty PG/Kunci</th>
     </thead>
 
     <tbody>
         @foreach ($invoice->invoice_details as $invoice_detail)
             @php
             $product = $invoice_detail->product;
+
+            // dd($invoice_detail->bonus);
+
+            $bonus = $invoice_detail->bonus ?? null;
+
+            if ($bonus) {
+                $product_bonus = $bonus->product;
+                $qty_bonus = $bonus->quantity;
+            }
             @endphp
             <tr>
                 <td class="px-3">{{ $loop->iteration }}</td>
@@ -69,6 +80,18 @@
                 <td>{{ $product->name }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
                 <td class="px-3 text-center">{{ abs($invoice_detail->quantity) }}</td>
+                <td class="px-3 text-center">
+                    @if ($bonus)
+                        @if($product_bonus->tipe_pg === 'pg')
+                            PG
+                        @elseif ($product_bonus->tipe_pg === 'kunci')
+                            Kunci
+                        @endif
+                    @else
+                        -
+                    @endif
+                </td>
+                <td class="px-3 text-center">{{ $bonus ? abs($qty_bonus) : '-' }}</td>
             </tr>
         @endforeach
     </tbody>
