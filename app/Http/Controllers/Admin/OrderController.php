@@ -125,7 +125,7 @@ class OrderController extends Controller
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $customprices = CustomPrice::pluck('nama', 'id')->prepend('Normal Price', '');
+        $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Normal Price', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -258,7 +258,7 @@ class OrderController extends Controller
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $customprices = CustomPrice::pluck('nama', 'id')->prepend('Normal Price', '');
+        $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Normal Price', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');

@@ -40,6 +40,15 @@ class CustomPrice extends Model
         return $this->belongsTo(Category::class, 'kategori_id');
     }
 
+    public function getNamaHargaAttribute() {
+        $nama = $this->nama;
+        if ($this->kategori) {
+            $nama .= ' - '. $this->kategori->name;
+        }
+        $nama .= ' - '. $this->harga;
+        return $nama;
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
