@@ -46,6 +46,11 @@ class InvoiceDetail extends Model
         return $this->belongsTo(Product::class, 'product_id');
     }
 
+    public function bonus()
+    {
+        return $this->belongsTo(InvoicePackage::class, 'invoice_detail_id');
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');

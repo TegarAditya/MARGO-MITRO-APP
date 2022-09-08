@@ -114,6 +114,20 @@
                     <span class="help-block">{{ trans('cruds.order.fields.salesperson_helper') }}</span>
                 </div>
             </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="required" for="semester_id">{{ trans('cruds.order.fields.semester') }}</label>
+                    <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
+                        @foreach($semesters as $id => $entry)
+                            <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : $order->semester->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('semester'))
+                        <span class="text-danger">{{ $errors->first('semester') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.order.fields.semester_helper') }}</span>
+                </div>
+            </div>
         </div>
 
         @foreach ([
@@ -207,7 +221,6 @@
         'id' => 'productModal',
         'label' => 'Semua Bahan',
         'items' => $products,
-        // 'hargax' =>
     ],
 ] as $modal)
     <div class="modal fade product-modal" id="{{ $modal['id'] }}" tabindex="-1" role="dialog">
@@ -278,6 +291,7 @@
                                 data-price="{{ $product->price }}"
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
+                                data-pg="{{ $product->tipe_pg }}"
                                 @if ($foto = $product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
                                 @endif
@@ -334,95 +348,95 @@
 
 @push('styles')
 <style>
-.product-group-title {
-    position: sticky;
-    position: -webkit-sticky;
-    top: 0;
-    z-index: 100;
-    background-color: #fff;
-    padding: .25em .5em;
-    margin-left: -.5em;
-    margin-right: -.5em;
-}
+    .product-group-title {
+        position: sticky;
+        position: -webkit-sticky;
+        top: 0;
+        z-index: 100;
+        background-color: #fff;
+        padding: .25em .5em;
+        margin-left: -.5em;
+        margin-right: -.5em;
+    }
 
-.product-pp.disabled > .select2,
-.product-pp.disabled > select {
-    opacity: 0.5;
-    pointer-events: none;
-}
+    .product-pp.disabled > .select2,
+    .product-pp.disabled > select {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 
-.product-list > .item-product:last-child .product-delete {
-    opacity: 0.5;
-    pointer-events: none;
-    background-color: #aeaeae;
-    border-color: #969696;
-}
+    .product-list > .item-product:last-child .product-delete {
+        opacity: 0.5;
+        pointer-events: none;
+        background-color: #aeaeae;
+        border-color: #969696;
+    }
 
-.product-list > .item-product:last-child > .product-col-content {
-    opacity: 0.66;
-    pointer-events: none;
-}
+    .product-list > .item-product:last-child > .product-col-content {
+        opacity: 0.66;
+        pointer-events: none;
+    }
 
-.product-action {
-    position: sticky;
-    position: -webkit-sticky;
-    z-index: 10;
-    bottom: 0;
-    background-color: #fff;
-    margin: 0 -1rem;
-    padding: 0 1rem;
-}
+    .product-action {
+        position: sticky;
+        position: -webkit-sticky;
+        z-index: 10;
+        bottom: 0;
+        background-color: #fff;
+        margin: 0 -1rem;
+        padding: 0 1rem;
+    }
 
-.item-product {
-    padding: .5rem 0;
-    transition: 250ms ease-in-out;
-}
+    .item-product {
+        padding: .5rem 0;
+        transition: 250ms ease-in-out;
+    }
 
-.item-product + .item-product {
-    border-top: 1px solid #cecece;
-}
+    .item-product + .item-product {
+        border-top: 1px solid #cecece;
+    }
 
-.item-product.highlight {
-    background-color: rgba(32, 201, 151, .25);
-}
+    .item-product.highlight {
+        background-color: rgba(32, 201, 151, .25);
+    }
 
-.product-searchbar {
-    position: sticky;
-    position: -webkit-sticky;
-    top: 0;
-    z-index: 100;
-    background-color: #fff;
-    padding: .5rem 0;
-}
+    .product-searchbar {
+        position: sticky;
+        position: -webkit-sticky;
+        top: 0;
+        z-index: 100;
+        background-color: #fff;
+        padding: .5rem 0;
+    }
 
-.product-select-item {
-    display: block;
-    border: 1px solid #eee;
-    border-radius: .25rem;
-    padding: .5rem .5rem;
-    background-color: #fff;
-    color: #323232
-}
+    .product-select-item {
+        display: block;
+        border: 1px solid #eee;
+        border-radius: .25rem;
+        padding: .5rem .5rem;
+        background-color: #fff;
+        color: #323232
+    }
 
-.product-select-item:not(.selected):hover {
-    border: 1px solid #cfcfcf;
-    background-color: #fafafa;
-    color: var(--blue);
-}
+    .product-select-item:not(.selected):hover {
+        border: 1px solid #cfcfcf;
+        background-color: #fafafa;
+        color: var(--blue);
+    }
 
-.product-select-item.selected {
-    border-color: var(--success);
-    background-color: #eafdef;
-    pointer-events: none;
-}
+    .product-select-item.selected {
+        border-color: var(--success);
+        background-color: #eafdef;
+        pointer-events: none;
+    }
 
-.product-select-item + .product-select-item {
-    margin-top: .5rem;
-}
+    .product-select-item + .product-select-item {
+        margin-top: .5rem;
+    }
 
-.select2-container--default .select2-results__option[aria-disabled=true] {
-    display: none;
-}
+    .select2-container--default .select2-results__option[aria-disabled=true] {
+        display: none;
+    }
 </style>
 @endpush
 
@@ -474,8 +488,11 @@
             var bindProduct = function(product) {
                 var qty = product.find('.product-qty');
                 var actions = product.find('.product-qty-act');
+                var actionsPg = product.find('.product-bonus-act');
                 var price = product.find('.product-price');
                 var priceText = product.find('.product-price_text');
+                var pg= product.find('.product-pg');
+                var bonus = product.find('.product-bonus');
 
                 actions.on('click', function (e) {
                     var el = $(e.currentTarget);
@@ -488,9 +505,28 @@
                     calculatePrice();
                 });
 
+                actionsPg.on('click', function (e) {
+                    var el = $(e.currentTarget);
+                    var target = product.find(el.data('target'));
+                    var qtyNum = parseInt(target.val());
+                    var calc = qtyNum + (el.data('action') === '-' ? -1 : 1);
+                    var value = calc <= 0 ? 0 : calc;
+
+                    target.filter(':not([readonly])').val(value).trigger('change');
+                });
+
                 qty.add(price).on('change keyup blur', function(e) {
                     calculatePrice();
                 });
+
+                qty.on('keyup blur', function(e) {
+                    let bonus_qty = Math.ceil(qty.val()/33.34);
+                    bonus.val(bonus_qty).trigger('change');
+                });
+
+                pg.on('change', function(e) {
+                    var value = e.target.value;
+                }).trigger('change');
 
                 priceText.on('change keyup blur', function(e) {
                     var value = numeral(e.target.value);
@@ -533,6 +569,8 @@
 
                 !products.children('.item-product').length && products.html('');
                 product.appendTo(products);
+
+                console.log('ini product add');
 
                 bindProduct(product);
                 group.find('.product-action').hide();
@@ -589,6 +627,7 @@
             var content = selected.find('.product-content').clone();
             var qty = product.find('.product-qty').val();
             var price = product.find('.product-price').val();
+            var bonus = product.find('.product-bonus').val();
             var name = product.data('name');
             var data = selected.data();
 
@@ -609,6 +648,26 @@
                 .attr('min', 1)
                 .attr('required', true)
                 .trigger('change');
+
+
+            if (data.pg !== 'non_pg') {
+                product.find('.div-product-pg').hide();
+                product.find('.div-product-bonus').hide();
+            } else {
+                product.find('.div-product-pg').show();
+                product.find('.div-product-bonus').show();
+                product.find('.product-pg')
+                    .attr('id', 'fieldPg-'+data.id)
+                    .attr('name', name+'['+data.id+'][pg]')
+                    .attr('required', true)
+                    .trigger('change');
+                product.find('.product-bonus').val(bonus || 0)
+                    .attr('id', 'fieldBonus-'+data.id)
+                    .attr('name', name+'['+data.id+'][bonus]')
+                    .attr('min', 1)
+                    .attr('required', true);
+            }
+
             product.find('.product-subtotal').html(numeral(data.price).format('$0,0'));
             product.find('.product-img').attr('src', data.image).parent()[!data.image ? 'hide' : 'show']();
 

@@ -21,6 +21,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Excel;
 use App\Imports\BukuImport;
+use App\Imports\BukuCustomImport;
 use Alert;
 
 class BukuController extends Controller

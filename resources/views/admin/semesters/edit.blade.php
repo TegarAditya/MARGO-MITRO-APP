@@ -36,8 +36,8 @@
             </div>
             <div class="form-group">
                 <div class="form-check {{ $errors->has('status') ? 'is-invalid' : '' }}">
-                    <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ $semester->status || old('status', 0) === 1 ? 'checked' : '' }} required>
-                    <label class="required form-check-label" for="status">{{ trans('cruds.semester.fields.status') }}</label>
+                    <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ $semester->status || old('status', 0) === 1 ? 'checked' : '' }}>
+                    <label class="form-check-label" for="status">{{ trans('cruds.semester.fields.status') }}</label>
                 </div>
                 @if($errors->has('status'))
                     <span class="text-danger">{{ $errors->first('status') }}</span>

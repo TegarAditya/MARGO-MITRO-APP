@@ -24,76 +24,87 @@
     <div class="card-body">
         <form id="filterform">
             <div class="row">
-                <div class="form-group col-12">
-                    <label for="name">{{ trans('cruds.buku.fields.name') }}</label>
-                    <input class="form-control" type="text" name="name" id="name" value="{{ old('name', '') }}">
-                    @if($errors->has('name'))
-                        <div class="invalid-feedback">
-                            {{ $errors->first('name') }}
-                        </div>
-                    @endif
-                    <span class="help-block">{{ trans('cruds.buku.fields.name_helper') }}</span>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="name">{{ trans('cruds.buku.fields.name') }}</label>
+                        <input class="form-control" type="text" name="name" id="name" value="{{ old('name', '') }}">
+                        @if($errors->has('name'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('name') }}
+                            </div>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.name_helper') }}</span>
+                    </div>
                 </div>
-                <div class="form-group col-6">
-                    <label for="brand_id">{{ trans('cruds.buku.fields.brand') }}</label>
-                    <select class="form-control select2 {{ $errors->has('brand') ? 'is-invalid' : '' }}" name="brand_id" id="brand_id">
-                        @foreach($brands as $id => $entry)
-                            <option value="{{ $id }}" {{ old('brand_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                        @endforeach
-                    </select>
-                    @if($errors->has('brand'))
-                        <span class="text-danger">{{ $errors->first('brand') }}</span>
-                    @endif
-                    <span class="help-block">{{ trans('cruds.buku.fields.brand_helper') }}</span>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="brand_id">{{ trans('cruds.buku.fields.brand') }}</label>
+                        <select class="form-control select2 {{ $errors->has('brand') ? 'is-invalid' : '' }}" name="brand_id" id="brand_id">
+                            @foreach($brands as $id => $entry)
+                                <option value="{{ $id }}" {{ old('brand_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('brand'))
+                            <span class="text-danger">{{ $errors->first('brand') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.brand_helper') }}</span>
+                    </div>
                 </div>
-                <div class="form-group col-6">
-                    <label for="isi_id">{{ trans('cruds.buku.fields.isi') }}</label>
-                    <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id" id="isi_id">
-                        @foreach($isi as $id => $entry)
-                            <option value="{{ $id }}" {{ old('isi_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                        @endforeach
-                    </select>
-                    @if($errors->has('isi'))
-                        <span class="text-danger">{{ $errors->first('isi') }}</span>
-                    @endif
-                    <span class="help-block">{{ trans('cruds.buku.fields.isi_helper') }}</span>
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="isi_id">{{ trans('cruds.buku.fields.isi') }}</label>
+                        <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id" id="isi_id">
+                            @foreach($isi as $id => $entry)
+                                <option value="{{ $id }}" {{ old('isi_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('isi'))
+                            <span class="text-danger">{{ $errors->first('isi') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.isi_helper') }}</span>
+                    </div>
                 </div>
-                <div class="form-group col-6">
-                    <label for="jenjang_id">{{ trans('cruds.buku.fields.jenjang') }}</label>
-                    <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
-                        @foreach($jenjang as $id => $entry)
-                            <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                        @endforeach
-                    </select>
-                    @if($errors->has('jenjang'))
-                        <span class="text-danger">{{ $errors->first('jenjang') }}</span>
-                    @endif
-                    <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="jenjang_id">{{ trans('cruds.buku.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                            @foreach($jenjang as $id => $entry)
+                                <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
+                    </div>
                 </div>
-
-                <div class="form-group col-6">
-                    <label for="kelas_id">{{ trans('cruds.buku.fields.kelas') }}</label>
-                    <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas_id" id="kelas_id">
-                        @foreach($kelas as $id => $entry)
-                            <option value="{{ $id }}" {{ old('kelas_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                        @endforeach
-                    </select>
-                    @if($errors->has('kelas'))
-                        <span class="text-danger">{{ $errors->first('kelas') }}</span>
-                    @endif
-                    <span class="help-block">{{ trans('cruds.buku.fields.kelas_helper') }}</span>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="kelas_id">{{ trans('cruds.buku.fields.kelas') }}</label>
+                        <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas_id" id="kelas_id">
+                            @foreach($kelas as $id => $entry)
+                                <option value="{{ $id }}" {{ old('kelas_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('kelas'))
+                            <span class="text-danger">{{ $errors->first('kelas') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.kelas_helper') }}</span>
+                    </div>
                 </div>
-                <div class="form-group col-6">
-                    <label for="halaman_id">{{ trans('cruds.buku.fields.halaman') }}</label>
-                    <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id">
-                        @foreach($halaman as $id => $entry)
-                            <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                        @endforeach
-                    </select>
-                    @if($errors->has('halaman'))
-                        <span class="text-danger">{{ $errors->first('halaman') }}</span>
-                    @endif
-                    <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="halaman_id">{{ trans('cruds.buku.fields.halaman') }}</label>
+                        <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id">
+                            @foreach($halaman as $id => $entry)
+                                <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('halaman'))
+                            <span class="text-danger">{{ $errors->first('halaman') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
+                    </div>
                 </div>
             </div>
 
@@ -182,7 +193,7 @@
 @endcan
 
   let dtOverrideGlobals = {
-    buttons: dtButtons,
+    // buttons: dtButtons,
     processing: true,
     serverSide: true,
     retrieve: true,

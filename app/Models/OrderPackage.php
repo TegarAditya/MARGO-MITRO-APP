@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class OrderDetail extends Model
+class OrderPackage extends Model
 {
     use SoftDeletes;
     use HasFactory;
 
-    public $table = 'order_details';
+    public $table = 'order_packages';
 
     protected $dates = [
         'created_at',
@@ -21,36 +21,23 @@ class OrderDetail extends Model
     ];
 
     protected $fillable = [
-        'order_id',
-        'product_id',
         'quantity',
         'moved',
-        'unit_price',
-        'price',
-        'total',
+        'product_id',
+        'order_detail_id',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
-
-    protected $casts = [
-        'price' => 'double',
-        'total' => 'double',
-    ];
-
-    public function order()
-    {
-        return $this->belongsTo(Order::class, 'order_id');
-    }
 
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
 
-    public function bonus()
+    public function order_detail()
     {
-        return $this->hasOne(OrderPackage::class, 'order_detail_id');
+        return $this->belongsTo(OrderDetail::class, 'order_detail_id');
     }
 
     protected function serializeDate(DateTimeInterface $date)

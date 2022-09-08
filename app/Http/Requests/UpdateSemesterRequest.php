@@ -30,7 +30,7 @@ class UpdateSemesterRequest extends FormRequest
                 'nullable',
             ],
             'status' => [
-                'required',
+                'nullable',
             ],
         ];
     }

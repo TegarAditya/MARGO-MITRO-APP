@@ -14,6 +14,10 @@ $jenjang = $product->jenjang;
 $stock = $product->stock ?: 0;
 $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
 
+$bonus = $detail->bonus;
+$tipe_pg = !$bonus ? 'pg' : $bonus->product->tipe_pg;
+$qty_pg = !$bonus ? 0 : $bonus->quantity;
+
 $foto = !$product->foto ? null : $product->foto->first();
 
 $modal = !isset($modal) ? '#productModal' : $modal;
@@ -110,6 +114,44 @@ $name = !isset($name) ? 'products' : $name;
             >
                 <x-slot name="left">
                     <span class="text-sm mr-1">Rp</span>
+                </x-slot>
+            </x-admin.form-group>
+        </div>
+
+        <div class="col div-product-pg" style="max-width: 240px; display: {{ !$bonus ? 'none' : 'block' }};">
+            <p class="mb-0 text-sm">PG/Kunci</p>
+            <select class="form-control-sm product-pg"
+                name="{{ (!$bonus? null: $name).'['.$product->id.'][pg]' }}"
+                id="fieldPg-{{ $product->id }}"
+            >
+                <option value="pg" {{ $tipe_pg == 'pg' ? 'selected' : '' }}>PG</option>
+                <option value="kunci" {{ $tipe_pg == 'kunci' ? 'selected' : '' }}>Kunci</option>
+            </select>
+        </div>
+
+        <div class="col div-product-bonus" style="max-width: 120px; display: {{ !$bonus ? 'none' : 'block' }};">
+            <p class="mb-0 text-sm">Bonus PG/Kunci</p>
+
+            <x-admin.form-group
+                type="number"
+                id="fieldBonus-{{ $product->id }}"
+                name="{{ (!$bonus? null: $name).'['.$product->id.'][bonus]' }}"
+                containerClass=" m-0"
+                boxClass=" p-0"
+                class="form-control-sm hide-arrows text-center product-bonus product-bonus1"
+                value="{{ $qty_pg }}"
+                min="0"
+            >
+                <x-slot name="left">
+                    <button type="button" class="btn btn-sm border-0 px-2 product-bonus-act" data-target=".product-bonus1" data-action="-">
+                        &minus;
+                    </button>
+                </x-slot>
+
+                <x-slot name="right">
+                    <button type="button" class="btn btn-sm border-0 px-2 product-bonus-act" data-target=".product-bonus1" data-action="+">
+                        &plus;
+                    </button>
                 </x-slot>
             </x-admin.form-group>
         </div>

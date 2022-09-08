@@ -30,7 +30,7 @@ class StoreSemesterRequest extends FormRequest
                 'nullable',
             ],
             'status' => [
-                'required',
+                'nullable',
             ],
         ];
     }

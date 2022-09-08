@@ -241,7 +241,7 @@
 
                                 <tfoot>
                                     <tr>
-                                        <td class="text-center px-3" colspan="4"><strong>Total</strong></td>
+                                        <td class="text-center px-3" colspan="5"><strong>Total</strong></td>
                                         <td class="text-right px-3">
                                             <strong>@money(abs($invoice->nominal))</strong>
                                         </td>

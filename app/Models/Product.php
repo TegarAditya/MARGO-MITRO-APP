@@ -160,6 +160,25 @@ class Product extends Model implements HasMedia
         return $nama;
     }
 
+    public function getNamaIsiBukuAttribute()
+    {
+        $nama = '';
+        if ($this->brand) {
+            $nama .= '('. $this->brand->name.' | '.$this->isi->name.')';
+        }
+        $nama .= ' - '. $this->name;
+        if ($this->kelas) {
+            $nama .= ' -  KELAS '. $this->kelas->name;
+        }
+        if ($this->halaman) {
+            $nama .= ' -  HAL '. $this->halaman->name;
+        }
+
+
+        return $nama;
+    }
+
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');

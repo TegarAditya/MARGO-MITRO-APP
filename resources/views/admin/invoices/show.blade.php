@@ -8,68 +8,121 @@
 
     <div class="card-body">
         <div class="form-group">
-            <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.invoices.index') }}">
-                    {{ trans('global.back_to_list') }}
-                </a>
-            </div>
-            <table class="table table-bordered table-striped">
-                <tbody>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.invoice.fields.id') }}
-                        </th>
-                        <td>
-                            {{ $invoice->id }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.invoice.fields.no_suratjalan') }}
-                        </th>
-                        <td>
-                            {{ $invoice->no_suratjalan }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.invoice.fields.no_invoice') }}
-                        </th>
-                        <td>
-                            {{ $invoice->no_invoice }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.invoice.fields.order') }}
-                        </th>
-                        <td>
-                            {{ $invoice->order->date ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.invoice.fields.date') }}
-                        </th>
-                        <td>
-                            {{ $invoice->date }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.invoice.fields.nominal') }}
-                        </th>
-                        <td>
-                            {{ $invoice->nominal }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.invoices.index') }}">
-                    {{ trans('global.back_to_list') }}
-                </a>
-            </div>
+            <a class="btn btn-default" href="{{ url()->previous() }}">
+                Back
+            </a>
+        </div>
+        <div class="model-detail mt-`3">
+            <section class="py-3">
+                @php
+                $print = function($type) use ($invoice) {
+                    return route('admin.invoices.show', ['invoice' => $invoice->id, 'print' => $type]);
+                };
+                @endphp
+                <div class="card">
+                    <div class="card-body px-3 py-2">
+                        <div class="row">
+                            <div class="col-6 mb-1">
+                                <span class="badge badge-{{ 'Keluar' == $invoice->type ? 'warning' : 'info' }}">{{ $invoice->type }}</span>
+                            </div>
+
+                            <div class="col-6 text-right">
+                                <a href="{{ route('admin.invoices.edit', $invoice->id) }}" class="border-bottom">
+                                    <i class="fa fa-edit"></i> Edit
+                                </a>
+                            </div>
+
+                            <div class="col-3">
+                                <p class="mb-0 text-sm">
+                                    No. Invoice
+                                    <br />
+                                    <strong>{{ $invoice->no_invoice }}</strong>
+
+                                    <a href="{{ $print('inv') }}" class="fa fa-print ml-1 text-info" title="Print Invoice" target="_blank"></a>
+                                </p>
+                            </div>
+
+                            <div class="col-3">
+                                <p class="mb-0 text-sm">
+                                    No. Surat Jalan
+                                    <br />
+                                    <strong>{{ $invoice->no_suratjalan }}</strong>
+
+                                    <a href="{{ $print('sj') }}" class="fa fa-print ml-1 text-info" title="Print Surat Jalan" target="_blank"></a>
+                                </p>
+                            </div>
+
+                            <div class="col text-right">
+                                <span>Tanggal<br />{{ $invoice->date }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-3">
+                                <p class="mb-0 text-sm">
+                                    Salesman
+                                    <br />
+                                    <strong>{{ $invoice->order->salesperson->name }}</strong>
+                                </p>
+                            </div>
+
+                            <div class="col-3">
+                                <p class="mb-0 text-sm">
+                                    Semester
+                                    <br />
+                                    <strong>{{ $invoice->order->semester->name }}</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <p class="mt-2 mb-1">
+                            <strong>Produk {{ $invoice->type }}</strong>
+                        </p>
+
+                        <table class="table table-sm table-bordered m-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="1%">No.</th>
+                                    <th>Jenjang</th>
+                                    <th>Tema/Mapel</th>
+                                    <th class="text-center px-3" width="15%">Harga</th>
+                                    <th class="text-center px-3" width="1%">Qty</th>
+                                    <th class="text-center px-3" width="20%">Subtotal</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @forelse ($invoice->invoice_details as $invoice_detail)
+                                    @php
+                                    $product = $invoice_detail->product;
+                                    @endphp
+                                    <tr>
+                                        <td class="text-right px-3">{{ $loop->iteration }}.</td>
+                                        <td class="text-center">{{ $product->jenjang->name ?? '' }}</td>
+                                        <td>{{ $product->nama_buku }}</td>
+                                        <td class="text-right px-3">@money(abs($invoice_detail->price))</td>
+                                        <td class="text-center px-3">{{ abs($invoice_detail->quantity) }}</td>
+                                        <td class="text-right px-3">@money(abs($invoice_detail->total))</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td class="px-3" colspan="6">Tidak ada produk</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <td class="text-center px-3" colspan="5"><strong>Total</strong></td>
+                                    <td class="text-right px-3">
+                                        <strong>@money(abs($invoice->nominal))</strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 </div>

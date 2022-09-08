@@ -19,7 +19,7 @@
             <div class="row mb-5">
                 <div class="col row">
 
-                    <div class="col-6">
+                    <div class="col-4">
                         <div class="form-group mb-0">
                             <label class="small mb-0" for="salesperson_id">Sales Person</label>
                             <select class="form-control select2 {{ $errors->has('salesperson_id') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id">
@@ -33,7 +33,21 @@
                         </div>
                     </div>
 
-                    <div class="col-6">
+                    <div class="col-4">
+                        <div class="form-group mb-0">
+                            <label class="small mb-0" for="salesperson_id">Semester</label>
+                            <select class="form-control select2 {{ $errors->has('semester_id') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                                @foreach($semesters as $id => $entry)
+                                    <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('semester_id'))
+                                <span class="text-danger">{{ $errors->first('semester_id') }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="col-4">
                         <x-admin.form-group
                             type="text"
                             id="date"
@@ -115,6 +129,7 @@
         data: function(data) {
             data.date = $('#date').val(),
             data.sales = $('#salesperson_id').val()
+            data.semester = $('#semester_id').val()
         }
     },
     columns: [
@@ -123,12 +138,12 @@
         { data: 'date', name: 'date', class: 'text-center'  },
         { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center'  },
         { data: 'salesperson_area', name: 'salesperson.area', class: 'text-center'  },
-        { data: 'lunas', name: 'lunas', class: 'text-center' },
+        { data: 'tagihan', name: 'tagihan'},
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center'  }
     ],
     orderCellsTop: true,
     order: [[ 2, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
   let table = $('.datatable-Order').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){

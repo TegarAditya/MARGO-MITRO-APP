@@ -15,8 +15,6 @@ class StockMovement extends Model
     use HasFactory;
 
     public const TYPE_SELECT = [
-        'order'    => 'Order',
-        'faktur'    => 'Sales',
         'adjustment' => 'Adjustment',
         'invoice' => 'Invoice',
         'realisasi' => 'Realisasi',
@@ -51,12 +49,12 @@ class StockMovement extends Model
     }
 
     public function referensi() {
-        if ($this->attributes['type'] === 'faktur') {
+        if ($this->attributes['type'] === 'invoice') {
             return $this->belongsTo(Invoice::class, 'reference');
         } else if ($this->attributes['type'] === 'adjustment') {
             return $this->belongsTo(StockAdjustment::class, 'reference');
-        } else if ($this->attributes['type'] === 'order') {
-            return $this->belongsTo(Order::class, 'reference');
+        } else if ($this->attributes['type'] === 'realisasi') {
+            return $this->belongsTo(Realisasi::class, 'reference');
         }
     }
 

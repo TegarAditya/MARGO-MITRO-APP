@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStockMovementRequest;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Models\StockAdjustment;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Unit;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +23,30 @@ class StockMovementController extends Controller
 
         if ($request->ajax()) {
             $query = StockMovement::with(['product'])->select(sprintf('%s.*', (new StockMovement())->table));
+
+            if (!empty($request->name)) {
+                $query->where('name','LIKE','%'.$request->name.'%');
+            }
+
+            if (!empty($request->brand)) {
+                $query->where('brand_id', $request->brand);
+            }
+
+            if (!empty($request->jenjang)) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+
+            if (!empty($request->kelas)) {
+                $query->where('kelas_id', $request->kelas);
+            }
+
+            if (!empty($request->halaman)) {
+                $query->where('halaman_id', $request->halaman);
+            }
+
+            if (!empty($request->isi)) {
+                $query->where('isi_id', $request->isi);
+            }
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -41,24 +69,31 @@ class StockMovementController extends Controller
 
             $table->editColumn('reference', function ($row) {
                 if ($row->type == 'adjustment') {
-                    return '<a href="'.route('admin.stock-adjustments.show', $row->reference).'">Reference</a>';
-                } else if ($row->type == 'faktur') {
-                    return '<a href="'.route('admin.invoices.show', $row->reference).'">Reference</a>';
-                } else if ($row->type == 'order') {
-                    return '<a href="'.route('admin.orders.show', $row->reference).'">Reference</a>';
+                    return 'Adjustment <a class="px-1" title="Reference" href="'.route('admin.stock-adjustments.show', $row->reference).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
                 } else if ($row->type == 'invoice') {
-                    return '<a href="'.route('admin.invoices.show', $row->reference).'">Reference</a>';
+                    return 'Invoice <a class="px-1" title="Reference" href="'.route('admin.invoices.show', $row->reference).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
                 } else if ($row->type == 'realisasi') {
-                    return '<a href="'.route('admin.realisasis.show', $row->reference).'">Reference</a>';
+                    return 'Realisasi <a class="px-1" title="Reference" href="'.route('admin.realisasis.show', $row->reference).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
                 }
-
-                return $row->reference ? $row->reference : '';
             });
+
             $table->editColumn('type', function ($row) {
                 return $row->type ? StockMovement::TYPE_SELECT[$row->type] : '';
             });
+
             $table->addColumn('product_name', function ($row) {
-                return $row->product ? $row->product->nama_buku : '';
+                return $row->product ? $row->product->nama_isi_buku : '';
+            });
+
+            $table->addColumn('sales', function ($row) {
+                if ($row->type == 'adjustment') {
+                    return $row->referensi ? StockAdjustment::OPERATION_SELECT[$row->referensi->operation] : '';
+                } else if ($row->type == 'invoice') {
+                    return $row->referensi ? $row->referensi->order->salesperson->name : '';
+                } else if ($row->type == 'realisasi') {
+                    return $row->referensi ? $row->referensi->production_order->productionperson->name : '';
+                }
+                return $row->referensi ? $row->referensi : '';
             });
 
             $table->editColumn('quantity', function ($row) {
@@ -70,8 +105,12 @@ class StockMovementController extends Controller
             return $table->make(true);
         }
 
-        $products = Product::get();
+        $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.stockMovements.index', compact('products'));
+        return view('admin.stockMovements.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi'));
     }
 }

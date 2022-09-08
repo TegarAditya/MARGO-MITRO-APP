@@ -83,7 +83,7 @@ class CustomPriceController extends Controller
     {
         abort_if(Gate::denies('custom_price_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $kategoris = Category::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kategoris = Category::whereIn('type', ['halaman'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $customPrice->load('kategori');
 
