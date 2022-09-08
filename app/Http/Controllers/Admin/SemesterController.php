@@ -65,6 +65,9 @@ class SemesterController extends Controller
 
     public function store(StoreSemesterRequest $request)
     {
+        if (!$request->input('status')) {
+            $request->request->add(['status' => 0]);
+        }
         $semester = Semester::create($request->all());
 
         return redirect()->route('admin.semesters.index');
@@ -79,6 +82,9 @@ class SemesterController extends Controller
 
     public function update(UpdateSemesterRequest $request, Semester $semester)
     {
+        if (!$request->input('status')) {
+            $request->request->add(['status' => 0]);
+        }
         $semester->update($request->all());
 
         return redirect()->route('admin.semesters.index');

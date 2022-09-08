@@ -43,7 +43,7 @@ class CustomPrice extends Model
     public function getNamaHargaAttribute() {
         $nama = $this->nama;
         if ($this->kategori) {
-            $nama .= ' - '. $this->kategori->name;
+            $nama .= ' - HAL '. $this->kategori->name;
         }
         $nama .= ' - '. $this->harga;
         return $nama;
