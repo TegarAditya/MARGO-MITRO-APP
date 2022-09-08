@@ -8,11 +8,13 @@ use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\UpdateInvoiceRequest;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
+use App\Models\InvoicePackage;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\Salesperson;
+use App\Models\Semester;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -29,6 +31,29 @@ class InvoiceController extends Controller
 
         if ($request->ajax()) {
             $query = Invoice::with(['order'])->select(sprintf('%s.*', (new Invoice())->table));
+            if (!empty($request->date)) {
+                $dates = explode(' - ', $request->date);
+
+                $start = Date::parse($dates[0])->startOfDay();
+                $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+
+                $query->whereBetween('date', [$start, $end]);
+            }
+
+            if (!empty($request->sales)) {
+                $sales = $request->sales;
+                $query->whereHas('order', function ($q) use($sales) {
+                    $q->where('salesperson_id', $sales);
+                });
+            }
+
+            if (!empty($request->semester)) {
+                $semester = $request->semester;
+                $query->whereHas('order', function($q) use($semester) {
+                    $q->where('semester_id', $semester);
+                });
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -42,15 +67,13 @@ class InvoiceController extends Controller
                 $parent = 'orders';
                 $idParent = $row->order->id;
 
-                return view('partials.datatableOrderActions', compact(
-                'viewGate',
-                'editGate',
-                'deleteGate',
-                'crudRoutePart',
-                'parent',
-                'idParent',
-                'row'
-            ));
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
             });
 
             $table->editColumn('id', function ($row) {
@@ -60,7 +83,8 @@ class InvoiceController extends Controller
                 return $row->no_suratjalan ? $row->no_suratjalan : '';
             });
             $table->editColumn('no_invoice', function ($row) {
-                return $row->no_invoice ? $row->no_invoice : '';
+                return 'No Invoice : '. $row->no_invoice .'<br>'.
+                'No Surat Jalan : '. $row->no_suratjalan;
             });
             $table->editColumn('date', function ($row) {
                 $is_out = ($row->nominal > 0 ? true : false);
@@ -70,16 +94,23 @@ class InvoiceController extends Controller
                 return !$row->order ? '-' : '<a href="'.route('admin.orders.show', $row->order->id).'">'.$row->order->no_order.'</a>';
             });
 
+            $table->addColumn('sales', function ($row) {
+                return $row->order->salesperson ? $row->order->salesperson->name : '';
+            });
+
             $table->editColumn('nominal', function ($row) {
                 return $row->nominal ? abs($row->nominal) : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'order', 'date']);
+            $table->rawColumns(['actions', 'placeholder', 'order', 'date', 'no_invoice']);
 
             return $table->make(true);
         }
 
-        return view('admin.invoices.index');
+        $salespersons = Salesperson::pluck('name', 'id')->prepend('Semua Sales Person', '');
+        $semesters = Semester::pluck('name', 'id')->prepend('Semua Semester', '');
+
+        return view('admin.invoices.index', compact('salespersons', 'semesters'));
     }
 
     public function create()
@@ -91,7 +122,7 @@ class InvoiceController extends Controller
         })->get()->mapWithKeys(function($item) {
             return [$item->id => $item->no_order .' - '.$item->salesperson->name ];
         })->prepend(trans('global.pleaseSelect'), '');
-        $order_details = OrderDetail::with(['product', 'product.media'])
+        $order_details = OrderDetail::with(['product', 'product.media', 'bonus'])
             ->whereHas('product')
             ->get();
 
@@ -132,9 +163,12 @@ class InvoiceController extends Controller
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0
             ]);
 
-            $products = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request, $multiplier) {
+            // dd($request->all());
+
+            $products = Product::whereIn('id', array_keys($request->products))->get()->each(function($item) use ($invoice, $order, $request, $multiplier) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
+                $qty_bonus = $request->products[$item->id]['bonus'] ?? null;
 
                 $qty = $qty * $multiplier;
 
@@ -150,16 +184,39 @@ class InvoiceController extends Controller
                     'moved' => DB::raw("order_details.moved + $qty"),
                 ]);
 
-                return [
+                $invoice_detail = InvoiceDetail::create([
                     'product_id' => $item->id,
                     'invoice_id' => $invoice->id,
                     'quantity' => $qty,
                     'price' => $price,
                     'total' => $qty * $price,
-                ];
-            });
+                ]);
 
-            $invoice->invoice_details()->createMany($products->all());
+                if ($qty_bonus) {
+                    $order_package = $order->order_details()->where('product_id', $item->id)->first();
+
+                    $bonus = InvoicePackage::create([
+                        'product_id' => $item->id,
+                        'invoice_detail_id' => $invoice_detail->id,
+                        'quantity' => $qty_bonus
+                    ]);
+
+                    $order_bonus = $order_package->bonus;
+                    $order_bonus->update([
+                        'moved' => $order_bonus->move + $qty_bonus,
+                    ]);
+
+                    $bonus_product = Product::find($order_bonus->product_id);
+
+                    $bonus_product->stock_movements()->create([
+                        'reference' => $invoice->id,
+                        'type' => 'invoice',
+                        'quantity' => -1 * $qty,
+                        'product_id' => $bonus_product->id,
+                    ]);
+                    $bonus_product->update([ 'stock' => $bonus_product->stock - $qty_bonus ]);
+                }
+            });
 
             DB::commit();
 
@@ -313,7 +370,7 @@ class InvoiceController extends Controller
 
         $invoice->load([
             'invoice_details',
-            'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan',
+            'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan', 'invoice_details.bonus',
         ]);
 
         switch (request('print')) {
