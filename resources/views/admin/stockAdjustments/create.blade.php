@@ -51,6 +51,21 @@
                         <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required">{{ trans('cruds.buku.fields.semester') }}</label>
+                        <select class="form-control {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester" required>
+                            <option value disabled {{ old('semester', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                            @foreach(App\Models\Product::SEMESTER_SELECT as $key => $label)
+                                <option value="{{ $key }}" {{ request('semester') == (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-6">
@@ -68,6 +83,7 @@
             <input type="hidden" name="cover" value="{{ request('cover') }}">
             <input type="hidden" name="isi" value="{{ request('isi') }}">
             <input type="hidden" name="jenjang" value="{{ request('jenjang') }}">
+            <input type="hidden" name="semester_buku" value="{{ request('semester_buku') }}">
 
             <div class="row">
                 <div class="col-6">

@@ -60,6 +60,10 @@ class BukuController extends Controller
                 $query->where('isi_id', $request->isi);
             }
 
+            if (!empty($request->semester)) {
+                $query->where('semester', $request->semester);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

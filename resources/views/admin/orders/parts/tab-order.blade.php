@@ -1,7 +1,7 @@
 <div class="order-product pt-3">
     <form method="GET" action="{{ !$order->id ? route('admin.orders.create') : route("admin.orders.edit", [$order->id]) }}" enctype="multipart/form-data" id="pilihForm">
         <div class="row">
-            <div class="col-6">
+            <div class="col-4">
                 <div class="form-group">
                     <label for="custom_price">Custom Price</label>
                     <select class="form-control select2 {{ $errors->has('custom_price') ? 'is-invalid' : '' }}" name="custom_price" id="custom_price">
@@ -15,7 +15,7 @@
                     <span class="help-block"></span>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="col-4">
                 <div class="form-group">
                     <label class="required" for="cover">Cover</label>
                     <select class="form-control select2 {{ $errors->has('cover') ? 'is-invalid' : '' }}" name="cover" id="cover" required>
@@ -29,7 +29,7 @@
                     <span class="help-block"></span>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="col-4">
                 <div class="form-group">
                     <label class="required" for="isi">Isi</label>
                     <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi" id="isi" required>
@@ -43,7 +43,7 @@
                     <span class="help-block"></span>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="col-4">
                 <div class="form-group">
                     <label class="required" for="jenjang">{{ trans('cruds.buku.fields.jenjang') }} {{ old('jenjang') }}</label>
                     <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang" id="jenjang" required>
@@ -55,6 +55,35 @@
                         <span class="text-danger">{{ $errors->first('jenjang') }}</span>
                     @endif
                     <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="kelas_id">{{ trans('cruds.buku.fields.kelas') }}</label>
+                    <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas" id="kelas">
+                        @foreach($kelas as $id => $entry)
+                            <option value="{{ $id }}" {{ request('kelas') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('kelas'))
+                        <span class="text-danger">{{ $errors->first('kelas') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.kelas_helper') }}</span>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label>{{ trans('cruds.buku.fields.semester') }}</label>
+                    <select class="form-control {{ $errors->has('semester_buku') ? 'is-invalid' : '' }}" name="semester_buku" id="semester_buku">
+                        <option value disabled {{ old('semester_buku', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                        @foreach(App\Models\Product::SEMESTER_SELECT as $key => $label)
+                            <option value="{{ $key }}" {{ request('semester_buku', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('semester_buku'))
+                        <span class="text-danger">{{ $errors->first('semester_buku') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
                 </div>
             </div>
         </div>
@@ -75,6 +104,8 @@
         <input type="hidden" name="cover" value="{{ request('cover') }}">
         <input type="hidden" name="isi" value="{{ request('isi') }}">
         <input type="hidden" name="jenjang" value="{{ request('jenjang') }}">
+        <input type="hidden" name="kelas" value="{{ request('kelas') }}">
+        <input type="hidden" name="semester_buku" value="{{ request('semester_buku') }}">
 
         <div class="row">
             <div class="col-6">

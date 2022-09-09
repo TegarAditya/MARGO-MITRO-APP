@@ -75,7 +75,7 @@ class StockAdjustmentController extends Controller
     {
         abort_if(Gate::denies('stock_adjustment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        if ($request->cover || $request->isi || $request->jenjang) {
+        if ($request->cover || $request->isi || $request->jenjang || $request->semester) {
             $query = Product::with(['brand', 'isi', 'jenjang']);
             if ($request->cover) {
                 $query->where('brand_id', $request->cover);
@@ -86,7 +86,11 @@ class StockAdjustmentController extends Controller
             if ($request->jenjang) {
                 $query->where('jenjang_id', $request->jenjang);
             }
+            if ($request->semester) {
+                $query->where('semester', $request->semester);
+            }
             $products = $query->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         } else {
             $products = collect([]);
         }
@@ -103,6 +107,7 @@ class StockAdjustmentController extends Controller
         $cover = $request->cover;
         $isi = $request->isi;
         $jenjang = $request->jenjang;
+        $semester = $request->semester;
 
         DB::beginTransaction();
         try {
@@ -132,7 +137,7 @@ class StockAdjustmentController extends Controller
             return redirect()->back();
         }
 
-        return redirect()->route('admin.stock-adjustments.create', ['cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang]);
+        return redirect()->route('admin.stock-adjustments.create', ['cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'semester' => $semester]);
     }
 
     public function edit(StockAdjustment $stockAdjustment)

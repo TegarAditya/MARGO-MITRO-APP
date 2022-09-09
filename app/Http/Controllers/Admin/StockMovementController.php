@@ -58,6 +58,13 @@ class StockMovementController extends Controller
                     $q->where('isi_id', $isi);
                 });
             }
+
+            if (!empty($request->semester)) {
+                $semester = $request->semester;
+                $query->whereHas('product', function($q) use($semester) {
+                    $q->where('semester', $semester);
+                });
+            }
             $query->select(sprintf('%s.*', (new StockMovement())->table));
             $table = Datatables::of($query);
 

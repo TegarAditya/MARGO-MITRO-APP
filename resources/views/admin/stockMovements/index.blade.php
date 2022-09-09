@@ -78,6 +78,21 @@
                         <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.buku.fields.semester') }}</label>
+                        <select class="form-control {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
+                            <option value disabled {{ old('semester', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                            @foreach(App\Models\Product::SEMESTER_SELECT as $key => $label)
+                                <option value="{{ $key }}" {{ old('semester') == (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
+                    </div>
+                </div>
             </div>
             <div class="row mt-2 mb-3">
                 <div class="col-12">
@@ -138,6 +153,7 @@ $(function () {
             data.jenjang = $('#jenjang_id').val(),
             data.kelas = $('#kelas_id').val(),
             data.halaman = $('#halaman_id').val()
+            data.semester = $('#semester').val()
         }
     },
     columns: [

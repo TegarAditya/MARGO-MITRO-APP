@@ -128,9 +128,10 @@ class OrderController extends Controller
         $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Normal Price', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price) {
+        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester_buku) {
             $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang']);
             if ($request->cover) {
                 $query->where('brand_id', $request->cover);
@@ -140,6 +141,12 @@ class OrderController extends Controller
             }
             if ($request->jenjang) {
                 $query->where('jenjang_id', $request->jenjang);
+            }
+            if ($request->kelas) {
+                $query->where('kelas_id', $request->kelas);
+            }
+            if ($request->semester_buku) {
+                $query->where('semester', $request->semester_buku);
             }
 
             $custom_price = null;
@@ -163,7 +170,7 @@ class OrderController extends Controller
             $products = collect([]);
         }
 
-        return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters'));
+        return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -178,6 +185,8 @@ class OrderController extends Controller
         $cover = $request->cover;
         $isi = $request->isi;
         $jenjang = $request->jenjang;
+        $kelas = $request->jenjang;
+        $semester_buku = $request->semester_buku;
 
         DB::beginTransaction();
         try {
@@ -244,7 +253,7 @@ class OrderController extends Controller
 
             Alert::success('Success', 'Sales Order berhasil di simpan');
 
-            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang]);
+            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'kelas' => $kelas, 'semester_buku' => $semester_buku]);
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -261,9 +270,10 @@ class OrderController extends Controller
         $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Normal Price', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price) {
+        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester_buku) {
             $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang']);
             if ($request->cover) {
                 $query->where('brand_id', $request->cover);
@@ -273,6 +283,12 @@ class OrderController extends Controller
             }
             if ($request->jenjang) {
                 $query->where('jenjang_id', $request->jenjang);
+            }
+            if ($request->kelas) {
+                $query->where('kelas_id', $request->kelas);
+            }
+            if ($request->semester_buku) {
+                $query->where('semester', $request->semester_buku);
             }
 
             $custom_price = null;
@@ -307,7 +323,7 @@ class OrderController extends Controller
             'semester'
         ]);
 
-        return view('admin.orders.edit', compact('order', 'salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters'));
+        return view('admin.orders.edit', compact('order', 'salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order)
@@ -322,6 +338,8 @@ class OrderController extends Controller
         $cover = $request->cover;
         $isi = $request->isi;
         $jenjang = $request->jenjang;
+        $kelas = $request->jenjang;
+        $semester_buku = $request->semester_buku;
 
         DB::beginTransaction();
         try {
@@ -419,7 +437,7 @@ class OrderController extends Controller
 
             Alert::success('Success', 'Sales Order berhasil di simpan');
 
-            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang]);
+            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'kelas' => $kelas, 'semester_buku' => $semester_buku]);
         } catch (\Exception $e) {
             DB::rollback();
 

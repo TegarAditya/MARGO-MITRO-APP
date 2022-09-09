@@ -9,9 +9,9 @@
             <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
                 Import
             </button>
-            <a class="btn btn-success" href="{{ public_path('template/Template_Import_Buku.csv') }}">
+            {{-- <a class="btn btn-success" href="{{ public_path('template/Template_Import_Buku.csv') }}">
                 Download Template Import
-            </a>
+            </a> --}}
             @include('csvImport.import_modal', ['model' => 'Product', 'route' => 'admin.buku.import'])
         </div>
     </div>
@@ -104,6 +104,21 @@
                             <span class="text-danger">{{ $errors->first('halaman') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.buku.fields.semester') }}</label>
+                        <select class="form-control {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
+                            <option value disabled {{ old('semester', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                            @foreach(App\Models\Product::SEMESTER_SELECT as $key => $label)
+                                <option value="{{ $key }}" {{ old('semester', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
                     </div>
                 </div>
             </div>
@@ -207,6 +222,7 @@
             data.jenjang = $('#jenjang_id').val(),
             data.kelas = $('#kelas_id').val(),
             data.halaman = $('#halaman_id').val()
+            data.semester = $('#semester').val()
         }
     },
     columns: [
