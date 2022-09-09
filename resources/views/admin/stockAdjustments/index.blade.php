@@ -63,7 +63,16 @@ let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.stock-adjustments.index') }}",
+    ajax: {
+        url: "{{ route('admin.stock-adjustments.index') }}",
+        data: function(data) {
+            data.brand = $('#brand_id').val(),
+            data.isi = $('#isi_id').val(),
+            data.jenjang = $('#jenjang_id').val(),
+            data.kelas = $('#kelas_id').val(),
+            data.halaman = $('#halaman_id').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'date', name: 'date', class:'text-center' },
@@ -82,6 +91,11 @@ let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
+
+    $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 
 });
 

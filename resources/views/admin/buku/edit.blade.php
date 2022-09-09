@@ -63,6 +63,43 @@
                 <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
             </div>
             <div class="form-group">
+                <label class="required" for="kelas_id">{{ trans('cruds.buku.fields.kelas') }}</label>
+                <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas_id" id="kelas_id" required>
+                    @foreach($kelas as $id => $entry)
+                        <option value="{{ $id }}" {{ (old('kelas_id') ? old('kelas_id') : $product->kelas->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('kelas'))
+                    <span class="text-danger">{{ $errors->first('kelas') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.buku.fields.kelas_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label class="required" for="halaman_id">{{ trans('cruds.buku.fields.halaman') }}</label>
+                <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id" required>
+                    @foreach($halaman as $id => $entry)
+                        <option value="{{ $id }}" {{ (old('halaman_id') ? old('halaman_id') : $product->halaman->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('halaman'))
+                    <span class="text-danger">{{ $errors->first('halaman') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label>{{ trans('cruds.product.fields.semester') }}</label>
+                <select class="form-control {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
+                    <option value disabled {{ old('semester', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                    @foreach(App\Models\Product::SEMESTER_SELECT as $key => $label)
+                        <option value="{{ $key }}" {{ old('semester', $product->semester) === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('semester'))
+                    <span class="text-danger">{{ $errors->first('semester') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.product.fields.semester_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label class="required" for="unit_id">{{ trans('cruds.product.fields.unit') }}</label>
                 <select class="form-control select2 {{ $errors->has('unit') ? 'is-invalid' : '' }}" name="unit_id" id="unit_id" required>
                     @foreach($units as $id => $entry)

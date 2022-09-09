@@ -9,6 +9,8 @@ use App\Http\Requests\UpdateStockAdjustmentRequest;
 use App\Models\Product;
 use App\Models\StockAdjustment;
 use App\Models\StockMovement;
+use App\Models\Brand;
+use App\Models\Category;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,7 +53,7 @@ class StockAdjustmentController extends Controller
                 return $row->operation ? StockAdjustment::OPERATION_SELECT[$row->operation] : '';
             });
             $table->addColumn('product_name', function ($row) {
-                return $row->product ? $row->product->nama_buku : '';
+                return $row->product ? $row->product->nama_isi_buku : '';
             });
 
             $table->editColumn('quantity', function ($row) {
@@ -69,17 +71,39 @@ class StockAdjustmentController extends Controller
         return view('admin.stockAdjustments.index');
     }
 
-    public function create()
+    public function create(Request $request)
     {
         abort_if(Gate::denies('stock_adjustment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        if ($request->cover || $request->isi || $request->jenjang) {
+            $query = Product::with(['brand', 'isi', 'jenjang']);
+            if ($request->cover) {
+                $query->where('brand_id', $request->cover);
+            }
+            if ($request->isi) {
+                $query->where('isi_id', $request->isi);
+            }
+            if ($request->jenjang) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+            $products = $query->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        } else {
+            $products = collect([]);
+        }
 
-        return view('admin.stockAdjustments.create', compact('products'));
+        $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.stockAdjustments.create', compact('products', 'isi', 'covers', 'jenjang'));
     }
 
     public function store(StoreStockAdjustmentRequest $request)
     {
+        $cover = $request->cover;
+        $isi = $request->isi;
+        $jenjang = $request->jenjang;
+
         DB::beginTransaction();
         try {
             $stockAdjustment = StockAdjustment::create($request->all());
@@ -108,7 +132,7 @@ class StockAdjustmentController extends Controller
             return redirect()->back();
         }
 
-        return redirect()->route('admin.stock-adjustments.index');
+        return redirect()->route('admin.stock-adjustments.create', ['cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang]);
     }
 
     public function edit(StockAdjustment $stockAdjustment)

@@ -86,6 +86,19 @@
                 <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
             </div>
             <div class="form-group">
+                <label>{{ trans('cruds.buku.fields.semester') }}</label>
+                <select class="form-control {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
+                    <option value disabled {{ old('semester', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                    @foreach(App\Models\Product::SEMESTER_SELECT as $key => $label)
+                        <option value="{{ $key }}" {{ old('semester', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('semester'))
+                    <span class="text-danger">{{ $errors->first('semester') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label class="required" for="unit_id">{{ trans('cruds.buku.fields.unit') }}</label>
                 <select class="form-control select2 {{ $errors->has('unit') ? 'is-invalid' : '' }}" name="unit_id" id="unit_id" required>
                     @foreach($units as $id => $entry)
@@ -98,7 +111,7 @@
                 <span class="help-block">{{ trans('cruds.buku.fields.unit_helper') }}</span>
             </div>
             <div class="form-group">
-                <label>{{ trans('cruds.product.fields.tipe_pg') }}</label>
+                <label>{{ trans('cruds.buku.fields.tipe_pg') }}</label>
                 <select class="form-control {{ $errors->has('tipe_pg') ? 'is-invalid' : '' }}" name="tipe_pg" id="tipe_pg">
                     <option value disabled {{ old('tipe_pg', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
                     @foreach(App\Models\Product::TIPE_PG_SELECT as $key => $label)
@@ -108,7 +121,7 @@
                 @if($errors->has('tipe_pg'))
                     <span class="text-danger">{{ $errors->first('tipe_pg') }}</span>
                 @endif
-                <span class="help-block">{{ trans('cruds.product.fields.tipe_pg_helper') }}</span>
+                <span class="help-block">{{ trans('cruds.buku.fields.tipe_pg_helper') }}</span>
             </div>
             <div class="form-group" id="div_pg">
                 <label class="required" for="pg_id">Pegangan Guru(PG)</label>

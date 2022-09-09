@@ -223,6 +223,8 @@ return [
             'finishing_cost_helper' => ' ',
             'tipe_pg'               => 'Tipe PG',
             'tipe_pg_helper'        => ' ',
+            'semester'              => 'Semester',
+            'semester_helper'       => ' ',
         ],
     ],
     'buku' => [
@@ -271,6 +273,10 @@ return [
             'kelas_helper'      => ' ',
             'isi'             => 'Isi',
             'isi_helper'      => ' ',
+            'semester'              => 'Semester',
+            'semester_helper'       => ' ',
+            'tipe_pg'               => 'Tipe PG',
+            'tipe_pg_helper'        => ' ',
         ],
     ],
     'bahan' => [

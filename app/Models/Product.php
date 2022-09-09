@@ -26,6 +26,11 @@ class Product extends Model implements HasMedia
         'non_pg' => 'NON PG',
     ];
 
+    public const SEMESTER_SELECT = [
+        'ganjil' => 'SEMESTER GANJIL',
+        'genap'  => 'SEMESTER GENAP',
+    ];
+
     public $table = 'products';
 
     protected $appends = [
@@ -59,6 +64,7 @@ class Product extends Model implements HasMedia
         'finishing_cost',
         'min_stock',
         'status',
+        'semester',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -156,6 +162,9 @@ class Product extends Model implements HasMedia
         if ($this->halaman) {
             $nama .= ' -  HAL '. $this->halaman->name;
         }
+        if ($this->semester) {
+            $nama .= ' - '. Product::SEMESTER_SELECT[$this->semester];
+        }
 
         return $nama;
     }
@@ -172,6 +181,9 @@ class Product extends Model implements HasMedia
         }
         if ($this->halaman) {
             $nama .= ' -  HAL '. $this->halaman->name;
+        }
+        if ($this->semester) {
+            $nama .= ' - '. Product::SEMESTER_SELECT[$this->semester];
         }
 
 

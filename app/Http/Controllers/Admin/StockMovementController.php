@@ -22,31 +22,43 @@ class StockMovementController extends Controller
         abort_if(Gate::denies('stock_movement_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = StockMovement::with(['product'])->select(sprintf('%s.*', (new StockMovement())->table));
-
-            if (!empty($request->name)) {
-                $query->where('name','LIKE','%'.$request->name.'%');
-            }
+            $query = StockMovement::with(['product']);
 
             if (!empty($request->brand)) {
-                $query->where('brand_id', $request->brand);
+                $brand = $request->brand;
+                $query->whereHas('product', function($q) use($brand) {
+                    $q->where('brand_id', $brand);
+                });
             }
 
             if (!empty($request->jenjang)) {
-                $query->where('jenjang_id', $request->jenjang);
+                $jenjang = $request->jenjang;
+                $query->whereHas('product', function($q) use($jenjang) {
+                    $q->where('jenjang_id', $jenjang);
+                });
             }
 
             if (!empty($request->kelas)) {
-                $query->where('kelas_id', $request->kelas);
+                $kelas = $request->kelas;
+                $query->whereHas('product', function($q) use($kelas) {
+                    $q->where('kelas_id', $kelas);
+                });
             }
 
             if (!empty($request->halaman)) {
-                $query->where('halaman_id', $request->halaman);
+                $halaman = $request->halaman;
+                $query->whereHas('product', function($q) use($halaman) {
+                    $q->where('halaman_id', $halaman);
+                });
             }
 
             if (!empty($request->isi)) {
-                $query->where('isi_id', $request->isi);
+                $isi = $request->isi;
+                $query->whereHas('product', function($q) use($isi) {
+                    $q->where('isi_id', $isi);
+                });
             }
+            $query->select(sprintf('%s.*', (new StockMovement())->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

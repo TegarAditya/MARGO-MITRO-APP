@@ -110,7 +110,7 @@
 
             <div class="form-group mt-3">
                 <button class="btn btn-success" type="submit">
-                    Cari
+                    Filter
                 </button>
             </div>
         </form>
@@ -138,9 +138,9 @@
                     {{-- <th>
                         {{ trans('cruds.buku.fields.halaman') }}
                     </th> --}}
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.buku.fields.hpp') }}
-                    </th>
+                    </th> --}}
                     {{-- <th>
                         {{ trans('cruds.buku.fields.price') }}
                     </th> --}}
@@ -216,7 +216,7 @@
         // { data: 'kelas_name', name: 'kelas_name' },
         { data: 'name', name: 'name' },
         // { data: 'halaman_name', name: 'halaman_name' },
-        { data: 'hpp', name: 'hpp', class: 'text-right' },
+        // { data: 'hpp', name: 'hpp', class: 'text-right' },
         // { data: 'price', name: 'price' },
         { data: 'stock', name: 'stock', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }

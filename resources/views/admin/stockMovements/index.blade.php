@@ -83,7 +83,7 @@
                 <div class="col-12">
                     <div class="form-group">
                         <button class="btn btn-success" type="submit">
-                            Cari
+                            Filter
                         </button>
                     </div>
                 </div>
@@ -130,7 +130,16 @@ $(function () {
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.stock-movements.index') }}",
+    ajax: {
+        url: "{{ route('admin.stock-movements.index') }}",
+        data: function(data) {
+            data.brand = $('#brand_id').val(),
+            data.isi = $('#isi_id').val(),
+            data.jenjang = $('#jenjang_id').val(),
+            data.kelas = $('#kelas_id').val(),
+            data.halaman = $('#halaman_id').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'reference', name: 'reference', class:'text-center' },
@@ -146,6 +155,11 @@ $(function () {
     let table = $('.datatable-StockMovement').DataTable(dtOverrideGlobals);
     $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
         $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+    });
+
+    $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
     });
 });
 </script>

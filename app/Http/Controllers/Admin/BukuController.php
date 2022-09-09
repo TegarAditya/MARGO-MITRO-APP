@@ -81,11 +81,7 @@ class BukuController extends Controller
             });
 
             $table->editColumn('name', function ($row) {
-                if ($row->kelas && $row->halaman) {
-                    return $row->name ? $row->name .' -  KELAS '.$row->kelas->name. ' - HAL '. $row->halaman->name : '';
-                } else {
-                    return $row->name ? $row->name : '';
-                }
+                return $row->nama_buku;
             });
             $table->addColumn('jenjang_name', function ($row) {
                 return $row->jenjang ? $row->jenjang->name : '';
