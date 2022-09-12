@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\StockMovement;
+use App\Models\Semester;
 use Gate;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -61,7 +62,7 @@ class BukuController extends Controller
             }
 
             if (!empty($request->semester)) {
-                $query->where('semester', $request->semester);
+                $query->where('semester_id', $request->semester);
             }
 
             $table = Datatables::of($query);
@@ -85,7 +86,7 @@ class BukuController extends Controller
             });
 
             $table->editColumn('name', function ($row) {
-                return $row->nama_buku;
+                return $row->nama_isi_buku;
             });
             $table->addColumn('jenjang_name', function ($row) {
                 return $row->jenjang ? $row->jenjang->name : '';
@@ -136,10 +137,11 @@ class BukuController extends Controller
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $pg = Product::where('tipe_pg', 'pg')->get()->pluck('nama_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $kunci = Product::where('tipe_pg', 'kunci')->get()->pluck('nama_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $pg = Product::where('tipe_pg', 'pg')->WhereDoesntHave('jadi_pg')->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kunci = Product::where('tipe_pg', 'kunci')->WhereDoesntHave('jadi_kunci')->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semester = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci'));
+        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci', 'semester'));
     }
 
     public function store(StoreProductRequest $request)
@@ -172,12 +174,13 @@ class BukuController extends Controller
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $pg = Product::where('tipe_pg', 'pg')->get()->pluck('nama_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $kunci = Product::where('tipe_pg', 'kunci')->get()->pluck('nama_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $pg = Product::where('tipe_pg', 'pg')->WhereDoesntHave('jadi_pg')->orWhere('id', ($product->pg ? $product->pg->id : '-1'))->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kunci = Product::where('tipe_pg', 'kunci')->WhereDoesntHave('jadi_kunci')->orWhere('id', ($product->kunci ? $product->kunci->id : '-1'))->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semester = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman');
 
-        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci'));
+        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci', 'semester'));
     }
 
     public function update(UpdateProductRequest $request, $id)

@@ -26,11 +26,6 @@ class Product extends Model implements HasMedia
         'non_pg' => 'NON PG',
     ];
 
-    public const SEMESTER_SELECT = [
-        'ganjil' => 'SEMESTER GANJIL',
-        'genap'  => 'SEMESTER GENAP',
-    ];
-
     public $table = 'products';
 
     protected $appends = [
@@ -64,7 +59,7 @@ class Product extends Model implements HasMedia
         'finishing_cost',
         'min_stock',
         'status',
-        'semester',
+        'semester_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -121,6 +116,11 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Category::class, 'halaman_id');
     }
 
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
     public function isi()
     {
         return $this->belongsTo(Category::class, 'isi_id');
@@ -131,9 +131,19 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Product::class, 'pg_id');
     }
 
+    public function jadi_pg()
+    {
+        return $this->hasOne(Product::class, 'pg_id');
+    }
+
     public function kunci()
     {
         return $this->belongsTo(Product::class, 'kunci_id');
+    }
+
+    public function jadi_kunci()
+    {
+        return $this->hasOne(Product::class, 'kunci_id');
     }
 
     public function stock_movements()
@@ -162,9 +172,9 @@ class Product extends Model implements HasMedia
         if ($this->halaman) {
             $nama .= ' -  HAL '. $this->halaman->name;
         }
-        if ($this->semester) {
-            $nama .= ' - '. Product::SEMESTER_SELECT[$this->semester];
-        }
+        // if ($this->semester) {
+        //     $nama .= ' - '. $this->semester->name;
+        // }
 
         return $nama;
     }
@@ -182,9 +192,9 @@ class Product extends Model implements HasMedia
         if ($this->halaman) {
             $nama .= ' -  HAL '. $this->halaman->name;
         }
-        if ($this->semester) {
-            $nama .= ' - '. Product::SEMESTER_SELECT[$this->semester];
-        }
+        // if ($this->semester) {
+        //     $nama .= ' - '. $this->semester->name;
+        // }
 
 
         return $nama;

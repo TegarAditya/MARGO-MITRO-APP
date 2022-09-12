@@ -14,7 +14,7 @@ class AddSemesterColumnToProductsTable extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->string('semester')->nullable();
+            $table->unsignedBigInteger('semester_id')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddSemesterColumnToProductsTable extends Migration
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('semester');
+            $table->dropColumn('semester_id');
         });
     }
 }

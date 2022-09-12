@@ -87,17 +87,16 @@
                 <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
             </div>
             <div class="form-group">
-                <label>{{ trans('cruds.product.fields.semester') }}</label>
-                <select class="form-control {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
-                    <option value disabled {{ old('semester', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                    @foreach(App\Models\Product::SEMESTER_SELECT as $key => $label)
-                        <option value="{{ $key }}" {{ old('semester', $product->semester) === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                <label class="required" for="semester_id">{{ trans('cruds.product.fields.semester') }}</label>
+                <select class="form-control select2 {{ $errors->has('semester_id') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
+                    @foreach($semester as $id => $entry)
+                        <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : $product->semester->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                     @endforeach
                 </select>
-                @if($errors->has('semester'))
-                    <span class="text-danger">{{ $errors->first('semester') }}</span>
+                @if($errors->has('semester_id'))
+                    <span class="text-danger">{{ $errors->first('semester_id') }}</span>
                 @endif
-                <span class="help-block">{{ trans('cruds.product.fields.semester_helper') }}</span>
+                <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
             </div>
             <div class="form-group">
                 <label class="required" for="unit_id">{{ trans('cruds.product.fields.unit') }}</label>
