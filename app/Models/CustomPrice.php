@@ -24,6 +24,7 @@ class CustomPrice extends Model
 
     protected $fillable = [
         'nama',
+        'sales_id',
         'kategori_id',
         'harga',
         'created_at',
@@ -34,6 +35,11 @@ class CustomPrice extends Model
     protected $casts = [
         'harga' => 'double',
     ];
+
+    public function sales()
+    {
+        return $this->belongsTo(Salesperson::class, 'sales_id');
+    }
 
     public function kategori()
     {

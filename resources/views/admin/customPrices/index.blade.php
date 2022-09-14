@@ -29,6 +29,9 @@
                         {{ trans('cruds.customPrice.fields.nama') }}
                     </th>
                     <th>
+                        {{ trans('cruds.customPrice.fields.sales') }}
+                    </th>
+                    <th>
                         {{ trans('cruds.customPrice.fields.kategori') }}
                     </th>
                     {{-- <th>
@@ -92,11 +95,12 @@
     aaSorting: [],
     ajax: "{{ route('admin.custom-prices.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'nama', name: 'nama' },
-{ data: 'kategori_name', name: 'kategori.name', class:'text-center' },
-{ data: 'harga', name: 'harga', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
-{ data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'nama', name: 'nama', class: 'text-left' },
+        { data: 'sales', name: 'sales', class:'text-center' },
+        { data: 'kategori_name', name: 'kategori.name', class:'text-center' },
+        { data: 'harga', name: 'harga', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

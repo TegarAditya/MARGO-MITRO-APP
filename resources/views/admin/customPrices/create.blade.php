@@ -18,6 +18,18 @@
                 <span class="help-block">{{ trans('cruds.customPrice.fields.nama_helper') }}</span>
             </div>
             <div class="form-group">
+                <label class="required" for="sales_id">{{ trans('cruds.customPrice.fields.sales') }}</label>
+                <select class="form-control select2 {{ $errors->has('sales') ? 'is-invalid' : '' }}" name="sales_id" id="sales_id" required>
+                    @foreach($sales as $id => $entry)
+                        <option value="{{ $id }}" {{ old('sales_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('sales'))
+                    <span class="text-danger">{{ $errors->first('sales') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.customPrice.fields.sales_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label class="required" for="kategori_id">{{ trans('cruds.customPrice.fields.kategori') }}</label>
                 <select class="form-control select2 {{ $errors->has('kategori') ? 'is-invalid' : '' }}" name="kategori_id" id="kategori_id" required>
                     @foreach($kategoris as $id => $entry)

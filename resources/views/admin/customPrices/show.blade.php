@@ -13,32 +13,30 @@
                     {{ trans('global.back_to_list') }}
                 </a>
             </div>
+            <div class="row mb-3">
+                <div class="col-2"><h5>Nama Sales :</h5></div>
+                <div class="col-4"><h5><strong>{{ $customPrice->sales->name }}</strong></h5></div>
+            </div>
             <table class="table table-bordered table-striped">
+                <thead>
+                    <th>Nama</th>
+                    <th>Halaman</th>
+                    <th>Harga</th>
+                </thead>
                 <tbody>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.customPrice.fields.nama') }}
-                        </th>
-                        <td>
-                            {{ $customPrice->nama }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.customPrice.fields.kategori') }}
-                        </th>
-                        <td>
-                            {{ $customPrice->kategori->name ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.customPrice.fields.harga') }}
-                        </th>
-                        <td>
-                            {{ $customPrice->harga }}
-                        </td>
-                    </tr>
+                    @foreach ($harga as $element)
+                        <tr>
+                            <td class="text-center">
+                                {{ $element->nama }}
+                            </td>
+                            <td  class="text-center">
+                                Halaman {{ $element->kategori->name }}
+                            </td>
+                            <td  class="text-right">
+                                @money($element->harga)
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
             <div class="form-group">
@@ -49,7 +47,4 @@
         </div>
     </div>
 </div>
-
-
-
 @endsection

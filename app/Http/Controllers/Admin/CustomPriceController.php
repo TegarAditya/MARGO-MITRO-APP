@@ -9,6 +9,7 @@ use App\Http\Requests\StoreCustomPriceRequest;
 use App\Http\Requests\UpdateCustomPriceRequest;
 use App\Models\Category;
 use App\Models\CustomPrice;
+use App\Models\SalesPerson;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +24,7 @@ class CustomPriceController extends Controller
         abort_if(Gate::denies('custom_price_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = CustomPrice::with(['kategori'])->select(sprintf('%s.*', (new CustomPrice())->table));
+            $query = CustomPrice::with(['kategori', 'sales'])->select(sprintf('%s.*', (new CustomPrice())->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -47,6 +48,9 @@ class CustomPriceController extends Controller
             $table->editColumn('nama', function ($row) {
                 return $row->nama ? $row->nama : '';
             });
+            $table->addColumn('sales', function ($row) {
+                return $row->sales ? $row->sales->name: '';
+            });
             $table->addColumn('kategori_name', function ($row) {
                 return $row->kategori ? (Category::TYPE_SELECT[$row->kategori->type]. ' ' .$row->kategori->name) : '';
             });
@@ -67,9 +71,10 @@ class CustomPriceController extends Controller
     {
         abort_if(Gate::denies('custom_price_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $sales = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kategoris = Category::whereIn('type', ['halaman'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.customPrices.create', compact('kategoris'));
+        return view('admin.customPrices.create', compact('kategoris', 'sales'));
     }
 
     public function store(StoreCustomPriceRequest $request)
@@ -83,9 +88,10 @@ class CustomPriceController extends Controller
     {
         abort_if(Gate::denies('custom_price_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $sales = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kategoris = Category::whereIn('type', ['halaman'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $customPrice->load('kategori');
+        $customPrice->load('kategori', 'sales');
 
         return view('admin.customPrices.edit', compact('customPrice', 'kategoris'));
     }
@@ -101,9 +107,13 @@ class CustomPriceController extends Controller
     {
         abort_if(Gate::denies('custom_price_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $customPrice->load('kategori');
+        $sales_id = $customPrice->sales_id;
 
-        return view('admin.customPrices.show', compact('customPrice'));
+        $harga = CustomPrice::where('sales_id', $sales_id)->get();
+
+        $customPrice->load('kategori', 'sales');
+
+        return view('admin.customPrices.show', compact('customPrice', 'harga'));
     }
 
     public function destroy(CustomPrice $customPrice)

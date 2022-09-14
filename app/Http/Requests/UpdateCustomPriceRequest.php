@@ -21,6 +21,10 @@ class UpdateCustomPriceRequest extends FormRequest
                 'string',
                 'required',
             ],
+            'sales_id' => [
+                'required',
+                'integer',
+            ],
             'kategori_id' => [
                 'required',
                 'integer',
