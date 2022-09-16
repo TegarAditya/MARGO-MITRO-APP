@@ -9,7 +9,7 @@ use App\Http\Requests\StoreCustomPriceRequest;
 use App\Http\Requests\UpdateCustomPriceRequest;
 use App\Models\Category;
 use App\Models\CustomPrice;
-use App\Models\SalesPerson;
+use App\Models\Salesperson;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
