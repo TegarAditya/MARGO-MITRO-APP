@@ -35,27 +35,27 @@ class BukuCustomImport implements ToCollection, WithHeadingRow
     {
         $isi_array = $this->isi;
         $cover_array = $this->cover;
-        $halaman_pg = $this->halaman->where('name', 'PG')->first();
 
-        $isik13 = array('32', '33');
-        $isimerdeka = array('31', '33');
+        $isik13 = array('31', '32');
+        $isimerdeka = array('30', '32');
+        $k13only = array('31');
 
         //k13 naskah sendiri
         $sdk13 = array("MMJ", "MP", "AL HUDA", "FATONAH", "ANNUR", "CILACAP PARYANTO", "BANYUMAS", "JUARA", "BRILIANT", "GEMILANG", "PANDAWA", "LAMONGAN", "PELANGI", "KRESNA", "APIN MAS", "MGMP SRAGEN");
         $smpk13 = array("MMJ", "MIKA", "PELANGI", "MGMP TUBAN", "MGMP KEDIRI", "MGMP MAGETAN", "MGMP TRENGGALEK", "SPORTIF", "MGMP CILACAP", "MGMP JEPARA", "GEMILANG");
-        $mak13 = array('MMJ');
+        $smak13 = array("MMJ", "MASTER", "MGMP SOLO", "MP", "MGMP JAMBI", "MGMP GROBOGAN");
         $peminatank13 = array('MMJ');
+        $smkk13 = array("MMJ", "MP", "MIKA", "MASTER");
         $mik13 = array("MMJ", "MP", "NU KENDAL");
         $mtsk13 = array("MMJ", "MP", "MGMP KEDIRI", "MGMP TUBAN");
-        $smak13 = array("MMJ", "MASTER", "MGMP SOLO", "MP", "MGMP JAMBI", "MGMP GROBOGAN");
-        $smkk13 = array("MMJ", "MP", "MIKA", "MASTER");
+        $mak13 = array('MMJ');
 
         //merdeka naskah sendiri
         $sdmerdeka = array("MMJ", "MP", "SI PINTAR", "MGMP PARYANTO");
         $smpmerdeka = array("MMJ", "MP", "SI PINTAR", "MGMP PARYANTO", "MIKA", "MASTER", "MGMP JAMBI", "MGMP GROBOGAN");
         $smamerdeka = array("MMJ", "MIKA", "MASTER", "MGMP JAMBI", "MGMP GROBOGAN");
 
-        $semesters = array('ganjil', 'genap');
+        $semesters = array('7');
 
 
         set_time_limit(0);
@@ -87,7 +87,7 @@ class BukuCustomImport implements ToCollection, WithHeadingRow
                                 'min_stock' => 0,
                                 'tipe_pg' => 'non_pg',
                                 'status' => 1,
-                                'semester' => $semester
+                                'semester_id' => $semester
                             ]);
 
                             $product_pg = Product::create([
@@ -98,7 +98,7 @@ class BukuCustomImport implements ToCollection, WithHeadingRow
                                 'unit_id' => 1,
                                 'jenjang_id' => $jenjang->id,
                                 'kelas_id' => $kelas->id,
-                                'halaman_id' => $halaman_pg->id,
+                                'halaman_id' => $halaman->id,
                                 'isi_id' => $isi,
                                 'hpp' => null,
                                 'price' => 6000,
@@ -107,7 +107,7 @@ class BukuCustomImport implements ToCollection, WithHeadingRow
                                 'min_stock' => 0,
                                 'tipe_pg' => 'pg',
                                 'status' => 1,
-                                'semester' => $semester
+                                'semester_id' => $semester
                             ]);
 
                             $product->update([

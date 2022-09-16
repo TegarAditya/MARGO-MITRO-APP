@@ -35,7 +35,7 @@ class BukuController extends Controller
         abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Product::where('category_id', 1)->with(['category', 'brand', 'unit'])->select(sprintf('%s.*', (new Product())->table));
+            $query = Product::where('category_id', 1)->with(['category', 'brand', 'unit', 'semester'])->select(sprintf('%s.*', (new Product())->table));
 
             if (!empty($request->name)) {
                 $query->where('name','LIKE','%'.$request->name.'%');
@@ -123,8 +123,9 @@ class BukuController extends Controller
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semester = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.buku.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi'));
+        return view('admin.buku.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi', 'semester'));
     }
 
     public function create()

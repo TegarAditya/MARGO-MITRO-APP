@@ -35,7 +35,7 @@
 
                     <div class="col-4">
                         <div class="form-group mb-0">
-                            <label class="small mb-0" for="salesperson_id">Semester</label>
+                            <label class="small mb-0" for="semester_id">Semester</label>
                             <select class="form-control select2 {{ $errors->has('semester_id') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
                                 @foreach($semesters as $id => $entry)
                                     <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>

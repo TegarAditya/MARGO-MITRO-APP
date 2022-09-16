@@ -109,7 +109,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="semester_id">{{ trans('cruds.buku.fields.semester') }}</label>
-                        <select class="form-control select2 {{ $errors->has('semester_id') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
+                        <select class="form-control select2 {{ $errors->has('semester_id') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
                             @foreach($semester as $id => $entry)
                                 <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach

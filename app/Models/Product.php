@@ -172,9 +172,9 @@ class Product extends Model implements HasMedia
         if ($this->halaman) {
             $nama .= ' -  HAL '. $this->halaman->name;
         }
-        // if ($this->semester) {
-        //     $nama .= ' - '. $this->semester->name;
-        // }
+        if ($this->semester) {
+            $nama .= ' - '. $this->semester->name;
+        }
 
         return $nama;
     }
@@ -192,10 +192,9 @@ class Product extends Model implements HasMedia
         if ($this->halaman) {
             $nama .= ' -  HAL '. $this->halaman->name;
         }
-        // if ($this->semester) {
-        //     $nama .= ' - '. $this->semester->name;
-        // }
-
+        if ($this->semester) {
+            $nama .= ' - '. $this->semester->name;
+        }
 
         return $nama;
     }

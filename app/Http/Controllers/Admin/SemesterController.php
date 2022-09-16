@@ -45,7 +45,7 @@ class SemesterController extends Controller
             });
 
             $table->editColumn('status', function ($row) {
-                return '<input type="checkbox" disabled ' . ($row->status ? 'checked' : null) . '>';
+                return $row->status ? '<i class="fa fa-check" aria-hidden="true"></i>' : '<i class="fa fa-times" aria-hidden="true"></i>';
             });
 
             $table->rawColumns(['actions', 'placeholder', 'status']);

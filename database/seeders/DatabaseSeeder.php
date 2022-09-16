@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             BrandTableSeeder::class,
             CategoryTableSeeder::class,
             UnitTableSeeder::class,
+            SemesterTableSeeder::class,
         ]);
     }
 }
