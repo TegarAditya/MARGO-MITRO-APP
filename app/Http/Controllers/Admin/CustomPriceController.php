@@ -131,4 +131,11 @@ class CustomPriceController extends Controller
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+    public function select(Request $request)
+    {
+        $sales = $request->sales;
+        $customprices = CustomPrice::where('sales_id', $sales)->get()->pluck('nama_harga', 'id');
+        return response()->json($customprices);
+    }
 }

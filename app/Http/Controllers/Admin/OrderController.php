@@ -92,7 +92,7 @@ class OrderController extends Controller
             $table->addColumn('salesperson_area', function ($row) {
                 $labels = [];
                 foreach ($row->salesperson->area_pemasarans as $area_pemasaran) {
-                    if ($area_pemasaran === $row->salesperson->area_pemasarans ->last()) {
+                    if ($area_pemasaran === $row->salesperson->area_pemasarans->last()) {
                         $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
                     } else {
                         $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->name);
@@ -125,14 +125,15 @@ class OrderController extends Controller
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Normal Price', '');
+        // $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
+        $customprices = collect(['Harga Normal', '']);
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester_buku) {
-            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang']);
+        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester) {
+            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang', 'semester']);
             if ($request->cover) {
                 $query->where('brand_id', $request->cover);
             }
@@ -145,8 +146,8 @@ class OrderController extends Controller
             if ($request->kelas) {
                 $query->where('kelas_id', $request->kelas);
             }
-            if ($request->semester_buku) {
-                $query->where('semester', $request->semester_buku);
+            if ($request->semester) {
+                $query->where('semester_id', $request->semester);
             }
 
             $custom_price = null;
@@ -178,15 +179,16 @@ class OrderController extends Controller
         $request->validate([
             'date' => 'required|date',
             'salesperson_id' => 'required|exists:salespeople,id',
-            'products' => 'required|array|min:1',
+            'semester_id' => 'required|exists:semesters,id'
+            // 'products' => 'required|array|min:1',
         ]);
 
         $custom_price = $request->custom_price;
         $cover = $request->cover;
         $isi = $request->isi;
         $jenjang = $request->jenjang;
-        $kelas = $request->jenjang;
-        $semester_buku = $request->semester_buku;
+        $kelas = $request->kelas;
+        $semester = $request->semester;
 
         DB::beginTransaction();
         try {
@@ -199,47 +201,49 @@ class OrderController extends Controller
 
             $order_details = collect();
 
-            Product::whereIn('id', array_keys($request->products))->get()->each(function($item) use ($order, $request, $order_details) {
-                $qty = (int) $request->products[$item->id]['qty'] ?: 0;
-                $price = (float) $request->products[$item->id]['price'] ?: 0;
-                $unit_price = $item->price;
-                $total = $qty * $price;
-                $pg_tipe = $request->products[$item->id]['pg'] ?? null ;
-                $pg_bonus = $request->products[$item->id]['bonus'] ?? null;
+            if ($request->products) {
+                Product::whereIn('id', array_keys($request->products))->get()->each(function($item) use ($order, $request, $order_details) {
+                    $qty = (int) $request->products[$item->id]['qty'] ?: 0;
+                    $price = (float) $request->products[$item->id]['price'] ?: 0;
+                    $unit_price = $item->price;
+                    $total = $qty * $price;
+                    $pg_tipe = $request->products[$item->id]['pg'] ?? null ;
+                    $pg_bonus = $request->products[$item->id]['bonus'] ?? null;
 
-                $order_detail = OrderDetail::create([
-                    'product_id' => $item->id,
-                    'order_id' => $order->id,
-                    'quantity' => $qty,
-                    'unit_price' => $unit_price,
-                    'price' => $price,
-                    'total' => $total,
-                ]);
+                    $order_detail = OrderDetail::create([
+                        'product_id' => $item->id,
+                        'order_id' => $order->id,
+                        'quantity' => $qty,
+                        'unit_price' => $unit_price,
+                        'price' => $price,
+                        'total' => $total,
+                    ]);
 
-                $order_details->push([
-                    'total' => $total,
-                ]);
+                    $order_details->push([
+                        'total' => $total,
+                    ]);
 
-                if ($item->tipe_pg === 'non_pg') {
-                    if ($pg_tipe === 'pg') {
-                        if ($item->pg_id) {
-                            $bonus = OrderPackage::create([
-                                'product_id' => $item->pg_id,
-                                'order_detail_id' => $order_detail->id,
-                                'quantity' => $pg_bonus,
-                            ]);
-                        }
-                    } else if ($pg_tipe === 'kunci') {
-                        if ($item->kunci_id) {
-                            $bonus = OrderPackage::create([
-                                'product_id' =>  $item->kunci_id,
-                                'order_detail_id' => $order_detail->id,
-                                'quantity' => $pg_bonus,
-                            ]);
+                    if ($item->tipe_pg === 'non_pg') {
+                        if ($pg_tipe === 'pg') {
+                            if ($item->pg_id) {
+                                $bonus = OrderPackage::create([
+                                    'product_id' => $item->pg_id,
+                                    'order_detail_id' => $order_detail->id,
+                                    'quantity' => $pg_bonus,
+                                ]);
+                            }
+                        } else if ($pg_tipe === 'kunci') {
+                            if ($item->kunci_id) {
+                                $bonus = OrderPackage::create([
+                                    'product_id' =>  $item->kunci_id,
+                                    'order_detail_id' => $order_detail->id,
+                                    'quantity' => $pg_bonus,
+                                ]);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
 
             $order->tagihan()->create([
                 'order_id' => $order->id,
@@ -253,7 +257,7 @@ class OrderController extends Controller
 
             Alert::success('Success', 'Sales Order berhasil di simpan');
 
-            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'kelas' => $kelas, 'semester_buku' => $semester_buku]);
+            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'kelas' => $kelas, 'semester' => $semester]);
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -267,14 +271,14 @@ class OrderController extends Controller
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Normal Price', '');
+        $customprices = CustomPrice::where('sales_id', $order->salesperson_id)->get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester_buku) {
-            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang']);
+        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester) {
+            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang', 'semester']);
             if ($request->cover) {
                 $query->where('brand_id', $request->cover);
             }
@@ -287,8 +291,8 @@ class OrderController extends Controller
             if ($request->kelas) {
                 $query->where('kelas_id', $request->kelas);
             }
-            if ($request->semester_buku) {
-                $query->where('semester', $request->semester_buku);
+            if ($request->semester) {
+                $query->where('semester_id', $request->semester);
             }
 
             $custom_price = null;
@@ -331,15 +335,29 @@ class OrderController extends Controller
         $request->validate([
             'date' => 'required|date',
             'salesperson_id' => 'required|exists:salespeople,id',
-            'products' => 'required|array|min:1',
+            'semester_id' => 'required|exists:semesters,id',
         ]);
 
         $custom_price = $request->custom_price;
         $cover = $request->cover;
         $isi = $request->isi;
         $jenjang = $request->jenjang;
-        $kelas = $request->jenjang;
-        $semester_buku = $request->semester_buku;
+        $kelas = $request->kelas;
+        $semester = $request->semester;
+
+        if ($request->filter) {
+            $order->forceFill([
+                'date' => $request->date,
+                'salesperson_id' => $request->salesperson_id,
+                'semester_id' => $request->semester_id
+            ])->save();
+
+            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'kelas' => $kelas, 'semester' => $semester]);
+        }
+
+        $request->validate([
+            'products' => 'required|array|min:1',
+        ]);
 
         DB::beginTransaction();
         try {
@@ -437,7 +455,7 @@ class OrderController extends Controller
 
             Alert::success('Success', 'Sales Order berhasil di simpan');
 
-            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'kelas' => $kelas, 'semester_buku' => $semester_buku]);
+            return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'kelas' => $kelas, 'semester' => $semester]);
         } catch (\Exception $e) {
             DB::rollback();
 
