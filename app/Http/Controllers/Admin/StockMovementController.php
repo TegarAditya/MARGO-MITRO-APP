@@ -10,6 +10,7 @@ use App\Models\StockAdjustment;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Unit;
+use App\Models\Semester;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +63,7 @@ class StockMovementController extends Controller
             if (!empty($request->semester)) {
                 $semester = $request->semester;
                 $query->whereHas('product', function($q) use($semester) {
-                    $q->where('semester', $semester);
+                    $q->where('semester_id', $semester);
                 });
             }
             $query->select(sprintf('%s.*', (new StockMovement())->table));
@@ -129,7 +130,8 @@ class StockMovementController extends Controller
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semester = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.stockMovements.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi'));
+        return view('admin.stockMovements.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi', 'semester'));
     }
 }

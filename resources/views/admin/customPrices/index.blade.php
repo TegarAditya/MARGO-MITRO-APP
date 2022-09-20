@@ -6,16 +6,61 @@
             <a class="btn btn-success" href="{{ route('admin.custom-prices.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.customPrice.title_singular') }}
             </a>
-            <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
+            {{-- <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
                 {{ trans('global.app_csvImport') }}
+            </button> --}}
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
             </button>
-            @include('csvImport.modal', ['model' => 'CustomPrice', 'route' => 'admin.custom-prices.parseCsvImport'])
+            @include('csvImport.import_modal', ['model' => 'CustomPrice', 'route' => 'admin.custom-prices.import'])
+            {{-- @include('csvImport.modal', ['model' => 'CustomPrice', 'route' => 'admin.custom-prices.parseCsvImport']) --}}
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.customPrice.title_singular') }} {{ trans('global.list') }}
+    </div>
+
+    <div class="card-body">
+        <form id="filterform">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="sales_id">{{ trans('cruds.customPrice.fields.sales') }}</label>
+                        <select class="form-control select2 {{ $errors->has('sales') ? 'is-invalid' : '' }}" name="sales_id" id="sales_id">
+                            @foreach($sales as $id => $entry)
+                                <option value="{{ $id }}" {{ old('sales_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('sales'))
+                            <span class="text-danger">{{ $errors->first('sales') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.customPrice.fields.sales_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="kategori_id">{{ trans('cruds.customPrice.fields.kategori') }}</label>
+                        <select class="form-control select2 {{ $errors->has('kategori') ? 'is-invalid' : '' }}" name="kategori_id" id="kategori_id">
+                            @foreach($kategoris as $id => $entry)
+                                <option value="{{ $id }}" {{ old('kategori_id') == $id ? 'selected' : '' }}>{{ $entry }} Halaman</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('kategori'))
+                            <span class="text-danger">{{ $errors->first('kategori') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.customPrice.fields.kategori_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button class="btn btn-success" type="submit">
+                    Filter
+                </button>
+            </div>
+        </form>
     </div>
 
     <div class="card-body">
@@ -93,7 +138,13 @@
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.custom-prices.index') }}",
+    ajax: {
+        url: "{{ route('admin.custom-prices.index') }}",
+        data: function(data) {
+            data.sales = $('#sales_id').val(),
+            data.halaman = $('#kategori_id').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'nama', name: 'nama', class: 'text-left' },
@@ -111,6 +162,11 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
+
+  $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 
 });
 

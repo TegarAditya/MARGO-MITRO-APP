@@ -80,15 +80,14 @@
                 </div>
                 <div class="col-4">
                     <div class="form-group">
-                        <label>{{ trans('cruds.buku.fields.semester') }}</label>
-                        <select class="form-control {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
-                            <option value disabled {{ old('semester', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                            @foreach(App\Models\Product::SEMESTER_SELECT as $key => $label)
-                                <option value="{{ $key }}" {{ old('semester') == (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                        <label for="semester_id">{{ trans('cruds.buku.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester_id') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semester as $id => $entry)
+                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
                         </select>
-                        @if($errors->has('semester'))
-                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @if($errors->has('semester_id'))
+                            <span class="text-danger">{{ $errors->first('semester_id') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
                     </div>

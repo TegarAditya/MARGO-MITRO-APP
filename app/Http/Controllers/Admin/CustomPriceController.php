@@ -14,6 +14,9 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Excel;
+use App\Imports\CustomPriceImport;
+use Alert;
 
 class CustomPriceController extends Controller
 {
@@ -25,6 +28,15 @@ class CustomPriceController extends Controller
 
         if ($request->ajax()) {
             $query = CustomPrice::with(['kategori', 'sales'])->select(sprintf('%s.*', (new CustomPrice())->table));
+
+            if (!empty($request->sales)) {
+                $query->where('sales_id', $request->sales);
+            }
+
+            if (!empty($request->halaman)) {
+                $query->where('kategori_id', $request->halaman);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -64,7 +76,10 @@ class CustomPriceController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.customPrices.index');
+        $sales = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kategoris = Category::whereIn('type', ['halaman'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.customPrices.index', compact('kategoris', 'sales'));
     }
 
     public function create()
@@ -137,5 +152,18 @@ class CustomPriceController extends Controller
         $sales = $request->sales;
         $customprices = CustomPrice::where('sales_id', $sales)->get()->pluck('nama_harga', 'id');
         return response()->json($customprices);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('import_file');
+        $request->validate([
+            'import_file' => 'mimes:csv,txt,xls,xlsx',
+        ]);
+
+        Excel::import(new CustomPriceImport(), $file);
+
+        Alert::success('Success', 'Custom Price berhasil di import');
+        return redirect()->back();
     }
 }

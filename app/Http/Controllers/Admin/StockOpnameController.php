@@ -10,6 +10,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
+use App\Models\Semester;
 use Gate;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
@@ -22,20 +23,45 @@ class StockOpnameController extends Controller
         abort_if(Gate::denies('stock_opname_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Product::with(['category', 'brand', 'unit'])->select(sprintf('%s.*', (new Product())->table))->where('stock','>', 0)->orderBy('stock', 'DESC');
+            $query = Product::with(['category', 'brand', 'unit', 'semester'])->where('stock','>', 0)->orderBy('stock', 'DESC')->select(sprintf('%s.*', (new Product())->table));
+            if (!empty($request->name)) {
+                $query->where('name','LIKE','%'.$request->name.'%');
+            }
+
+            if (!empty($request->brand)) {
+                $query->where('brand_id', $request->brand);
+            }
+
+            if (!empty($request->jenjang)) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+
+            if (!empty($request->kelas)) {
+                $query->where('kelas_id', $request->kelas);
+            }
+
+            if (!empty($request->halaman)) {
+                $query->where('halaman_id', $request->halaman);
+            }
+
+            if (!empty($request->isi)) {
+                $query->where('isi_id', $request->isi);
+            }
+
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('value', '&nbsp;');
 
             $table->editColumn('name', function ($row) {
-                return '<a href="'.route('admin.products.show', $row->id).'">'.$row->nama_buku .'</a>';
+                return '<a href="'.route('admin.products.show', $row->id).'">'.$row->nama_isi_buku .'</a>';
             });
             $table->addColumn('category_name', function ($row) {
                 return $row->category ? $row->category->name : '';
-            });
-            $table->addColumn('brand_name', function ($row) {
-                return $row->brand ? $row->brand->name : '';
             });
             $table->editColumn('hpp', function ($row) {
                 return $row->hpp ? 'Rp '. number_format($row->hpp, 0, ',', '.') : '';
@@ -54,10 +80,14 @@ class StockOpnameController extends Controller
             return $table->make(true);
         }
 
-        $categories = Category::get();
-        $brands     = Brand::get();
+        $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semester = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.stockOpnames.index', compact('categories', 'brands'));
+        return view('admin.stockOpnames.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi', 'semester'));
     }
 
     public function create()

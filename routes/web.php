@@ -168,6 +168,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('custom-prices/parse-csv-import', 'CustomPriceController@parseCsvImport')->name('custom-prices.parseCsvImport');
     Route::post('custom-prices/process-csv-import', 'CustomPriceController@processCsvImport')->name('custom-prices.processCsvImport');
     Route::get('custom-prices/select', 'CustomPriceController@select')->name('custom-prices.select');
+    Route::post('custom-prices/import', 'CustomPriceController@import')->name('custom-prices.import');
     Route::resource('custom-prices', 'CustomPriceController');
 
     // Semester
