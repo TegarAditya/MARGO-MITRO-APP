@@ -45,7 +45,7 @@ class PriceController extends Controller
                 return $row->name ? $row->name : '';
             });
             $table->addColumn('category_name', function ($row) {
-                return $row->category ? $row->category->name : '';
+                return $row->category ? $row->category->name .' Halaman' : '';
             });
 
             $table->editColumn('price', function ($row) {
@@ -64,7 +64,7 @@ class PriceController extends Controller
     {
         abort_if(Gate::denies('price_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $categories = Category::whereIn('type', ['halaman'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $categories = Category::whereIn('type', ['halaman'])->pluck('name', 'id');
 
         return view('admin.prices.create', compact('categories'));
     }
@@ -80,7 +80,7 @@ class PriceController extends Controller
     {
         abort_if(Gate::denies('price_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $categories = Category::whereIn('type', ['halaman'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $categories = Category::whereIn('type', ['halaman'])->pluck('name', 'id')->prepend('Pilih', '');
 
         $price->load('category');
 

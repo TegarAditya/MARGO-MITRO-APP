@@ -85,11 +85,11 @@
     aaSorting: [],
     ajax: "{{ route('admin.prices.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'name', name: 'name' },
-{ data: 'category_name', name: 'category.name' },
-{ data: 'price', name: 'price' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'name', name: 'name', class: 'text-center' },
+        { data: 'category_name', name: 'category.name', class: 'text-center' },
+        { data: 'price', name: 'price', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
@@ -100,7 +100,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

@@ -190,6 +190,12 @@ class CategoryTableSeeder extends Seeder
                 'parent_id' => 1,
             ],
             [
+                'name'  => '112(BENDING)',
+                'slug'  => SlugService::createSlug(Category::class, 'slug', '112(BENDING)'),
+                'type'  => 'halaman',
+                'parent_id' => 1,
+            ],
+            [
                 'name'  => 'MERDEKA',
                 'slug'  => SlugService::createSlug(Category::class, 'slug', 'MERDEKA'),
                 'type'  => 'isi',

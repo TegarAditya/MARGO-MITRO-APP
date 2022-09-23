@@ -21,7 +21,7 @@
                 <label class="required" for="category_id">{{ trans('cruds.price.fields.category') }}</label>
                 <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="category_id" id="category_id" required>
                     @foreach($categories as $id => $entry)
-                        <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $entry }} Halaman</option>
                     @endforeach
                 </select>
                 @if($errors->has('category'))
@@ -31,7 +31,21 @@
             </div>
             <div class="form-group">
                 <label class="required" for="price">{{ trans('cruds.price.fields.price') }}</label>
-                <input class="form-control {{ $errors->has('price') ? 'is-invalid' : '' }}" type="number" name="price" id="price" value="{{ old('price', '') }}" step="1" required>
+                <input id="price" type="hidden" name="price" />
+                <x-admin.form-group
+                    type="text"
+                    id="pricetext"
+                    name="pricetext"
+                    containerClass=" m-0"
+                    boxClass=" px-2 py-0"
+                    class="form-control {{ $errors->has('price') ? 'is-invalid' : '' }}"
+                    value="{{ old('price', '') }}"
+                    min="0"
+                >
+                    <x-slot name="left">
+                        <span class="text-sm mr-1">Rp</span>
+                    </x-slot>
+                </x-admin.form-group>
                 @if($errors->has('price'))
                     <span class="text-danger">{{ $errors->first('price') }}</span>
                 @endif
@@ -45,7 +59,21 @@
         </form>
     </div>
 </div>
-
-
-
 @endsection
+
+@push('scripts')
+<script>
+(function($, numeral) {
+    $(function() {
+        var price = $('#price');
+        var priceText = $('#pricetext');
+        priceText.on('change keyup blur', function(e) {
+            var value = numeral(e.target.value);
+
+            priceText.val(value.format('0,0'));
+            price.val(value.value()).trigger('change');
+        }).trigger('change');
+    });
+})(jQuery, window.numeral);
+</script>
+@endpush

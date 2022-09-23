@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             CategoryTableSeeder::class,
             UnitTableSeeder::class,
             SemesterTableSeeder::class,
+            PriceTableSeeder::class,
         ]);
     }
 }
