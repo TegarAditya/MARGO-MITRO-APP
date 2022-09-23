@@ -17,6 +17,8 @@ use App\Models\Category;
 use App\Models\Invoice;
 use App\Models\Pembayaran;
 use App\Models\Semester;
+use App\Models\Price;
+use App\Models\PriceDetail;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -126,50 +128,13 @@ class OrderController extends Controller
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         // $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
-        $customprices = collect(['Harga Normal', '']);
+        // $customprices = collect(['Harga Normal', '']);
+        $customprices = Price::get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester) {
-            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang', 'semester']);
-            if ($request->cover) {
-                $query->where('brand_id', $request->cover);
-            }
-            if ($request->isi) {
-                $query->where('isi_id', $request->isi);
-            }
-            if ($request->jenjang) {
-                $query->where('jenjang_id', $request->jenjang);
-            }
-            if ($request->kelas) {
-                $query->where('kelas_id', $request->kelas);
-            }
-            if ($request->semester) {
-                $query->where('semester_id', $request->semester);
-            }
-
-            $custom_price = null;
-            if ($request->custom_price) {
-                $custom = CustomPrice::find($request->custom_price);
-                $custom_price = $custom->harga;
-                $kategori = $custom->kategori_id;
-
-                $query->where('halaman_id', $kategori);
-            }
-
-            $products = $query->get();
-
-            if ($custom_price) {
-                $products->map(function($product) use($custom_price) {
-                    $product->price = $custom_price;
-                    return $product;
-                });
-            }
-        } else {
-            $products = collect([]);
-        }
+        $products = collect([]);
 
         return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas'));
     }
@@ -271,7 +236,8 @@ class OrderController extends Controller
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $customprices = CustomPrice::where('sales_id', $order->salesperson_id)->get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
+        // $customprices = CustomPrice::where('sales_id', $order->salesperson_id)->get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
+        $customprices = Price::get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -297,9 +263,16 @@ class OrderController extends Controller
 
             $custom_price = null;
             if ($request->custom_price) {
-                $custom = CustomPrice::find($request->custom_price);
-                $custom_price = $custom->harga;
-                $kategori = $custom->kategori_id;
+                $custom = Price::find($request->custom_price);
+                $detail = PriceDetail::where('price_id', $custom->id)->where('sales_id', $order->salesperson_id)->first();
+                if ($detail) {
+                    $price = $custom->price;
+                    $diskon = ($detail->diskon/100)*$price;
+                    $custom_price = (int) $price - $diskon;
+                } else {
+                    $custom_price = $custom->price;
+                }
+                $kategori = $custom->category_id;
 
                 $query->where('halaman_id', $kategori);
             }

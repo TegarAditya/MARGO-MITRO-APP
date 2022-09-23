@@ -701,7 +701,7 @@
     });
 })(jQuery, window.numeral);
 </script>
-<script>
+{{-- <script>
 $(document).ready(function() {
     $('#salesperson_id').change(function() {
         $('#custom_price').empty();
@@ -731,5 +731,5 @@ $(document).ready(function() {
         }
     });
 });
-</script>
+</script> --}}
 @endpush

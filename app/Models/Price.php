@@ -34,6 +34,20 @@ class Price extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    public function details()
+    {
+        return $this->hasMany(PriceDetail::class, 'price_id');
+    }
+
+    public function getNamaHargaAttribute() {
+        $nama = $this->name;
+        if ($this->category) {
+            $nama .= ' - HAL '. $this->category->name;
+        }
+        // $nama .= ' - '. $this->price;
+        return $nama;
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');

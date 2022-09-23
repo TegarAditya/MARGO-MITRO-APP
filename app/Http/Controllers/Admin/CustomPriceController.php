@@ -9,6 +9,8 @@ use App\Http\Requests\StoreCustomPriceRequest;
 use App\Http\Requests\UpdateCustomPriceRequest;
 use App\Models\Category;
 use App\Models\CustomPrice;
+use App\Models\Price;
+use App\Models\PriceDetail;
 use App\Models\Salesperson;
 use Gate;
 use Illuminate\Http\Request;
@@ -150,7 +152,8 @@ class CustomPriceController extends Controller
     public function select(Request $request)
     {
         $sales = $request->sales;
-        $customprices = CustomPrice::where('sales_id', $sales)->get()->pluck('nama_harga', 'id');
+        // $customprices = CustomPrice::where('sales_id', $sales)->get()->pluck('nama_harga', 'id');
+        $customprices = Price::all()->pluck('nama_harga', 'id');
         return response()->json($customprices);
     }
 

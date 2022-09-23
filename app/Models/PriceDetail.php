@@ -39,6 +39,13 @@ class PriceDetail extends Model
         return $this->belongsTo(Price::class, 'price_id');
     }
 
+    public function getNamaHargaAttribute() {
+        if ($this->price) {
+            $nama = $this->price->nama_harga;
+        }
+        return $nama;
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
