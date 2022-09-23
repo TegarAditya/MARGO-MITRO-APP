@@ -32,12 +32,6 @@
                         {{ trans('cruds.stockAdjustment.fields.operation') }}
                     </th>
                     <th>
-                        {{ trans('cruds.stockAdjustment.fields.product') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.stockAdjustment.fields.quantity') }}
-                    </th>
-                    <th>
                         {{ trans('cruds.stockAdjustment.fields.note') }}
                     </th>
                     <th>
@@ -77,8 +71,6 @@ let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
         { data: 'placeholder', name: 'placeholder' },
         { data: 'date', name: 'date', class:'text-center' },
         { data: 'operation', name: 'operation', class:'text-center' },
-        { data: 'product_name', name: 'product.name' },
-        { data: 'quantity', name: 'quantity', class:'text-center' },
         { data: 'note', name: 'note' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
     ],

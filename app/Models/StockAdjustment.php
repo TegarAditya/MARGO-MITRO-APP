@@ -34,8 +34,6 @@ class StockAdjustment extends Model
     protected $fillable = [
         'date',
         'operation',
-        'product_id',
-        'quantity',
         'note',
         'created_at',
         'updated_at',
@@ -56,11 +54,6 @@ class StockAdjustment extends Model
         $this->attributes['date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
     }
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class, 'product_id');
-    }
-
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
@@ -73,5 +66,10 @@ class StockAdjustment extends Model
         } else {
             return false;
         }
+    }
+
+    public function details()
+    {
+        return $this->hasMany(StockAdjustmentDetail::class);
     }
 }
