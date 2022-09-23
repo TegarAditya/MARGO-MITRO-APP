@@ -22,7 +22,7 @@
                 </li>
                 @can('user_management_access')
                     <li class="nav-item has-treeview {{ request()->is("admin/permissions*") ? "menu-open" : "" }} {{ request()->is("admin/roles*") ? "menu-open" : "" }} {{ request()->is("admin/users*") ? "menu-open" : "" }} {{ request()->is("admin/audit-logs*") ? "menu-open" : "" }} {{ request()->is("admin/user-alerts*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/permissions*") ? "active" : "" }} {{ request()->is("admin/roles*") ? "active" : "" }} {{ request()->is("admin/users*") ? "active" : "" }} {{ request()->is("admin/audit-logs*") ? "active" : "" }} {{ request()->is("admin/user-alerts*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-users">
 
                             </i>
@@ -96,8 +96,8 @@
                     </li>
                 @endcan
                 @can('master_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/brands*") ? "menu-open" : "" }} {{ request()->is("admin/cities*") ? "menu-open" : "" }} {{ request()->is("admin/categories*") ? "menu-open" : "" }} {{ request()->is("admin/custom-prices*") ? "menu-open" : "" }} {{ request()->is("admin/semesters*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/brands*") ? "menu-open" : "" }} {{ request()->is("admin/cities*") ? "menu-open" : "" }} {{ request()->is("admin/categories*") ? "menu-open" : "" }} {{ request()->is("admin/custom-prices*") ? "menu-open" : "" }} {{ request()->is("admin/semesters*") ? "menu-open" : "" }} {{ request()->is("admin/prices*") ? "menu-open" : "" }} {{ request()->is("admin/price-details*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/units*") ? "active" : "" }} {{ request()->is("admin/brands*") ? "active" : "" }} {{ request()->is("admin/cities*") ? "active" : "" }} {{ request()->is("admin/categories*") ? "active" : "" }} {{ request()->is("admin/custom-prices*") ? "active" : "" }} {{ request()->is("admin/semesters*") ? "active" : "" }} {{ request()->is("admin/prices*") ? "active" : "" }} {{ request()->is("admin/price-details*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-cogs">
 
                             </i>
@@ -175,6 +175,30 @@
                                         </i>
                                         <p>
                                             {{ trans('cruds.customPrice.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('price_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.prices.index") }}" class="nav-link {{ request()->is("admin/prices") || request()->is("admin/prices/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-dollar-sign">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.price.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('price_detail_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.price-details.index") }}" class="nav-link {{ request()->is("admin/price-details") || request()->is("admin/price-details/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-dollar-sign">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.priceDetail.title') }}
                                         </p>
                                     </a>
                                 </li>

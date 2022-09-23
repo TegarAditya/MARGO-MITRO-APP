@@ -175,6 +175,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('semesters/destroy', 'SemesterController@massDestroy')->name('semesters.massDestroy');
     Route::resource('semesters', 'SemesterController');
 
+    // Price
+    Route::delete('prices/destroy', 'PriceController@massDestroy')->name('prices.massDestroy');
+    Route::resource('prices', 'PriceController');
+
+    // Price Detail
+    Route::delete('price-details/destroy', 'PriceDetailController@massDestroy')->name('price-details.massDestroy');
+    Route::resource('price-details', 'PriceDetailController');
+
     // Realisasi
     Route::delete('realisasis/destroy', 'RealisasiController@massDestroy')->name('realisasis.massDestroy');
     Route::post('realisasis/parse-csv-import', 'RealisasiController@parseCsvImport')->name('realisasis.parseCsvImport');
