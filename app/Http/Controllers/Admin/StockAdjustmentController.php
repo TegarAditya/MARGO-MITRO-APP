@@ -150,7 +150,7 @@ class StockAdjustmentController extends Controller
             return redirect()->back();
         }
 
-        return redirect()->route('admin.stock-adjustments.create', ['cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'semester' => $semester]);
+        return redirect()->route('admin.stock-adjustments.edit', ['stock_adjustment' => $stockAdjustment->id, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'semester' => $semester]);
     }
 
     public function edit(StockAdjustment $stockAdjustment, Request $request)
