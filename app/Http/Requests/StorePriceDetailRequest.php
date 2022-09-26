@@ -6,6 +6,7 @@ use App\Models\PriceDetail;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class StorePriceDetailRequest extends FormRequest
 {
@@ -24,6 +25,14 @@ class StorePriceDetailRequest extends FormRequest
             'price_id' => [
                 'required',
                 'integer',
+                Rule::unique('price_details')->where(function ($query) {
+                    return $query->where(
+                        [
+                            ["sales_id", "=", $this->sales_id],
+                            ["price_id", "=", $this->price_id]
+                        ]
+                    );
+                })
             ],
             'diskon' => [
                 'numeric',

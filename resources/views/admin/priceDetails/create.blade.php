@@ -43,7 +43,7 @@
                     name="diskon"
                     containerClass=" m-0"
                     boxClass=" px-2 py-0"
-                    value="0"
+                    value="{{ old('diskon', '0') }}"
                     min="1"
                 >
                     <x-slot name="left">
