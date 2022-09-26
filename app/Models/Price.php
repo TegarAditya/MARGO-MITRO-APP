@@ -44,7 +44,15 @@ class Price extends Model
         if ($this->category) {
             $nama .= ' - HAL '. $this->category->name;
         }
-        // $nama .= ' - '. $this->price;
+        $nama .= ' - '. $this->price;
+        return $nama;
+    }
+
+    public function getNamaAttribute() {
+        $nama = $this->name;
+        if ($this->category) {
+            $nama .= ' - HAL '. $this->category->name;
+        }
         return $nama;
     }
 

@@ -24,6 +24,7 @@ class PriceDetail extends Model
         'sales_id',
         'price_id',
         'diskon',
+        'custom_price',
         'created_at',
         'updated_at',
         'deleted_at',

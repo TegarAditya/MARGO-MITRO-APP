@@ -49,7 +49,7 @@ class SemesterTableSeeder extends Seeder
                 'name'  => 'SEMESTER GANJIL 2022/2023',
                 'start_date'  => "2022-02-01",
                 'end_date'  => "2022-08-31",
-                'status' => 0
+                'status' => 1
             ],
             [
                 'name'  => 'SEMESTER GENAP 2022/2023',

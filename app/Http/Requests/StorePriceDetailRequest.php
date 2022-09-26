@@ -28,6 +28,14 @@ class StorePriceDetailRequest extends FormRequest
             'diskon' => [
                 'numeric',
                 'required',
+                'min:0',
+                'max:100',
+            ],
+            'custom_price' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:2147483647',
             ],
         ];
     }

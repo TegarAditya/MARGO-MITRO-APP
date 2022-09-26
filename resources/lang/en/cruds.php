@@ -730,8 +730,8 @@ return [
         ],
     ],
     'priceDetail' => [
-        'title'          => 'Price Detail',
-        'title_singular' => 'Price Detail',
+        'title'          => 'Custom Price',
+        'title_singular' => 'Custom Price',
         'fields'         => [
             'id'                => 'ID',
             'id_helper'         => ' ',
@@ -747,6 +747,8 @@ return [
             'deleted_at_helper' => ' ',
             'price'             => 'Price',
             'price_helper'      => ' ',
+            'custom_price'        => 'Custom Price',
+            'custom_price_helper' => ' ',
         ],
     ],
 ];

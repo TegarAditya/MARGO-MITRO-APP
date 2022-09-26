@@ -80,7 +80,7 @@ class BukuCustomImport implements ToCollection, WithHeadingRow
                                 'kelas_id' => $kelas->id,
                                 'halaman_id' => $halaman->id,
                                 'isi_id' => $isi,
-                                'hpp' => null,
+                                'hpp' => $row['hpp'],
                                 'price' => $row['price'],
                                 'finishing_cost' => null,
                                 'stock' => 0,

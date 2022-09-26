@@ -31,6 +31,9 @@
                         {{ trans('cruds.priceDetail.fields.diskon') }}
                     </th>
                     <th>
+                        {{ trans('cruds.priceDetail.fields.custom_price') }}
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -85,11 +88,12 @@
     aaSorting: [],
     ajax: "{{ route('admin.price-details.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'sales_name', name: 'sales.name' },
-{ data: 'price_name', name: 'price.name' },
-{ data: 'diskon', name: 'diskon' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'sales_name', name: 'sales.name', class: 'text-center' },
+        { data: 'price_name', name: 'price.name', class: 'text-center' },
+        { data: 'diskon', name: 'diskon', class: 'text-center' },
+        { data: 'custom_price', name: 'custom_price', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
@@ -100,7 +104,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

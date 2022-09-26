@@ -127,9 +127,9 @@ class OrderController extends Controller
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        // $customprices = CustomPrice::get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
+        // $customprices = CustomPrice::get()->pluck('nama', 'id')->prepend('Harga Normal', '');
         // $customprices = collect(['Harga Normal', '']);
-        $customprices = Price::get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
+        $customprices = Price::get()->pluck('nama', 'id')->prepend('Harga Normal', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -236,8 +236,8 @@ class OrderController extends Controller
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        // $customprices = CustomPrice::where('sales_id', $order->salesperson_id)->get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
-        $customprices = Price::get()->pluck('nama_harga', 'id')->prepend('Harga Normal', '');
+        // $customprices = CustomPrice::where('sales_id', $order->salesperson_id)->get()->pluck('nama', 'id')->prepend('Harga Normal', '');
+        $customprices = Price::get()->pluck('nama', 'id')->prepend('Harga Normal', '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -260,15 +260,12 @@ class OrderController extends Controller
             if ($request->semester) {
                 $query->where('semester_id', $request->semester);
             }
-
             $custom_price = null;
             if ($request->custom_price) {
                 $custom = Price::find($request->custom_price);
                 $detail = PriceDetail::where('price_id', $custom->id)->where('sales_id', $order->salesperson_id)->first();
                 if ($detail) {
-                    $price = $custom->price;
-                    $diskon = ($detail->diskon/100)*$price;
-                    $custom_price = (int) $price - $diskon;
+                    $custom_price = $detail->custom_price;
                 } else {
                     $custom_price = $custom->price;
                 }

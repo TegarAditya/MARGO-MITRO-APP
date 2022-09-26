@@ -167,18 +167,6 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('custom_price_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.custom-prices.index") }}" class="nav-link {{ request()->is("admin/custom-prices") || request()->is("admin/custom-prices/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-dollar-sign">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.customPrice.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
                             @can('price_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.prices.index") }}" class="nav-link {{ request()->is("admin/prices") || request()->is("admin/prices/*") ? "active" : "" }}">

@@ -47,11 +47,14 @@ class PriceDetailController extends Controller
             });
 
             $table->addColumn('price_name', function ($row) {
-                return $row->price ? $row->price->name : '';
+                return $row->price ? $row->price->nama_harga : '';
             });
 
             $table->editColumn('diskon', function ($row) {
-                return $row->diskon ? $row->diskon : '';
+                return $row->diskon ? $row->diskon .' %' : '';
+            });
+            $table->editColumn('custom_price', function ($row) {
+                return $row->custom_price ? $row->custom_price : '';
             });
 
             $table->rawColumns(['actions', 'placeholder', 'sales', 'price']);
@@ -68,7 +71,7 @@ class PriceDetailController extends Controller
 
         $sales = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $prices = Price::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $prices = Price::all();
 
         return view('admin.priceDetails.create', compact('prices', 'sales'));
     }
@@ -86,7 +89,7 @@ class PriceDetailController extends Controller
 
         $sales = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $prices = Price::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $prices = Price::all();
 
         $priceDetail->load('sales', 'price');
 

@@ -39,6 +39,14 @@
                             {{ $priceDetail->diskon }}
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.priceDetail.fields.custom_price') }}
+                        </th>
+                        <td>
+                            {{ $priceDetail->custom_price }}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">

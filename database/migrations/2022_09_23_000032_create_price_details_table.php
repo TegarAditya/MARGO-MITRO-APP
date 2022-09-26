@@ -11,6 +11,7 @@ class CreatePriceDetailsTable extends Migration
         Schema::create('price_details', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->float('diskon', 15, 2);
+            $table->integer('custom_price');
             $table->timestamps();
             $table->softDeletes();
         });
