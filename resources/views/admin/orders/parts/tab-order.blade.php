@@ -385,14 +385,14 @@
         pointer-events: none;
     }
 
-    .product-list > .item-product:last-child .product-delete {
+    .product-list > .item-product:first-child .product-delete {
         opacity: 0.5;
         pointer-events: none;
         background-color: #aeaeae;
         border-color: #969696;
     }
 
-    .product-list > .item-product:last-child > .product-col-content {
+    .product-list > .item-product:first-child > .product-col-content {
         opacity: 0.66;
         pointer-events: none;
     }
@@ -595,7 +595,7 @@
                 var product = productFake.clone();
 
                 !products.children('.item-product').length && products.html('');
-                product.appendTo(products);
+                product.prependTo(products);
 
                 console.log('ini product add');
 
