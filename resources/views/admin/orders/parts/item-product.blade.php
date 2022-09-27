@@ -23,7 +23,7 @@ $foto = !$product->foto ? null : $product->foto->first();
 $modal = !isset($modal) ? '#productModal' : $modal;
 $name = !isset($name) ? 'products' : $name;
 @endphp
-<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}">
+<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-jenjang="{{ $product->jenjang_id }}" data-name="{{ $name }}">
     <div class="col-5 row">
         <div class="col-auto" style="display: {{ (!$product->id || !$foto) ? 'none' : 'block' }}">
             @if ($foto)

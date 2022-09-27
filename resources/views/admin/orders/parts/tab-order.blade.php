@@ -311,6 +311,7 @@
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
                                 data-pg="{{ $product->tipe_pg }}"
+                                data-jenjang="{{ $product->jenjang_id }}"
                                 @if ($foto = $product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
                                 @endif
@@ -479,6 +480,8 @@
         var productSelectItems = modals.find('.product-select-item');
         var productSelectTarget;
 
+        var jenjang = ['3', '4', '11'];
+
         var calculatePrice = function() {
             var total = 0;
 
@@ -539,7 +542,12 @@
                 });
 
                 qty.on('keyup blur', function(e) {
-                    let bonus_qty = Math.ceil(qty.val()/33.34);
+                    let jenjang_id = product.attr('data-jenjang');
+                    let pembagi = 100;
+                    if(jenjang.includes(jenjang_id)){
+                        pembagi = 33.34;
+                    }
+                    let bonus_qty = Math.ceil(qty.val()/pembagi);
                     bonus.val(bonus_qty).trigger('change');
                 });
 
@@ -653,6 +661,7 @@
             product.attr('data-id', data.id).data('id', data.id);
             product.attr('data-price', data.price).data('price', data.price);
             product.attr('data-stock', data.stock).data('stock', data.stock);
+            product.attr('data-jenjang', data.jenjang).data('stock', data.jenjang);
             product.find('.product-col-main').html(content);
             product.find('.product-qty1').val(qty || 0)
                 .attr('id', 'fieldQty-'+data.id)
