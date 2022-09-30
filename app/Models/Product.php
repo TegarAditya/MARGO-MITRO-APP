@@ -30,7 +30,8 @@ class Product extends Model implements HasMedia
 
     protected $appends = [
         'foto',
-        'nama_buku'
+        'nama_buku',
+        'nama_isi_buku'
     ];
 
     protected $dates = [

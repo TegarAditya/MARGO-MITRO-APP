@@ -107,7 +107,7 @@ class InvoiceController extends Controller
             return $table->make(true);
         }
 
-        $salespersons = Salesperson::pluck('name', 'id')->prepend('Semua Sales Person', '');
+        $salespersons = Salesperson::get()->pluck('nama_sales', 'id')->prepend('Semua Sales Person', '');
         $semesters = Semester::pluck('name', 'id')->prepend('Semua Semester', '');
 
         return view('admin.invoices.index', compact('salespersons', 'semesters'));

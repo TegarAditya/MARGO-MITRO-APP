@@ -69,7 +69,7 @@ class PriceDetailController extends Controller
     {
         abort_if(Gate::denies('price_detail_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $sales = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $sales = Salesperson::get()->pluck('nama_sales', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $prices = Price::all();
 
@@ -87,7 +87,7 @@ class PriceDetailController extends Controller
     {
         abort_if(Gate::denies('price_detail_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $sales = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $sales = Salesperson::get()->pluck('nama_sales', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $prices = Price::all();
 

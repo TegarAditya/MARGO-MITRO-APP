@@ -205,7 +205,7 @@ class HomeController
             $end_at = Date::parse('last day of this month')->endOf('day');
         }
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend("Pilih Sales", '');
+        $salespeople = Salesperson::get()->pluck('nama_sales', 'id')->prepend("Pilih Sales", '');
         $querySalesOrders = Order::query()
             ->with([
                 'salesperson', 'order_details',

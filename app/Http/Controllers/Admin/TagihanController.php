@@ -67,7 +67,7 @@ class TagihanController extends Controller
 
         $orders = Order::pluck('no_order', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::get()->pluck('nama_sales', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.tagihans.create', compact('orders', 'salespeople'));
     }
@@ -85,7 +85,7 @@ class TagihanController extends Controller
 
         $orders = Order::pluck('no_order', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::get()->pluck('nama_sales', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $tagihan->load('order', 'salesperson');
 

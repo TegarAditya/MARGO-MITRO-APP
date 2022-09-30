@@ -115,7 +115,7 @@ class OrderController extends Controller
             return $table->make(true);
         }
 
-        $salespersons = Salesperson::pluck('name', 'id')->prepend('Semua Sales Person', '');
+        $salespersons = Salesperson::get()->pluck('nama_sales', 'id')->prepend('Semua Sales Person', '');
         $semesters = Semester::pluck('name', 'id')->prepend('Semua Semester', '');
 
         return view('admin.orders.index', compact('salespersons', 'semesters'));
@@ -125,7 +125,7 @@ class OrderController extends Controller
     {
         abort_if(Gate::denies('order_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::get()->pluck('nama_sales', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         // $customprices = CustomPrice::get()->pluck('nama', 'id')->prepend('Harga Normal', '');
         // $customprices = collect(['Harga Normal', '']);
@@ -234,7 +234,7 @@ class OrderController extends Controller
     {
         abort_if(Gate::denies('order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::get()->pluck('nama_sales', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         // $customprices = CustomPrice::where('sales_id', $order->salesperson_id)->get()->pluck('nama', 'id')->prepend('Harga Normal', '');
         $customprices = Price::get()->pluck('nama', 'id')->prepend('Harga Normal', '');

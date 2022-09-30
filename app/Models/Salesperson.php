@@ -22,6 +22,7 @@ class Salesperson extends Model implements HasMedia
 
     protected $appends = [
         'foto',
+        'nama_sales'
     ];
 
     protected $dates = [
@@ -87,5 +88,21 @@ class Salesperson extends Model implements HasMedia
     public function tagihans()
     {
         return $this->hasMany(Tagihan::class);
+    }
+
+    public function getNamaSalesAttribute() {
+        $nama = $this->name;
+        if (!$this->area_pemasarans->isEmpty()) {
+            $nama .= ' (';
+            foreach($this->area_pemasarans as $area) {
+                if ($this->area_pemasarans->last()) {
+                    $nama .= $area->name;
+                } else {
+                    $nama .= $area->name.', ';
+                }
+            }
+            $nama .= ') ';
+        }
+        return $nama;
     }
 }
