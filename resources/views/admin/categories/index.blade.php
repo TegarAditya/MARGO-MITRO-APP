@@ -19,6 +19,33 @@
     </div>
 
     <div class="card-body">
+        <form id="filterform">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.category.fields.type') }}</label>
+                        <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
+                            <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>Semua</option>
+                            @foreach(App\Models\Category::TYPE_SELECT as $key => $label)
+                                <option value="{{ $key }}" {{ old('type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('type'))
+                            <span class="text-danger">{{ $errors->first('type') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.category.fields.type_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <button class="btn btn-success" type="submit">
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body">
         <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Category">
             <thead>
                 <tr>
@@ -90,7 +117,12 @@
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.categories.index') }}",
+    ajax: {
+        url: "{{ route('admin.categories.index') }}",
+        data: function(data) {
+            data.type = $('#type').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'name', name: 'name' },
@@ -108,7 +140,10 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-
+    $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 });
 
 </script>

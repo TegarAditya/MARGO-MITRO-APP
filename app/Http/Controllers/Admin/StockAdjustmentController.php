@@ -150,6 +150,8 @@ class StockAdjustmentController extends Controller
             return redirect()->back();
         }
 
+        Alert::success('Success', 'Stock Adjustment berhasil disimpan');
+
         return redirect()->route('admin.stock-adjustments.edit', ['stock_adjustment' => $stockAdjustment->id, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'semester' => $semester]);
     }
 

@@ -24,6 +24,9 @@ class CategoryController extends Controller
 
         if ($request->ajax()) {
             $query = Category::with(['parent'])->select(sprintf('%s.*', (new Category())->table));
+            if (!empty($request->type)) {
+                $query->where('type', $request->type);
+            }
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

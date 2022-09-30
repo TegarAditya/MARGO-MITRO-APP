@@ -23,33 +23,32 @@ class StockOpnameController extends Controller
         abort_if(Gate::denies('stock_opname_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Product::with(['category', 'brand', 'unit', 'semester'])->where('stock','>', 0)->orderBy('stock', 'DESC')->select(sprintf('%s.*', (new Product())->table));
-            if (!empty($request->name)) {
-                $query->where('name','LIKE','%'.$request->name.'%');
-            }
+            $query = Product::with(['category', 'brand', 'unit', 'semester'])
+            ->leftJoin('stock_movements', 'products.id', '=', 'stock_movements.product_id')
+            ->where('products.stock','>', 0)->orderBy('stock_movements.id', 'DESC')->select(sprintf('%s.*', (new Product())->table));
 
             if (!empty($request->brand)) {
-                $query->where('brand_id', $request->brand);
+                $query->where('products.brand_id', $request->brand);
             }
 
             if (!empty($request->jenjang)) {
-                $query->where('jenjang_id', $request->jenjang);
+                $query->where('products.jenjang_id', $request->jenjang);
             }
 
             if (!empty($request->kelas)) {
-                $query->where('kelas_id', $request->kelas);
+                $query->where('products.kelas_id', $request->kelas);
             }
 
             if (!empty($request->halaman)) {
-                $query->where('halaman_id', $request->halaman);
+                $query->where('products.halaman_id', $request->halaman);
             }
 
             if (!empty($request->isi)) {
-                $query->where('isi_id', $request->isi);
+                $query->where('products.isi_id', $request->isi);
             }
 
             if (!empty($request->semester)) {
-                $query->where('semester_id', $request->semester);
+                $query->where('products.semester_id', $request->semester);
             }
 
             $table = Datatables::of($query);

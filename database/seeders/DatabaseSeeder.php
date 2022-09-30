@@ -9,16 +9,16 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            PermissionsTableSeeder::class,
-            RolesTableSeeder::class,
-            PermissionRoleTableSeeder::class,
-            UsersTableSeeder::class,
-            RoleUserTableSeeder::class,
-            BrandTableSeeder::class,
-            CategoryTableSeeder::class,
-            UnitTableSeeder::class,
+            // PermissionsTableSeeder::class,
+            // RolesTableSeeder::class,
+            // PermissionRoleTableSeeder::class,
+            // UsersTableSeeder::class,
+            // RoleUserTableSeeder::class,
+            // BrandTableSeeder::class,
+            // CategoryTableSeeder::class,
+            // UnitTableSeeder::class,
             SemesterTableSeeder::class,
-            PriceTableSeeder::class,
+            // PriceTableSeeder::class,
         ]);
     }
 }

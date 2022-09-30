@@ -7,12 +7,6 @@
 
     <div class="card-body">
         <div class="row">
-            {{-- <div class="col">
-                <a class="btn btn-default" href="{{ route('admin.orders.index') }}">
-                    {{ trans('global.back_to_list') }}
-                </a>
-            </div> --}}
-
             <div class="col">
                 <a class="btn btn-default" href="{{ url()->previous() }}">
                     Back
@@ -20,8 +14,8 @@
             </div>
 
             <div class="col-auto">
-                <a class="btn btn-info" href="{{ route('admin.orders.edit', $order->id) }}">
-                    Edit Order
+                <a class="btn btn-info" href="{{ route('admin.stock-adjustments.edit', $order->id) }}">
+                    Edit Adjustment
                 </a>
             </div>
         </div>

@@ -17,6 +17,11 @@ class Semester extends Model
 
     public $table = 'semesters';
 
+    public const TYPE_SELECT = [
+        'GANJIL'   => 'GANJIL',
+        'GENAP' => 'GENAP',
+    ];
+
     protected $dates = [
         'start_date',
         'end_date',
@@ -27,6 +32,7 @@ class Semester extends Model
 
     protected $fillable = [
         'name',
+        'tipe',
         'start_date',
         'end_date',
         'status',

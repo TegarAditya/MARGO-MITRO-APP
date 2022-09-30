@@ -17,6 +17,7 @@ class Order extends Model
     use HasFactory;
 
     public $table = 'orders';
+    public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
     protected $dates = [
         'date',
@@ -87,12 +88,13 @@ class Order extends Model
 
     public static function generateNoOrder($semester)
     {
-        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
 
         $order_number = !$data ? 1 : ($data + 1);
 
-        $prefix = 'ORD/MMJ/'.Date::now()->format('m').'/';
-        $code = $prefix.sprintf("%04d", $order_number);
+        $prefix = 'ORD/'.$semester->tipe. '/MMJ/'.ORDER::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
+        $code = $prefix.sprintf("%03d", $order_number);
 
         return $code;
     }

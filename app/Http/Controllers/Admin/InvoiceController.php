@@ -152,8 +152,8 @@ class InvoiceController extends Controller
         try {
             $multiplier = -1 * (int) $request->get('invoice_type', -1);
             $invoice = Invoice::create([
-                'no_suratjalan' => Invoice::generateNoSJ(),
-                'no_invoice' => Invoice::generateNoInvoice(),
+                'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
+                'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
                 'date' => $request->date,
                 'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
@@ -275,8 +275,8 @@ class InvoiceController extends Controller
         try {
             $multiplier = -1 * (int) $request->get('invoice_type', -1);
             $invoice->forceFill([
-                'no_suratjalan' => Invoice::generateNoSJ(),
-                'no_invoice' => Invoice::generateNoInvoice(),
+                'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
+                'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
                 'date' => $request->date,
                 'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
@@ -502,8 +502,8 @@ class InvoiceController extends Controller
 
                 foreach($value as $element) {
                     $invoice = Invoice::create([
-                        'no_suratjalan' => Invoice::generateNoSJ(),
-                        'no_invoice' => Invoice::generateNoInvoice(),
+                        'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
+                        'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
                         'date' => $request->date,
                         'nominal' => $multiplier * (float) $value->sum('nominal'),
                         'order_id' => $order->id

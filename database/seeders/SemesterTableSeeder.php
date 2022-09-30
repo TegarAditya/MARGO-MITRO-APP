@@ -17,42 +17,49 @@ class SemesterTableSeeder extends Seeder
         $cats = [
             [
                 'name'  => 'SEMESTER GENAP 2019/2020',
+                'tipe' => 'GENAP',
                 'start_date'  => "2019-10-01",
                 'end_date'  => "2020-01-31",
                 'status' => 0
             ],
             [
                 'name'  => 'SEMESTER GANJIL 2020/2021',
+                'tipe' => 'GANJIL',
                 'start_date'  => "2020-04-01",
                 'end_date'  => "2020-07-01",
                 'status' => 0
             ],
             [
                 'name'  => 'SEMESTER GENAP 2020/2021',
+                'tipe' => 'GENAP',
                 'start_date'  => "2020-09-01",
                 'end_date'  => "2021-01-31",
                 'status' => 0
             ],
             [
                 'name'  => 'SEMESTER GANJIL 2021/2022',
+                'tipe' => 'GANJIL',
                 'start_date'  => "2021-07-01",
                 'end_date'  => "2021-09-08",
                 'status' => 0
             ],
             [
                 'name'  => 'SEMESTER GENAP 2021/2022',
+                'tipe' => 'GENAP',
                 'start_date'  => "2021-10-01",
                 'end_date'  => "2022-01-31",
                 'status' => 0
             ],
             [
                 'name'  => 'SEMESTER GANJIL 2022/2023',
+                'tipe' => 'GANJIL',
                 'start_date'  => "2022-02-01",
                 'end_date'  => "2022-08-31",
                 'status' => 1
             ],
             [
                 'name'  => 'SEMESTER GENAP 2022/2023',
+                'tipe' => 'GENAP',
                 'start_date'  => "2022-09-08",
                 'end_date'  => "2023-01-31",
                 'status' => 1
