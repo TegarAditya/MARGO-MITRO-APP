@@ -150,8 +150,7 @@ class StockAdjustmentController extends Controller
             return redirect()->back();
         }
 
-        Alert::success('Success', 'Stock Adjustment berhasil disimpan');
-
+        // Alert::success('Success', 'Stock Adjustment berhasil disimpan');
         return redirect()->route('admin.stock-adjustments.edit', ['stock_adjustment' => $stockAdjustment->id, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'semester' => $semester]);
     }
 
@@ -289,7 +288,7 @@ class StockAdjustmentController extends Controller
     {
         abort_if(Gate::denies('stock_adjustment_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $stockAdjustment->load('product');
+        $stockAdjustment->load('details');
 
         return view('admin.stockAdjustments.show', compact('stockAdjustment'));
     }

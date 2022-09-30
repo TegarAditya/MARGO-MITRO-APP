@@ -293,12 +293,18 @@
                             $cover = $product->brand;
                             $isi = $product->isi;
                             $jenjang = $product->jenjang;
+                            $semester = $product->semester;
+                            $kelas = $product->kelas;
+                            $halaman = $product->halaman;
                             $search = implode(' ', [
                                 $product->nama_buku,
                                 !$category ? '' : $category->name,
                                 !$cover ? '' : $cover->name,
                                 !$isi ? '' : $isi->name,
                                 !$jenjang ? '' : $jenjang->name,
+                                !$semester ? '' : $semester->name,
+                                !$kelas ? '' : 'KELAS '.$kelas->name,
+                                !$halaman ? '' : 'HAL '.$halaman->name,
                             ]);
                             $selected = $order->order_details->where('product_id', $product->id)->count();
                             @endphp

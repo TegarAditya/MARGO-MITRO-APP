@@ -220,8 +220,7 @@ class OrderController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Sales Order berhasil di simpan');
-
+            // Alert::success('Success', 'Sales Order berhasil di simpan');
             return redirect()->route('admin.orders.edit', ['order' => $order->id, 'custom_price' => $custom_price, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'kelas' => $kelas, 'semester' => $semester]);
         } catch (\Exception $e) {
             DB::rollback();
