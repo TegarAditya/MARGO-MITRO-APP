@@ -83,7 +83,7 @@
 
                     <div class="card">
                         <div class="card-body px-3 py-2">
-                            <h6 class="text-sm product-name mb-0">{{ $product->nama_buku }}</h6>
+                            <h6 class="text-sm product-name mb-0">{{ $product->nama_isi_buku }}</h6>
 
                             <p class="mb-2 text-sm">
                                 {{-- Category: {{ !$category ? 'Tidak ada' : $category->name }} --}}
@@ -221,7 +221,7 @@
                                         <tr>
                                             <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                             <td class="text-center">{{ $product->jenjang->name ?? '' }}</td>
-                                            <td>{{ $product->nama_buku }}</td>
+                                            <td>{{ $product->nama_isi_buku }}</td>
                                             <td class="text-right px-3">@money(abs($invoice_detail->price))</td>
                                             <td class="text-center px-3">{{ abs($invoice_detail->quantity) }}</td>
                                             <td class="text-right px-3">@money(abs($invoice_detail->total))</td>
