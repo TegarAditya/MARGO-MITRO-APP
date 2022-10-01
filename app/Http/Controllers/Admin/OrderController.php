@@ -464,7 +464,7 @@ class OrderController extends Controller
         $details = OrderDetail::where('order_id', $order->id)
                 ->with(['product' => function ($q) {
                     $q->orderBy('jenjang_id');
-                }])
+                }, 'bonus'])
                 ->get();
         return view('admin.orders.prints.estimasi', compact('order', 'details'));
     }

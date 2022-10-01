@@ -60,16 +60,17 @@
         @foreach ($details as $detail)
             @php
             $product = $detail->product;
+            $bonus = $detail->bonus;
             @endphp
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
                 <td>{{ $product->jenjang->name ?? '' }}</td>
                 <td>Kelas {{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
-                <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
-                <td class="text-center">{{ $detail->quantity }}</td>
-                <td class="text-center">{{ $detail->moved }}</td>
-                <td class="text-center">{{ ($detail->quantity - $detail->moved) }}</td>
+                <td class="text-center">{{ $product->halaman->name ?? '' }} </td>
+                <td class="text-center">{{ $detail->quantity }}{{ $bonus ? ' | '.$bonus->quantity : '' }}</td>
+                <td class="text-center">{{ $detail->moved }}{{ $bonus ? ' | '. $bonus->moved : '' }}</td>
+                <td class="text-center">{{ ($detail->quantity - $detail->moved) }}{{ $bonus ? ' | '.($bonus->quantity - $bonus->moved) : '' }}</td>
             </tr>
         @endforeach
     </tbody>
