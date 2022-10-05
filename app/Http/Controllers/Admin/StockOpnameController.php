@@ -30,8 +30,8 @@ class StockOpnameController extends Controller
         $summary_hpp = $filtered->get()->sum('total_hpp');
         $summary_sales = $filtered->get()->sum('total_price');
 
-        $summary_jenjang = Product::with('jenjang')->selectRaw('jenjang_id, SUM(stock) as total_stock, SUM(stock * price) AS total_price, SUM(stock * hpp) AS total_hpp')->groupBy('jenjang_id')->get();
-        $summary_semester = Product::with('semester')->selectRaw('semester_id, SUM(stock) as total_stock, SUM(stock * price) AS total_price, SUM(stock * hpp) AS total_hpp')->groupBy('semester_id')->get();
+        $summary_jenjang = Product::where('stock', '>', '0')->with('jenjang')->selectRaw('jenjang_id, SUM(stock) as total_stock, SUM(stock * price) AS total_price, SUM(stock * hpp) AS total_hpp')->groupBy('jenjang_id')->get();
+        $summary_semester = Product::where('stock', '>', '0')->with('semester')->selectRaw('semester_id, SUM(stock) as total_stock, SUM(stock * price) AS total_price, SUM(stock * hpp) AS total_hpp')->groupBy('semester_id')->get();
 
         if ($request->ajax()) {
             $query = Product::with(['category', 'unit'])->where('stock', '>', 0)->select(sprintf('%s.*', (new Product())->table));
