@@ -6,10 +6,10 @@
             <a class="btn btn-success" href="{{ route('admin.stock-adjustments.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.stockAdjustment.title_singular') }}
             </a>
-            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+            {{-- <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
                 Import
-            </button>
-            @include('csvImport.import_modal', ['model' => 'StockAdjustment', 'route' => 'admin.stock-adjustments.import'])
+            </button> --}}
+            {{-- @include('csvImport.import_modal', ['model' => 'StockAdjustment', 'route' => 'admin.stock-adjustments.import']) --}}
         </div>
     </div>
 @endcan

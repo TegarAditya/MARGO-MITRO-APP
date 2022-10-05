@@ -1,26 +1,121 @@
 @extends('layouts.admin')
 @section('content')
-
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.product.title_singular') }} {{ trans('global.list') }}
+        Summary Stock Opname Buku
     </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Item Product</span>
+                        <span class="info-box-number">{{ $summary_item }} Product</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Stock Product</span>
+                        <span class="info-box-number">{{ number_format($summary_stock, 0, 0) }} Eksemplar</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-dollar-sign"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Purchase Value</span>
+                        <span class="info-box-number">@money($summary_hpp)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-dollar-sign"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Sales Value</span>
+                        <span class="info-box-number">@money($summary_sales)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Perjenjang</h3>
+                    </div>
 
+                    <div class="card-body p-0">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Jenjang</th>
+                                    <th>Stock</th>
+                                    <th>Purchase Value</th>
+                                    <th>Sales Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($summary_jenjang as $item)
+                                <tr>
+                                    <td class="text-center">{{ $item->jenjang->name }}</td>
+                                    <td class="text-center">{{ number_format($item->total_stock, 0, 0) }} Eksemplar</td>
+                                    <td class="text-right">@money($item->total_hpp)</td>
+                                    <td class="text-right">@money($item->total_price)</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="offset-md-4 col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Persemester</h3>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Semester</th>
+                                    <th>Stock</th>
+                                    <th>Purchase Value</th>
+                                    <th>Sales Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($summary_semester as $item)
+                                <tr>
+                                    <td class="text-center">{{ $item->semester->name }}</td>
+                                    <td class="text-center">{{ number_format($item->total_stock, 0, 0) }} Eksemplar</td>
+                                    <td class="text-right">@money($item->total_hpp)</td>
+                                    <td class="text-right">@money($item->total_price)</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">
+        Stock Opname Buku
+    </div>
     <div class="card-body">
         <form id="filterform">
             <div class="row">
-                {{-- <div class="col-6">
-                    <div class="form-group">
-                        <label for="name">{{ trans('cruds.buku.fields.name') }}</label>
-                        <input class="form-control" type="text" name="name" id="name" value="{{ old('name', '') }}">
-                        @if($errors->has('name'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('name') }}
-                            </div>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.buku.fields.name_helper') }}</span>
-                    </div>
-                </div> --}}
                 <div class="col-4">
                     <div class="form-group">
                         <label for="brand_id">{{ trans('cruds.buku.fields.brand') }}</label>

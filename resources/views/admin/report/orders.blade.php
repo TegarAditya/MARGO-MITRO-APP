@@ -91,8 +91,8 @@
                     @foreach ($order->order_details as $detail)
                         <tr>
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="align-middle text-center">{{ $no }}</td>
-                                <td rowspan="{{ $rowspan }}" class="align-middle">
+                                <td rowspan="{{ $rowspan }}" class="text-center">{{ $no }}</td>
+                                <td rowspan="{{ $rowspan }}">
                                     <div class="row">
                                         <div class="col-6">
                                             <p class="mb-0">
@@ -111,7 +111,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td rowspan="{{ $rowspan }}" class="align-middle">
+                                <td rowspan="{{ $rowspan }}">
                                     {{ $order->date }}
                                 </td>
                             @endif
