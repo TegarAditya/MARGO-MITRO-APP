@@ -170,7 +170,10 @@
                     ])
 
                     @if ($item['items']->count())
-                        @each('admin.orders.parts.item-product', $item['items'], 'detail')
+                        @php
+                            $sortedProducts = $item['items']->sortBy('tipe_pg')->sortBy('halaman_id')->sortBy('kelas_id')->sortBy('product.name')->sortBy('product.jenjang_id');
+                        @endphp
+                        @each('admin.orders.parts.item-product', $sortedProducts, 'detail')
                     @endif
                 </div>
 
