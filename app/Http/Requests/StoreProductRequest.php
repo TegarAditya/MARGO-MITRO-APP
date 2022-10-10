@@ -47,6 +47,9 @@ class StoreProductRequest extends FormRequest
             'foto' => [
                 'array',
             ],
+            'kelas' => [
+                'array',
+            ]
         ];
     }
 }

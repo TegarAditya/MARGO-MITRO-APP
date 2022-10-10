@@ -24,6 +24,7 @@ use Excel;
 use App\Imports\BukuImport;
 use App\Imports\BukuCustomImport;
 use Alert;
+use DB;
 
 class BukuController extends Controller
 {
@@ -135,7 +136,7 @@ class BukuController extends Controller
         $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Category::where('type', 'kelas')->pluck('name', 'id');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $pg = Product::where('tipe_pg', 'pg')->WhereDoesntHave('jadi_pg')->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -147,74 +148,78 @@ class BukuController extends Controller
 
     public function store(StoreProductRequest $request)
     {
+        $kelas = $request->kelas;
         $request->request->add(['status' => 1]);
         $request->request->add(['category_id' => 1]);
-        $product = Product::create($request->all());
+        DB::beginTransaction();
+        try {
+            foreach($kelas as $kelas_id) {
+                $request->merge(['kelas_id' => $kelas_id]);
+                $product = Product::create($request->all());
 
-        if ($request->jenis_pg !== 'no_pg') {
-            $pg_brand_id = $request->brand_id;
-            $pg_isi_id = $request->isi_id;
-            $pg_jenjang_id = $request->jenjang_id;
-            $pg_kelas_id = $request->kelas_id;
-            $pg_halaman_id = $request->halaman_id;
-            $pg_semester_id = $request->semester_id;
-            $pg_unit_id = $request->unit_id;
-            $pg_stock = 0;
-            $pg_min_stock = 0;
-            $pg_status = 1;
-            $pg_category_id = 1;
+                if ($request->jenis_pg !== 'no_pg') {
+                    $pg_brand_id = $request->brand_id;
+                    $pg_isi_id = $request->isi_id;
+                    $pg_jenjang_id = $request->jenjang_id;
+                    $pg_kelas_id = $request->kelas_id;
+                    $pg_halaman_id = $request->halaman_id;
+                    $pg_semester_id = $request->semester_id;
+                    $pg_unit_id = $request->unit_id;
+                    $pg_stock = 0;
+                    $pg_min_stock = 0;
+                    $pg_status = 1;
+                    $pg_category_id = 1;
 
-            if ($request->isi_id === '31' || $request->isi_id === '32') {
-                $pg_brand_id = 1;
+                    if ($request->isi_id === '31' || $request->isi_id === '32') {
+                        $pg_brand_id = 1;
+                    }
+                    if ($request->jenis_pg == 'pg') {
+                        $pg_name = 'PG - '. $request->name;
+                        $pg_tipe_pg = 'pg';
+                        $pg_price = 6000;
+                    } else if ($request->jenis_pg == 'kunci') {
+                        $pg_name = 'KUNCI - '. $request->name;
+                        $pg_tipe_pg = 'kunci';
+                        $pg_price = 2000;
+                    }
+
+                    $product_pg = Product::firstOrCreate([
+                        'name' => $pg_name,
+                        'brand_id' => $pg_brand_id,
+                        'isi_id' => $pg_isi_id,
+                        'jenjang_id' => $pg_jenjang_id,
+                        'kelas_id' => $pg_kelas_id,
+                        'halaman_id' => $pg_halaman_id,
+                        'semester_id' => $pg_semester_id,
+                        'tipe_pg' => $pg_tipe_pg
+                    ], [
+                        'price' => $pg_price,
+                        'unit_id' => $pg_unit_id,
+                        'stock' => $pg_stock,
+                        'min_stock' => $pg_min_stock,
+                        'status' => $pg_status,
+                        'category_id' => $pg_category_id,
+                    ]);
+
+                    if ($pg_tipe_pg === 'pg') {
+                        $product->update([
+                            'pg_id' => $product_pg->id
+                        ]);
+                    } else if ($pg_tipe_pg === 'kunci') {
+                        $product->update([
+                            'kunci_id' => $product_pg->id
+                        ]);
+                    }
+                }
             }
-            if ($request->jenis_pg == 'pg') {
-                $pg_name = 'PG - '. $request->name;
-                $pg_tipe_pg = 'pg';
-                $pg_price = 6000;
-            } else if ($request->jenis_pg == 'kunci') {
-                $pg_name = 'KUNCI - '. $request->name;
-                $pg_tipe_pg = 'kunci';
-                $pg_price = 2000;
-            }
 
-            $product_pg = Product::firstOrCreate([
-                'name' => $pg_name,
-                'brand_id' => $pg_brand_id,
-                'isi_id' => $pg_isi_id,
-                'jenjang_id' => $pg_jenjang_id,
-                'kelas_id' => $pg_kelas_id,
-                'halaman_id' => $pg_halaman_id,
-                'semester_id' => $pg_semester_id,
-                'tipe_pg' => $pg_tipe_pg
-            ], [
-                'price' => $pg_price,
-                'unit_id' => $pg_unit_id,
-                'stock' => $pg_stock,
-                'min_stock' => $pg_min_stock,
-                'status' => $pg_status,
-                'category_id' => $pg_category_id,
-            ]);
+            DB::commit();
+            Alert::success('Success', 'Buku berhasil disimpan');
+        } catch (\Exception $e) {
+            DB::rollback();
 
-            if ($pg_tipe_pg === 'pg') {
-                $product->update([
-                    'pg_id' => $product_pg->id
-                ]);
-            } else if ($pg_tipe_pg === 'kunci') {
-                $product->update([
-                    'kunci_id' => $product_pg->id
-                ]);
-            }
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         }
-
-        foreach ($request->input('foto', []) as $file) {
-            $product->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('foto');
-        }
-
-        if ($media = $request->input('ck-media', false)) {
-            Media::whereIn('id', $media)->update(['model_id' => $product->id]);
-        }
-
-        Alert::success('Success', 'Buku berhasil disimpan');
 
         return redirect()->route('admin.buku.index');
     }
