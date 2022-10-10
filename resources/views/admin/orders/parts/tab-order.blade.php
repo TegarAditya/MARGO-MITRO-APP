@@ -163,15 +163,15 @@
                 <h5 class="product-group-title">{{ $item['label'] }}</h5>
 
                 <div class="product-list">
-                    @if ($item['items']->count())
-                        @each('admin.orders.parts.item-product', $item['items'], 'detail')
-                    @endif
-
                     @include('admin.orders.parts.item-product', [
                         'detail' => new App\Models\OrderDetail,
                         'modal' => $item['modal'],
                         'name' => $item['name'],
                     ])
+
+                    @if ($item['items']->count())
+                        @each('admin.orders.parts.item-product', $item['items'], 'detail')
+                    @endif
                 </div>
 
                 <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">

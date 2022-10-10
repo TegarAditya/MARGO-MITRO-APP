@@ -123,26 +123,14 @@
                 <span class="help-block">{{ trans('cruds.buku.fields.tipe_pg_helper') }}</span>
             </div>
             <div class="form-group" id="div_pg">
-                <label class="required" for="pg_id">Pegangan Guru(PG)</label>
-                <select class="form-control select2 {{ $errors->has('pg_id') ? 'is-invalid' : '' }}" name="pg_id" id="pg_id">
-                    @foreach($pg as $id => $entry)
-                        <option value="{{ $id }}" {{ old('pg_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                    @endforeach
+                <label class="required" for="jenis_pg">Jenis PG</label>
+                <select class="form-control select2 {{ $errors->has('jenis_pg') ? 'is-invalid' : '' }}" name="jenis_pg" id="jenis_pg">
+                    <option value="no_pg" {{ old('jenis_pg', 'no_pg') === 'no_pg' ? 'selected' : '' }}>Tidak ada PG</option>
+                    <option value="pg" {{ old('jenis_pg') === 'pg' ? 'selected' : '' }}>PG</option>
+                    <option value="kunci" {{ old('jenis_pg') === 'kunci' ? 'selected' : '' }}>Kunci</option>
                 </select>
-                @if($errors->has('pg_id'))
-                    <span class="text-danger">{{ $errors->first('pg_id') }}</span>
-                @endif
-                <span class="help-block"></span>
-            </div>
-            <div class="form-group" id="div_kunci">
-                <label class="required" for="kunci_id">Kunci Jawaban</label>
-                <select class="form-control select2 {{ $errors->has('kunci_id') ? 'is-invalid' : '' }}" name="kunci_id" id="kunci_id">
-                    @foreach($kunci as $id => $entry)
-                        <option value="{{ $id }}" {{ old('kunci_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('kunci_id'))
-                    <span class="text-danger">{{ $errors->first('kunci_id') }}</span>
+                @if($errors->has('jenis_pg'))
+                    <span class="text-danger">{{ $errors->first('jenis_pg') }}</span>
                 @endif
                 <span class="help-block"></span>
             </div>
@@ -285,18 +273,14 @@ Dropzone.options.fotoDropzone = {
     $(function() {
         var tipe_pg = $('#tipe_pg');
         var pg = $('#div_pg');
-        var kunci = $('#div_kunci');
 
         tipe_pg.on('change', function(e) {
             let value = e.target.value;
             if (value !== 'non_pg') {
                 pg.hide();
-                kunci.hide();
-                $('#pg_id').val('').trigger('change');
-                $('#kunci_id').val('').trigger('change');
+                $('#jenis_pg').val('').trigger('change');
             } else {
                 pg.show();
-                kunci.show();
             }
         }).trigger('change');
     });

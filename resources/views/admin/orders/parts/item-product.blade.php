@@ -15,7 +15,8 @@ $stock = $product->stock ?: 0;
 $qtyMax = !$detail->id ? $stock : ($detail->quantity + $stock);
 
 $bonus = $detail->bonus;
-$tipe_pg = !$bonus ? 'pg' : $bonus->product->tipe_pg;
+$tipe_pg = $bonus->product->tipe_pg ?? 'pg';
+$jenis_pg = $product->tipe_pg;
 $qty_pg = !$bonus ? 0 : $bonus->quantity;
 
 $foto = !$product->foto ? null : $product->foto->first();
@@ -118,10 +119,10 @@ $name = !isset($name) ? 'products' : $name;
             </x-admin.form-group>
         </div>
 
-        <div class="col div-product-pg" style="max-width: 240px; display: {{ !$bonus ? 'none' : 'block' }};">
+        <div class="col div-product-pg" style="max-width: 240px; display: {{ $jenis_pg !== 'non_pg' ? 'none' : 'block' }};">
             <p class="mb-0 text-sm">PG/Kunci</p>
             <select class="form-control-sm product-pg"
-                name="{{ (!$bonus? null: $name).'['.$product->id.'][pg]' }}"
+                name="{{ ($jenis_pg !== 'non_pg' ? null: $name).'['.$product->id.'][pg]' }}"
                 id="fieldPg-{{ $product->id }}"
             >
                 <option value="pg" {{ $tipe_pg == 'pg' ? 'selected' : '' }}>PG</option>
@@ -129,13 +130,13 @@ $name = !isset($name) ? 'products' : $name;
             </select>
         </div>
 
-        <div class="col div-product-bonus" style="max-width: 120px; display: {{ !$bonus ? 'none' : 'block' }};">
+        <div class="col div-product-bonus" style="max-width: 120px; display: {{ $jenis_pg !== 'non_pg' ? 'none' : 'block' }};">
             <p class="mb-0 text-sm">Bonus PG/Kunci</p>
 
             <x-admin.form-group
                 type="number"
                 id="fieldBonus-{{ $product->id }}"
-                name="{{ (!$bonus? null: $name).'['.$product->id.'][bonus]' }}"
+                name="{{ ($jenis_pg !== 'non_pg'? null: $name).'['.$product->id.'][bonus]' }}"
                 containerClass=" m-0"
                 boxClass=" p-0"
                 class="form-control-sm hide-arrows text-center product-bonus product-bonus1"

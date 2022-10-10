@@ -240,13 +240,9 @@ class StockAdjustmentController extends Controller
                 $item->stock_movements()->updateOrCreate([
                     'reference' => $stockAdjustment->id,
                     'type' => 'adjustment',
-                    'quantity' => $qty,
                     'product_id' => $item->id,
                 ],[
-                    'reference' => $stockAdjustment->id,
-                    'type' => 'adjustment',
                     'quantity' => $qty,
-                    'product_id' => $item->id,
                 ]);
                 $item->update(['stock' => $item->stock + $qty ]);
 
@@ -268,7 +264,7 @@ class StockAdjustmentController extends Controller
                 ->whereNotIn('product_id', $stockAdjustment_details->pluck('product_id'))
                 ->forceDelete();
             StockMovement::where('reference', $stockAdjustment->id)
-                ->where('type', 'invoice')
+                ->where('type', 'adjustment')
                 ->whereNotIn('product_id', $stockAdjustment_details->pluck('product_id'))
                 ->delete();
 
@@ -281,7 +277,8 @@ class StockAdjustmentController extends Controller
 
         Alert::success('Success', 'Stock Adjustment berhasil disimpan');
 
-        return redirect()->route('admin.stock-adjustments.edit', ['stock_adjustment' => $stockAdjustment->id, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'semester' => $semester]);
+        return redirect()->route('admin.stock-adjustments.index');
+        // return redirect()->route('admin.stock-adjustments.edit', ['stock_adjustment' => $stockAdjustment->id, 'cover' => $cover, 'isi' => $isi, 'jenjang' => $jenjang, 'semester' => $semester]);
     }
 
     public function show(StockAdjustment $stockAdjustment)

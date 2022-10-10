@@ -151,6 +151,61 @@ class BukuController extends Controller
         $request->request->add(['category_id' => 1]);
         $product = Product::create($request->all());
 
+        if ($request->jenis_pg !== 'no_pg') {
+            $pg_brand_id = $request->brand_id;
+            $pg_isi_id = $request->isi_id;
+            $pg_jenjang_id = $request->jenjang_id;
+            $pg_kelas_id = $request->kelas_id;
+            $pg_halaman_id = $request->halaman_id;
+            $pg_semester_id = $request->semester_id;
+            $pg_unit_id = $request->unit_id;
+            $pg_stock = 0;
+            $pg_min_stock = 0;
+            $pg_status = 1;
+            $pg_category_id = 1;
+
+            if ($request->isi_id === '31' || $request->isi_id === '32') {
+                $pg_brand_id = 1;
+            }
+            if ($request->jenis_pg == 'pg') {
+                $pg_name = 'PG - '. $request->name;
+                $pg_tipe_pg = 'pg';
+                $pg_price = 6000;
+            } else if ($request->jenis_pg == 'kunci') {
+                $pg_name = 'KUNCI - '. $request->name;
+                $pg_tipe_pg = 'kunci';
+                $pg_price = 2000;
+            }
+
+            $product_pg = Product::firstOrCreate([
+                'name' => $pg_name,
+                'brand_id' => $pg_brand_id,
+                'isi_id' => $pg_isi_id,
+                'jenjang_id' => $pg_jenjang_id,
+                'kelas_id' => $pg_kelas_id,
+                'halaman_id' => $pg_halaman_id,
+                'semester_id' => $pg_semester_id,
+                'tipe_pg' => $pg_tipe_pg
+            ], [
+                'price' => $pg_price,
+                'unit_id' => $pg_unit_id,
+                'stock' => $pg_stock,
+                'min_stock' => $pg_min_stock,
+                'status' => $pg_status,
+                'category_id' => $pg_category_id,
+            ]);
+
+            if ($pg_tipe_pg === 'pg') {
+                $product->update([
+                    'pg_id' => $product_pg->id
+                ]);
+            } else if ($pg_tipe_pg === 'kunci') {
+                $product->update([
+                    'kunci_id' => $product_pg->id
+                ]);
+            }
+        }
+
         foreach ($request->input('foto', []) as $file) {
             $product->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('foto');
         }
