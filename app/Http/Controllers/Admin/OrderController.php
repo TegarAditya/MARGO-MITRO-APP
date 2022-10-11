@@ -462,12 +462,13 @@ class OrderController extends Controller
         $order = Order::findOrFail($request->id);
 
         $details = OrderDetail::where('order_id', $order->id)
-                ->with(['product' => function ($q) {
-                    $q->orderBy('jenjang_id', 'ASC');
-                    $q->orderBy('kelas_id', 'ASC');
-                    $q->orderBy('halaman_id', 'ASC');
-                }, 'bonus'])
-                ->get();
+                ->with(['product', 'bonus'])
+                ->get()
+                ->sortBy('tipe_pg')
+                ->sortBy('product.halaman_id')
+                ->sortBy('product.kelas_id')
+                ->sortBy('product.name')
+                ->sortBy('product.jenjang_id');
         return view('admin.orders.prints.estimasi', compact('order', 'details'));
     }
 
