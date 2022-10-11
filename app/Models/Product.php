@@ -203,7 +203,13 @@ class Product extends Model implements HasMedia
 
     public function getTigaNamaAttribute()
     {
-        return implode(' ', array_slice(explode(' ', $this->name), 0, 3));
+        $name = $this->name;
+        if ($this->tipe_pg === 'pg') {
+            $name = str_replace('PG - ', '', $name);
+        } else if ($this->tipe_pg === 'kunci') {
+            $name = str_replace('KUNCI - ', '', $name);
+        }
+        return implode(' ', array_slice(explode(' ', $name), 0, 3));
     }
 
     protected function serializeDate(DateTimeInterface $date)
