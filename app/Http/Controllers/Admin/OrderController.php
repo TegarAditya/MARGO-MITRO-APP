@@ -464,11 +464,12 @@ class OrderController extends Controller
         $details = OrderDetail::where('order_id', $order->id)
                 ->with(['product', 'bonus'])
                 ->get()
-                ->sortBy('tipe_pg')
+                ->sortBy('product.tipe_pg')
                 ->sortBy('product.halaman_id')
                 ->sortBy('product.kelas_id')
-                ->sortBy('product.name')
+                ->sortBy('product.tiga_nama')
                 ->sortBy('product.jenjang_id');
+
         return view('admin.orders.prints.estimasi', compact('order', 'details'));
     }
 

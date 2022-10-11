@@ -31,7 +31,8 @@ class Product extends Model implements HasMedia
     protected $appends = [
         'foto',
         'nama_buku',
-        'nama_isi_buku'
+        'nama_isi_buku',
+        'tiga_nama'
     ];
 
     protected $dates = [
@@ -200,6 +201,10 @@ class Product extends Model implements HasMedia
         return $nama;
     }
 
+    public function getTigaNamaAttribute()
+    {
+        return implode(' ', array_slice(explode(' ', $this->name), 0, 3));
+    }
 
     protected function serializeDate(DateTimeInterface $date)
     {
