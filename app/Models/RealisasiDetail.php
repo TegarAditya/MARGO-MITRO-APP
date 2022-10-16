@@ -15,8 +15,8 @@ class RealisasiDetail extends Model
 
     protected $fillable = [
         'realisasi_id',
-        'production_order_id',
-        'po_detail_id',
+        'finishing_order_id',
+        'fo_detail_id',
         'product_id',
         'qty',
         'price',
@@ -28,14 +28,14 @@ class RealisasiDetail extends Model
         return $this->belongsTo(Realisasi::class);
     }
 
-    public function production_order()
+    public function finishing_order()
     {
-        return $this->belongsTo(ProductionOrder::class);
+        return $this->belongsTo(FinishingOrder::class);
     }
 
-    public function production_order_detail()
+    public function finishing_order_detail()
     {
-        return $this->belongsTo(ProductionOrderDetail::class, 'po_detail_id');
+        return $this->belongsTo(FinishingOrderDetail::class, 'fo_detail_id');
     }
 
     public function product()

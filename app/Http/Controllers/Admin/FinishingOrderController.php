@@ -43,7 +43,7 @@ class FinishingOrderController extends Controller
                 $viewGate = 'production_order_show';
                 $editGate = 'production_order_edit';
                 $deleteGate = 'production_order_delete_hidden'; //order delete hidden
-                $crudRoutePart = 'production-orders';
+                $crudRoutePart = 'finishing-orders';
 
                 return view('partials.datatablesActions', compact(
                 'viewGate',
@@ -165,7 +165,7 @@ class FinishingOrderController extends Controller
 
             Alert::success('Success', 'Finishing Order berhasil di simpan');
 
-            return redirect()->route('admin.production-orders.edit', $finishingOrder->id);
+            return redirect()->route('admin.finishing-orders.edit', $finishingOrder->id);
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -184,7 +184,7 @@ class FinishingOrderController extends Controller
         $categories = Category::whereIn('slug', ['buku', 'bahan'])->get();
         $products = Product::with(['media', 'category'])->get();
 
-        return view('admin.finishingOrders.edit', compact('FinishingOrder', 'productionpeople', 'products', 'categories'));
+        return view('admin.finishingOrders.edit', compact('finishingOrder', 'productionpeople', 'products', 'categories'));
     }
 
     public function update(UpdateFinishingOrderRequest $request, FinishingOrder $finishingOrder)
@@ -239,7 +239,7 @@ class FinishingOrderController extends Controller
 
             Alert::success('Success', 'Finishing Order berhasil di simpan');
 
-            return redirect()->route('admin.production-orders.edit', $finishingOrder->id);
+            return redirect()->route('admin.finishing-orders.edit', $finishingOrder->id);
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -258,15 +258,15 @@ class FinishingOrderController extends Controller
 
         switch (request('print')) {
             case 'spk':
-                return view('admin.finishingOrders.prints.perintah-kerja', compact('FinishingOrder'));
+                return view('admin.finishingOrders.prints.perintah-kerja', compact('finishingOrder'));
             case 'kwitansi':
-                return view('admin.finishingOrders.prints.kwitansi', compact('FinishingOrder'));
+                return view('admin.finishingOrders.prints.kwitansi', compact('finishingOrder'));
         }
 
         $categories = Category::whereIn('slug', ['buku', 'bahan'])->get();
         $products = Product::with(['media', 'category'])->get();
 
-        return view('admin.finishingOrders.show', compact('FinishingOrder', 'products', 'categories'));
+        return view('admin.finishingOrders.show', compact('finishingOrder', 'products', 'categories'));
     }
 
     public function destroy(FinishingOrder $finishingOrder)

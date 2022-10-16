@@ -11,7 +11,7 @@
     </div>
 
     <div class="card-body">
-        @if ($productionOrder->id)
+        @if ($finishingOrder->id)
             <div class="row mb-4">
                 <div class="col">
                     @if ($realisasi->id)
@@ -25,8 +25,8 @@
                             <span class="text-xs">PO No. </span>
                             <p class="m-0">
                                 <strong>
-                                    <a href="{{ route('admin.production-orders.edit', $productionOrder->id) }}">
-                                        #{{ $productionOrder->po_number }}
+                                    <a href="{{ route('admin.finishing-orders.edit', $finishingOrder->id) }}">
+                                        #{{ $finishingOrder->po_number }}
                                     </a>
                                 </strong>
                             </p>
@@ -35,20 +35,20 @@
                         <div class="col-auto">
                             <span class="text-xs">Production Person</span>
                             <p class="m-0">
-                                <strong>{{ $productionOrder->productionperson->name ?? '-' }}</strong>
+                                <strong>{{ $finishingOrder->productionperson->name ?? '-' }}</strong>
                             </p>
                         </div>
 
                         <div class="col-auto ml-3">
                             <span class="text-xs">Jenis</span>
                             <p class="m-0">
-                                <strong>{{ ucfirst($productionOrder->type) }}</strong>
+                                <strong>{{ ucfirst($finishingOrder->type) }}</strong>
                             </p>
                         </div>
 
                         <div class="col-auto d-flex align-items-center ml-3">
-                            <a href="{{ route('admin.production-orders.show', [
-                                'production_order' => $productionOrder->id,
+                            <a href="{{ route('admin.finishing-orders.show', [
+                                'finishing_order' => $finishingOrder->id,
                                 'print' => 'spk'
                             ]) }}" target="_blank" title="Cetak SPK" class="btn btn-sm btn-default border py-0 px-1">
                                 <i class="fa fa-print text-info"></i>
@@ -56,13 +56,13 @@
 
                             <div class="col text-muted px-2">
                                 <span class="text-xs">No. SPK</span>
-                                <p class="m-0">{{ $productionOrder->no_spk }}</p>
+                                <p class="m-0">{{ $finishingOrder->no_spk }}</p>
                             </div>
                         </div>
 
                         <div class="col-auto ml-3 d-flex align-items-center">
-                            <a href="{{ route('admin.production-orders.show', [
-                                'production_order' => $productionOrder->id,
+                            <a href="{{ route('admin.finishing-orders.show', [
+                                'finishing_order' => $finishingOrder->id,
                                 'print' => 'kwitansi'
                             ]) }}" target="_blank" title="Cetak Kwitansi" class="btn btn-sm btn-default border py-0 px-1">
                                 <i class="fa fa-print text-info"></i>
@@ -70,14 +70,14 @@
 
                             <div class="col text-muted px-2">
                                 <span class="text-xs">No. Kwitansi</span>
-                                <p class="m-0">{{ $productionOrder->no_kwitansi }}</p>
+                                <p class="m-0">{{ $finishingOrder->no_kwitansi }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-auto text-right">
-                    <h6 class="h6 text-primary m-0">{{ $productionOrder->date }}</h6>
+                    <h6 class="h6 text-primary m-0">{{ $finishingOrder->date }}</h6>
                 </div>
             </div>
         @endif
@@ -92,14 +92,14 @@
             @method(!$realisasi->id ? 'POST' : 'PUT')
             @csrf
 
-            @if ($production_order_id = request('production_order_id', $realisasi->production_order_id))
-                <input type="hidden" name="redirect" value="{{ route('admin.production-orders.edit', $production_order_id) }}" />
+            @if ($finishing_order_id = request('finishing_order_id', $realisasi->finishing_order_id))
+                <input type="hidden" name="redirect" value="{{ route('admin.finishing-orders.edit', $finishing_order_id) }}" />
             @endif
 
             @php
             $tabs = [
                 [ 'label' => 'Faktur', 'enabled' => true ],
-                [ 'label' => 'Riwayat', 'enabled' => !!$production_order_id ],
+                [ 'label' => 'Riwayat', 'enabled' => !!$finishing_order_id ],
             ];
             @endphp
             <ul class="nav nav-tabs" id="modelTabs" role="tablist">
@@ -124,7 +124,7 @@
                     @include('admin.realisasis.parts.tab-realisasi')
                 </div>
 
-                @if ($production_order_id)
+                @if ($finishing_order_id)
                     <div class="tab-pane fade" id="model-tab-2" role="tabpanel">
                         @include('admin.realisasis.parts.tab-realisasi-history')
                     </div>

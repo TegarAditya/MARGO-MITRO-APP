@@ -16,6 +16,8 @@ class FinishingOrder extends Model
     use Auditable;
     use HasFactory;
 
+    public $table = 'finishing_orders';
+
     protected $dates = [
         'date',
         'created_at',
@@ -82,7 +84,7 @@ class FinishingOrder extends Model
 
         $order_number = !$data ? 1 : ($data + 1);
 
-        $prefix = 'PO'.Date::now()->format('dm');
+        $prefix = 'FO'.Date::now()->format('dm');
         $code = $prefix.sprintf("%04d", $order_number);
 
         return $code;

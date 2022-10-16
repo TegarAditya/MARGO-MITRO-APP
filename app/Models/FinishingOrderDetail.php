@@ -12,7 +12,7 @@ class FinishingOrderDetail extends Model
     use SoftDeletes;
     use HasFactory;
 
-    public $table = 'production_order_details';
+    public $table = 'finishing_order_details';
 
     protected $dates = [
         'created_at',
