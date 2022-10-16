@@ -15,6 +15,7 @@ $foto = !$product->foto ? null : $product->foto->first();
 
 $modal = !isset($modal) ? '#productModal' : $modal;
 $name = !isset($name) ? 'products' : $name;
+$placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
 @endphp
 <div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}">
     <div class="col-5 row">
@@ -45,7 +46,7 @@ $name = !isset($name) ? 'products' : $name;
                 </div>
             @else
                 <button type="button" class="btn py-1 border product-pick" data-toggle="modal" data-target="{{ $modal }}">
-                    <span class="text-sm">Pilih Produk</span>
+                    <span class="text-sm">{{ $placeholder }}</span>
 
                     <i class="fa fa-chevron-down text-xs ml-4"></i>
                 </button>

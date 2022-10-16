@@ -101,11 +101,13 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             'product_ids' => $buku_products->pluck('id'),
             'modal' => '#productModal',
             'name' => 'products',
+            'placeholder' => 'Pilih Produk',
         ], [
             'label' => 'Bahan Dipilih',
             'product_ids' => $bahan_products->pluck('id'),
             'modal' => '#bahanModal',
             'name' => 'products',
+            'placeholder' => 'Pilih Bahan',
         ],
     ] as $item)
         @php
@@ -125,6 +127,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                     'detail' => new App\Models\ProductionOrderDetail,
                     'modal' => $item['modal'],
                     'name' => $item['name'],
+                    'placeholder' => $item['placeholder'],
                 ])
             </div>
 
