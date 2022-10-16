@@ -159,9 +159,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('production-orders/dashboard', 'ProductionOrderController@dashboard')->name('production-orders.dashboard');
     Route::resource('production-orders', 'ProductionOrderController');
 
-    // Production Order Detail
-    Route::delete('production-order-details/destroy', 'ProductionOrderDetailController@massDestroy')->name('production-order-details.massDestroy');
-    Route::resource('production-order-details', 'ProductionOrderDetailController');
+    // Finishing Order
+    Route::delete('finishing-orders/destroy', 'FinishingOrderController@massDestroy')->name('finishing-orders.massDestroy');
+    Route::post('finishing-orders/parse-csv-import', 'FinishingOrderController@parseCsvImport')->name('finishing-orders.parseCsvImport');
+    Route::post('finishing-orders/process-csv-import', 'FinishingOrderController@processCsvImport')->name('finishing-orders.processCsvImport');
+    Route::get('finishing-orders/dashboard', 'FinishingOrderController@dashboard')->name('finishing-orders.dashboard');
+    Route::resource('finishing-orders', 'FinishingOrderController');
+
+    // Finishing Order Detail
+    Route::delete('finishing-order-details/destroy', 'FinishingOrderDetailController@massDestroy')->name('finishing-order-details.massDestroy');
+    Route::resource('finishing-order-details', 'FinishingOrderDetailController');
 
     // Custom Price
     Route::delete('custom-prices/destroy', 'CustomPriceController@massDestroy')->name('custom-prices.massDestroy');

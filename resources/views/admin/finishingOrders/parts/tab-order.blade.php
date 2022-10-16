@@ -7,13 +7,13 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 @endphp
 
 <div class="model-products pt-3">
-    <input type="hidden" name="total" value="{{ $productionOrder->total }}" id="total" />
+    <input type="hidden" name="total" value="{{ $finishingOrder->total }}" id="total" />
 
     <div class="row">
         <div class="col-12">
             <div class="form-group">
                 <label for="po_number">No. Finishing Order</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('po_number') ? 'is-invalid' : '' }}" type="text" name="po_number" id="po_number" value="{{ old('po_number', $productionOrder->po_number) }}" readonly placeholder="(Otomatis)">
+                <input class="form-control h-auto py-1 {{ $errors->has('po_number') ? 'is-invalid' : '' }}" type="text" name="po_number" id="po_number" value="{{ old('po_number', $finishingOrder->po_number) }}" readonly placeholder="(Otomatis)">
                 @if($errors->has('po_number'))
                     <span class="text-danger">{{ $errors->first('po_number') }}</span>
                 @endif
@@ -23,7 +23,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         <div class="col-6">
             <div class="form-group">
                 <label for="no_spk">No. SPK</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" type="text" name="no_spk" id="no_spk" value="{{ old('no_spk', $productionOrder->no_spk) }}" readonly placeholder="(Otomatis)">
+                <input class="form-control h-auto py-1 {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" type="text" name="no_spk" id="no_spk" value="{{ old('no_spk', $finishingOrder->no_spk) }}" readonly placeholder="(Otomatis)">
                 @if($errors->has('no_spk'))
                     <span class="text-danger">{{ $errors->first('no_spk') }}</span>
                 @endif
@@ -33,7 +33,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         <div class="col-6">
             <div class="form-group">
                 <label for="no_kwitansi">No. Kwitansi</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', $productionOrder->no_kwitansi) }}" readonly placeholder="(Otomatis)">
+                <input class="form-control h-auto py-1 {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', $finishingOrder->no_kwitansi) }}" readonly placeholder="(Otomatis)">
                 @if($errors->has('no_kwitansi'))
                     <span class="text-danger">{{ $errors->first('no_kwitansi') }}</span>
                 @endif
@@ -45,7 +45,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         <div class="col-6">
             <div class="form-group">
                 <label class="required" for="date">Tanggal</label>
-                <input class="form-control date h-auto py-1 {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $productionOrder->date) }}" required>
+                <input class="form-control date h-auto py-1 {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $finishingOrder->date) }}" required>
                 @if($errors->has('date'))
                     <span class="text-danger">{{ $errors->first('date') }}</span>
                 @endif
@@ -58,8 +58,8 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 <label class="required" for="type">Jenis</label>
                 <select class="form-control select2 {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
                     <option value="">Please select</option>
-                    <option value="finishing" {{ $productionOrder->type == 'finishing' ? 'selected' : '' }}>Finishing</option>
-                    <option value="percetakan" {{ $productionOrder->type == 'percetakan' ? 'selected' : '' }}>Percetakan</option>
+                    <option value="finishing" {{ $finishingOrder->type == 'finishing' ? 'selected' : '' }}>Finishing</option>
+                    <option value="percetakan" {{ $finishingOrder->type == 'percetakan' ? 'selected' : '' }}>Percetakan</option>
                 </select>
                 @if($errors->has('type'))
                     <span class="text-danger">{{ $errors->first('type') }}</span>
@@ -70,7 +70,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
     <div class="row">
         <div class="col-6">
-            <div class="form-group product-pp{{ !$productionOrder->id ? ' disabled' : ''}}">
+            <div class="form-group product-pp{{ !$finishingOrder->id ? ' disabled' : ''}}">
                 <label class="required" for="productionperson_id">Production Person</label>
                 <select class="form-control select2 {{ $errors->has('productionperson') ? 'is-invalid' : '' }}" name="productionperson_id" id="productionperson_id" required>
                     <option value="">Please select</option>
@@ -79,12 +79,12 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                         <option
                             value="{{ $person->id }}"
                             data-type="{{ $person->type }}"
-                            {{ (old('productionperson_id') ? old('productionperson_id') : $productionOrder->productionperson->id ?? '') == $person->id ? 'selected' : '' }}
+                            {{ (old('productionperson_id') ? old('productionperson_id') : $finishingOrder->productionperson->id ?? '') == $person->id ? 'selected' : '' }}
                         >{{ $person->name }}</option>
                     @endforeach
                 </select>
 
-                <span class="product-warn-pp text-info text-sm" style="display: {{ !$productionOrder->type ? 'block' : 'none' }}">
+                <span class="product-warn-pp text-info text-sm" style="display: {{ !$finishingOrder->type ? 'block' : 'none' }}">
                     Mohon pilih Jenis produksi
                 </span>
 
@@ -111,7 +111,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         ],
     ] as $item)
         @php
-        $order_details = $productionOrder->production_order_details->whereIn('product_id', $item['product_ids']);
+        $order_details = $finishingOrder->finishing_order_details->whereIn('product_id', $item['product_ids']);
         @endphp
         <hr style="margin: .5em -15px;border-color:#ccc" />
 
@@ -120,11 +120,11 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
             <div class="product-list">
                 @if ($order_details->count())
-                    @each('admin.productionOrders.parts.item-product', $order_details, 'detail')
+                    @each('admin.finishingOrders.parts.item-product', $order_details, 'detail')
                 @endif
 
-                @include('admin.productionOrders.parts.item-product', [
-                    'detail' => new App\Models\ProductionOrderDetail,
+                @include('admin.finishingOrders.parts.item-product', [
+                    'detail' => new App\Models\FinishingOrderDetail,
                     'modal' => $item['modal'],
                     'name' => $item['name'],
                     'placeholder' => $item['placeholder'],
@@ -148,8 +148,8 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             </div>
 
             <div class="product-faker d-none">
-                @include('admin.productionOrders.parts.item-product', [
-                    'detail' => new App\Models\ProductionOrderDetail,
+                @include('admin.finishingOrders.parts.item-product', [
+                    'detail' => new App\Models\FinishingOrderDetail,
                     'modal' => $item['modal'],
                     'name' => $item['name'],
                 ])
@@ -161,17 +161,17 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         </div>
     @endforeach
 
-    <div class="product-summary" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+    <div class="product-summary" style="display: {{ !$finishingOrder->finishing_order_details->count() ? 'none' : 'block' }}">
         <div class="row border-top pt-2">
             <div class="col text-right">
                 <p class="mb-0">
                     <span class="text-sm">Grand Total</span>
                     <br />
-                    <strong class="product-total">@money(data_get($productionOrder, 'total', 0))</strong>
+                    <strong class="product-total">@money(data_get($finishingOrder, 'total', 0))</strong>
                 </p>
             </div>
 
-            @if (!$productionOrder->id)
+            @if (!$finishingOrder->id)
                 <div class="col-auto opacity-0 pl-5 order-action-placeholder" style="pointer-events: none">
                     <button type="button" class="btn py-1"></button>
                 </div>
@@ -183,7 +183,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         <div class="col"></div>
 
         <div class="col-auto">
-            <button type="submit" class="btn {{ !$productionOrder->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
+            <button type="submit" class="btn {{ !$finishingOrder->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
         </div>
     </div>
 </div>
@@ -253,7 +253,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 $product->name,
                                 !$category ? '' : $category->name,
                             ]);
-                            $selected = $productionOrder->production_order_details->where('product_id', $product->id)->count();
+                            $selected = $finishingOrder->finishing_order_details->where('product_id', $product->id)->count();
                             @endphp
                             <a
                                 href="{{ route('admin.products.show', $product->id) }}"

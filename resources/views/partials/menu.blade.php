@@ -354,7 +354,7 @@
                     </li>
                 @endcan
                 @can('production_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/production-orders*") ? "menu-open" : "" }} {{ request()->is("admin/realisasis*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/finishing-orders*") ? "menu-open" : "" }} {{ request()->is("admin/realisasis*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-print"></i>
                             <p>
@@ -365,7 +365,7 @@
                         <ul class="nav nav-treeview">
                             @can('production_access')
                                 <li class="nav-item">
-                                    <a href="{{ route("admin.production-orders.index") }}" class="nav-link {{ request()->is("admin/production-orders") || request()->is("admin/production-orders/*") ? "active" : "" }}">
+                                    <a href="{{ route("admin.finishing-orders.index") }}" class="nav-link {{ request()->is("admin/production-orders") || request()->is("admin/production-orders/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-print">
 
                                         </i>

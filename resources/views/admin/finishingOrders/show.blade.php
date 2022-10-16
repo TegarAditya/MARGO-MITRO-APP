@@ -28,14 +28,14 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             </div>
 
             <div class="col-auto">
-                <a class="btn btn-info" href="{{ route('admin.production-orders.edit', $productionOrder->id) }}">
+                <a class="btn btn-info" href="{{ route('admin.finishing-orders.edit', $finishingOrder->id) }}">
                     Edit Finishing Order
                 </a>
             </div>
         </div>
 
         <div class="model-detail mt-3">
-            <h5>PO #{{ $productionOrder->po_number }}</h5>
+            <h5>PO #{{ $finishingOrder->po_number }}</h5>
 
             <div class="breadcrumb-nav">
                 <ul class="m-0 border-bottom">
@@ -58,7 +58,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 PO Number
                             </th>
                             <td>
-                                {{ $productionOrder->po_number }}
+                                {{ $finishingOrder->po_number }}
                             </td>
                         </tr>
                         <tr>
@@ -66,9 +66,9 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 No. SPK
                             </th>
                             <td>
-                                {{ $productionOrder->no_spk }}
-                                <a href="{{ route('admin.production-orders.show', [
-                                    'production_order' => $productionOrder->id,
+                                {{ $finishingOrder->no_spk }}
+                                <a href="{{ route('admin.finishing-orders.show', [
+                                    'finishing_order' => $finishingOrder->id,
                                     'print' => 'spk'
                                 ]) }}" target="_blank" title="Cetak SPK" class="btn btn-sm btn-default border py-0 px-1">
                                     <i class="fa fa-print text-info"></i>
@@ -80,9 +80,9 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 No. Kwitansi
                             </th>
                             <td>
-                                {{ $productionOrder->no_kwitansi }}
-                                <a href="{{ route('admin.production-orders.show', [
-                                    'production_order' => $productionOrder->id,
+                                {{ $finishingOrder->no_kwitansi }}
+                                <a href="{{ route('admin.finishing-orders.show', [
+                                    'finishing_order' => $finishingOrder->id,
                                     'print' => 'kwitansi'
                                 ]) }}" target="_blank" title="Cetak Kwitansi" class="btn btn-sm btn-default border py-0 px-1">
                                     <i class="fa fa-print text-info"></i>
@@ -94,7 +94,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 Tanggal
                             </th>
                             <td>
-                                {{ $productionOrder->date }}
+                                {{ $finishingOrder->date }}
                             </td>
                         </tr>
                         <tr>
@@ -102,7 +102,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 Jenis
                             </th>
                             <td>
-                                @switch($productionOrder->type)
+                                @switch($finishingOrder->type)
                                     @case('finishing')
                                         Finishing
                                         @break
@@ -117,7 +117,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 Production Person
                             </th>
                             <td>
-                                {{ $productionOrder->productionperson->name ?? '' }}
+                                {{ $finishingOrder->productionperson->name ?? '' }}
                             </td>
                         </tr>
                     </tbody>
@@ -136,12 +136,12 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 ],
             ] as $item)
                 @php
-                $po_details = $productionOrder->production_order_details->whereIn('product_id', $item['product_ids']);
+                $po_details = $finishingOrder->finishing_order_details->whereIn('product_id', $item['product_ids']);
                 @endphp
                 <section class="border-top py-3" id="{{ $item['id']}}">
                     <h6 class="mb-0">{{ $item['label'] }}</h6>
 
-                    <p class="mb-2">Total pemesanan: {{ $productionOrder->production_order_details->count() }} produk</p>
+                    <p class="mb-2">Total pemesanan: {{ $finishingOrder->finishing_order_details->count() }} produk</p>
 
                     @foreach ($po_details as $po_detail)
                         @php
@@ -215,15 +215,15 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                     <div class="col">
                         <h6>Daftar Realisasi</h6>
 
-                        <p class="mb-0">Total invoice: {{ $productionOrder->realisasis->count() }}</p>
+                        <p class="mb-0">Total invoice: {{ $finishingOrder->realisasis->count() }}</p>
                     </div>
 
                     <div class="col-auto">
-                        <a href="{{ route('admin.realisasis.create', ['production_order_id'=>$productionOrder->id]) }}" class="btn btn-sm btn-success">Tambah Realisasi</a>
+                        <a href="{{ route('admin.realisasis.create', ['finishing_order_id'=>$finishingOrder->id]) }}" class="btn btn-sm btn-success">Tambah Realisasi</a>
                     </div>
                 </div>
 
-                @foreach ($productionOrder->realisasis as $realisasi)
+                @foreach ($finishingOrder->realisasis as $realisasi)
                     <div class="card">
                         <div class="card-body px-3 py-2">
                             <div class="row">
@@ -315,7 +315,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
                 <div class="border-top mt-2 pt-2 text-right ml-5">
                     <p class="m-0">Total Realisai</p>
-                    <h5 class="m-0">@money($productionOrder->realisasis->sum('nominal'))</h5>
+                    <h5 class="m-0">@money($finishingOrder->realisasis->sum('nominal'))</h5>
                 </div>
             </section>
 
@@ -330,7 +330,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                         <p class="mb-0">
                             <span>Total Order</span>
                             <br />
-                            <span class="h5 mb-0 tagihan-total">@money(data_get($productionOrder, 'total', 0))</span>
+                            <span class="h5 mb-0 tagihan-total">@money(data_get($finishingOrder, 'total', 0))</span>
                         </p>
                     </div>
 
@@ -338,7 +338,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                         <p class="mb-0">
                             <span>Total Realisasi</span>
                             <br />
-                            <span class="h5 mb-0 tagihan-total">@money($productionOrder->realisasis->sum('nominal'))</span>
+                            <span class="h5 mb-0 tagihan-total">@money($finishingOrder->realisasis->sum('nominal'))</span>
                         </p>
                     </div>
                 </div>
