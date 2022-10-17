@@ -29,6 +29,7 @@ class ReportController extends Controller
 
         $ordersQuery = Order::query()->with([
             'order_details',
+            'order_details.product',
             'salesperson',
         ]);
 

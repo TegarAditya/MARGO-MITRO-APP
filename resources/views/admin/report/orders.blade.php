@@ -85,10 +85,15 @@
                 $rowspan = $order->order_details->count();
                 $link = route('admin.orders.edit', $order->id);
                 $no = $loop->iteration;
+
+                $order_details = $order->order_details;
+                $sorted = $order_details->sortBy('product.kelas_id')
+                    ->sortBy('product.tiga_nama')->sortBy('product.jenjang_id');
+                $details = $sorted->values()->all();
                 @endphp
 
                 <tbody>
-                    @foreach ($order->order_details as $detail)
+                    @foreach ($details as $detail)
                         <tr>
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}" class="text-center">{{ $no }}</td>
