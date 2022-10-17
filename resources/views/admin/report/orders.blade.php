@@ -70,13 +70,21 @@
         <table class="mt-3 table table-bordered table-invoices">
             <thead>
                 <tr>
-                    <th></th>
-                    <th>{{ trans('cruds.invoice.fields.order') }}</th>
-                    <th width="110">{{ trans('cruds.invoice.fields.date') }}</th>
-                    <th class="text-center">Products</th>
-                    <th class="text-center">Pesanan</th>
-                    <th class="text-center">Dikirim</th>
-                    <th class="text-center">Sisa</th>
+                    <th rowspan="2"></th>
+                    <th rowspan="2">{{ trans('cruds.invoice.fields.order') }}</th>
+                    <th rowspan="2" width="110">{{ trans('cruds.invoice.fields.date') }}</th>
+                    <th rowspan="2" class="text-center">Products</th>
+                    <th colspan="2" class="text-center">Pesanan</th>
+                    <th colspan="2" class="text-center">Dikirim</th>
+                    <th colspan="2" class="text-center">Sisa</th>
+                </tr>
+                <tr>
+                    <th class="text-center">Buku</th>
+                    <th class="text-center">PG</th>
+                    <th class="text-center">Buku</th>
+                    <th class="text-center">PG</th>
+                    <th class="text-center">Buku</th>
+                    <th class="text-center">PG</th>
                 </tr>
             </thead>
 
@@ -94,19 +102,24 @@
 
                 <tbody>
                     @foreach ($details as $detail)
+                        @php
+                        $product = $detail->product;
+                        $bonus = $detail->bonus;
+                        @endphp
                         <tr>
                             @if ($loop->first)
                                 <td rowspan="{{ $rowspan }}" class="text-center">{{ $no }}</td>
                                 <td rowspan="{{ $rowspan }}">
                                     <div class="row">
-                                        <div class="col-6">
+                                        <div class="col-12">
                                             <p class="mb-0">
                                                 <strong class="text-xs">No. Order</strong>
                                                 <br />
                                                 <a href="{{ route('admin.orders.show', $order->id) }}">{{ $order->no_order }}</a>
                                             </p>
                                         </div>
-
+                                    </div>
+                                    <div class="row mt-2">
                                         <div class="col-6">
                                             <p class="mb-0">
                                                 <strong class="text-xs">Sales Person</strong>
@@ -122,7 +135,7 @@
                             @endif
 
                             <td class="align-middle">
-                                @if ($product = $detail->product)
+                                @if ($product)
                                     <p class="text-sm m-0">
                                         <span class="text-xs text-muted">({{ $product->brand->name }} - {{ $product->isi->name }})</span>
                                         <br />
@@ -135,8 +148,11 @@
                                 @endif
                             </td>
                             <td class="text-center align-middle">{{ $detail->quantity }}</td>
+                            <td class="text-center align-middle">{{ $bonus ? $bonus->quantity : '-' }}</td>
                             <td class="text-center align-middle">{{ $detail->moved }}</td>
+                            <td class="text-center align-middle">{{ $bonus ? $bonus->moved : '-' }}</td>
                             <td class="text-center align-middle">{{ ($detail->quantity - $detail->moved) }}</td>
+                            <td class="text-center align-middle">{{ $bonus ? ($bonus->quantity - $bonus->moved) : '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
