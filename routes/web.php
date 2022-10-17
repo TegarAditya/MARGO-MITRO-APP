@@ -312,6 +312,14 @@ Route::group(['as' => 'frontend.', 'namespace' => 'Frontend', 'middleware' => ['
     Route::delete('production-order-details/destroy', 'ProductionOrderDetailController@massDestroy')->name('production-order-details.massDestroy');
     Route::resource('production-order-details', 'ProductionOrderDetailController');
 
+    // Production Order
+    Route::delete('finishing-orders/destroy', 'FinishingOrderController@massDestroy')->name('finishing-orders.massDestroy');
+    Route::resource('finishing-orders', 'FinishingOrderController');
+
+    // Production Order Detail
+    Route::delete('finishing-order-details/destroy', 'FinishingOrderDetailController@massDestroy')->name('finishing-order-details.massDestroy');
+    Route::resource('finishing-order-details', 'FinishingOrderDetailController');
+
     Route::get('frontend/profile', 'ProfileController@index')->name('profile.index');
     Route::post('frontend/profile', 'ProfileController@update')->name('profile.update');
     Route::post('frontend/profile/destroy', 'ProfileController@destroy')->name('profile.destroy');

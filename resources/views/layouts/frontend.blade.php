@@ -218,12 +218,12 @@
                                         </a>
                                     @endcan
                                     @can('production_order_access')
-                                        <a class="dropdown-item ml-3" href="{{ route('frontend.production-orders.index') }}">
+                                        <a class="dropdown-item ml-3" href="{{ route('frontend.finishing-orders.index') }}">
                                             {{ trans('cruds.productionOrder.title') }}
                                         </a>
                                     @endcan
                                     @can('production_order_detail_access')
-                                        <a class="dropdown-item ml-3" href="{{ route('frontend.production-order-details.index') }}">
+                                        <a class="dropdown-item ml-3" href="{{ route('frontend.finishing-order-details.index') }}">
                                             {{ trans('cruds.productionOrderDetail.title') }}
                                         </a>
                                     @endcan
