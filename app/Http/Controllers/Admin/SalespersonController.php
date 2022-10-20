@@ -10,6 +10,7 @@ use App\Http\Requests\StoreSalespersonRequest;
 use App\Http\Requests\UpdateSalespersonRequest;
 use App\Models\City;
 use App\Models\Salesperson;
+use App\Models\AlamatSale;
 use Gate;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -18,6 +19,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Excel;
 use App\Imports\SalespersonImport;
 use Alert;
+use DB;
 
 class SalespersonController extends Controller
 {
@@ -81,50 +83,100 @@ class SalespersonController extends Controller
     {
         abort_if(Gate::denies('salesperson_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $area_pemasarans = City::pluck('name', 'id');
+        $cities = City::all();
 
-        return view('admin.salespeople.create', compact('area_pemasarans'));
+        return view('admin.salespeople.create', compact('cities'));
     }
 
-    public function store(StoreSalespersonRequest $request)
+    public function store(Request $request)
     {
-        $salesperson = Salesperson::create($request->all());
-        $salesperson->area_pemasarans()->sync($request->input('area_pemasarans', []));
-        if ($request->input('foto', false)) {
-            $salesperson->addMedia(storage_path('tmp/uploads/' . basename($request->input('foto'))))->toMediaCollection('foto');
-        }
+        $request->validate([
+            'name' => 'required|string',
+            'alamat' => 'required|array|min:1',
+        ]);
 
-        if ($media = $request->input('ck-media', false)) {
-            Media::whereIn('id', $media)->update(['model_id' => $salesperson->id]);
-        }
+        DB::beginTransaction();
+        try {
+            $salesperson = Salesperson::create([
+                'name' => $request->name,
+                'telephone' => $request->telephone,
+                'company' => $request->company,
+            ]);
 
-        return redirect()->route('admin.salespeople.index');
+            City::whereIn('id', array_keys($request->alamat))->get()->each(function($item) use ($salesperson, $request) {
+                $alamat = $request->alamat[$item->id]['alamat'];
+                $city = $item->id;
+
+                AlamatSale::create([
+                    'alamat' => $alamat,
+                    'sales_id' => $salesperson->id,
+                    'kota_id' => $city,
+                ]);
+            });
+
+            DB::commit();
+
+            Alert::success('Success', 'Sales berhasil di simpan');
+
+            return redirect()->route('admin.salespeople.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function edit(Salesperson $salesperson)
     {
         abort_if(Gate::denies('salesperson_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $area_pemasarans = City::pluck('name', 'id');
+        $salesperson->load('adresses');
+        $cities = City::all();
 
-        $salesperson->load('area_pemasarans');
-
-        return view('admin.salespeople.edit', compact('area_pemasarans', 'salesperson'));
+        return view('admin.salespeople.edit', compact('cities', 'salesperson'));
     }
 
-    public function update(UpdateSalespersonRequest $request, Salesperson $salesperson)
+    public function update(Request $request, Salesperson $salesperson)
     {
-        $salesperson->update($request->all());
-        $salesperson->area_pemasarans()->sync($request->input('area_pemasarans', []));
-        if ($request->input('foto', false)) {
-            if (!$salesperson->foto || $request->input('foto') !== $salesperson->foto->file_name) {
-                if ($salesperson->foto) {
-                    $salesperson->foto->delete();
-                }
-                $salesperson->addMedia(storage_path('tmp/uploads/' . basename($request->input('foto'))))->toMediaCollection('foto');
-            }
-        } elseif ($salesperson->foto) {
-            $salesperson->foto->delete();
+        $request->validate([
+            'name' => 'required|string',
+            'alamat' => 'required|array|min:1',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $salesperson->forceFill([
+                'name' => $request->name,
+                'telephone' => $request->telephone,
+                'company' => $request->company,
+            ])->save();
+
+            $kota = City::whereIn('id', array_keys($request->alamat))->get()->map(function($item) use ($salesperson, $request) {
+                $alamat = $request->alamat[$item->id]['alamat'];
+                $city = $item->id;
+
+                AlamatSale::where('kota_id', $city)->where('sales_id', $salesperson->id)->update([
+                    'alamat' => $alamat,
+                ]);
+
+                return [
+                    'kota_id' => $city
+                ];
+            });
+
+            $salesperson->adresses()
+                ->whereNotIn('kota_id', $kota->pluck('kota_id'))
+                ->forceDelete();
+
+            DB::commit();
+
+            Alert::success('Success', 'Sales berhasil di simpan');
+
+            return redirect()->route('admin.salespeople.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         }
 
         return redirect()->route('admin.salespeople.index');
