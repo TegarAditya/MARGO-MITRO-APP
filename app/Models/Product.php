@@ -209,7 +209,12 @@ class Product extends Model implements HasMedia
         } else if ($this->tipe_pg === 'kunci') {
             $name = str_replace('KUNCI - ', '', $name);
         }
-        return implode(' ', array_slice(explode(' ', $name), 0, 1));
+
+        if (str_contains($name, 'TEMA ') ) {
+            $name = 'KELAS '. $this->kelas->name . ' '. $name;
+        }
+        // return implode(' ', array_slice(explode(' ', $name), 0, 1));
+        return $name;
     }
 
     protected function serializeDate(DateTimeInterface $date)
