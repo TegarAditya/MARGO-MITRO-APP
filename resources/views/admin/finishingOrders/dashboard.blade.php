@@ -6,7 +6,7 @@
 
         <div class="row align-items-center">
             <div class="col">
-                <h3 class="mb-0">Dashboard Admin</h3>
+                <h3 class="mb-0">Dashboard Finishing</h3>
             </div>
         </div>
 

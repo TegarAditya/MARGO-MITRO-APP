@@ -1,97 +1,48 @@
 @extends('layouts.admin')
 @section('content')
-<div class="container container-chart">
-    <form action="{{ route('admin.home') }}" method="POST">
-        @csrf
+<div class="card">
+    <div class="card-body">
+        <div class="model-detail">
+            <h5>Dashboard PO</h5>
 
-        <div class="row align-items-center">
-            <div class="col">
-                <h3 class="mb-0">Dashboard Admin</h3>
-            </div>
-        </div>
+            <p>Daftar Order untuk dilanjutkan menuju Production Order</p>
 
-        <div class="row mt-4">
-            @foreach ([
-                [
-                    'icon' => 'fas fa-hand-holding-usd h1',
-                    'label' => 'Order',
-                    'content' => $orders->count(),
-                ], [
-                    'icon' => 'fas fa-box h1',
-                    'label' => 'Produk Dipesan',
-                    'content' => $orders->map(function($item) {
-                        return $item->order_details->sum('quantity');
-                    })->sum(),
-                ], [
-                    'icon' => 'fas fa-file-invoice-dollar h1',
-                    'label' => 'Surat Jalan',
-                    'content' => $orders->map(function($item) {
-                        return $item->invoices->count();
-                    })->sum(),
-                ], [
-                    'icon' => 'fa fa-truck h1',
-                    'label' => 'Produk Keluar',
-                    'content' => $orders->map(function($item) {
-                        return $item->order_details->sum('moved');
-                    })->sum(),
-                ]
-            ] as $card)
-                <div class="col-3 d-flex flex-column">
-                    <div class="card mb-0 rounded-xl flex-grow-1">
-                        <div class="card-body">
-                            <i class="{{ $card['icon'] }}"></i>
+            {{-- List Order --}}
+            <section class="border-top py-3" id="modelProduct">
+                <h6 class="mb-3">Daftar Sales Order</h6>
 
-                            <h3 class="font-weight-bold mb-1">{{ $card['content'] }}</h3>
+                @foreach ([1, 2, 3, 4] as $item)
+                    <div class="card mb-2">
+                        <div class="card-body px-3 py-2">
+                            <h6 class="text-sm product-name mb-0">
+                                Produk #{{ $loop->iteration }}
+                            </h6>
 
-                            <p class="m-0">{{ $card['label'] }}</p>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+                            <div class="row align-items-end align-self-center">
+                                <div class="col" style="max-width: 120px">
+                                    <p class="mb-0 text-sm">
+                                        Pesanan: 1
+                                    </p>
 
-        <div class="row mt-4">
-            <div class="col-12 d-flex flex-column">
-                @foreach ([
-                    [
-                        'icon' => 'fas fa-money-bill h3',
-                        'label' => 'Total Order',
-                        'content' => money($orders->sum('tagihan.total')),
-                    ], [
-                        'icon' => 'fas fa-dollar-sign h3',
-                        'label' => 'Total Tagihan',
-                        'content' => money($orders->map(function($item) {
-                            return $item->invoices->sum('nominal');
-                        })->sum()),
-                    ], [
-                        'icon' => 'fa fa-money-check-alt h3',
-                        'label' => 'Total Pembayaran',
-                        'content' => money($orders->map(function($item) {
-                            return $item->pembayarans->sum('nominal');
-                        })->sum()),
-                    ], [
-                        'icon' => 'fa fa-wallet h3',
-                        'label' => 'Sisa Tagihan',
-                        'content' => money($orders->sum('sisa_tagihan')),
-                    ],
-                ] as $card)
-                    <div class="card {{ !$loop->last ? 'mb-3' : 'mb-0' }} rounded-xl flex-grow-1">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-auto pr-2 text-center" style="min-width:2.5rem">
-                                    <i class="{{ $card['icon'] }}"></i>
+                                    <p class="mb-0 text-sm">
+                                        Terkirim: 2
+                                    </p>
                                 </div>
 
-                                <div class="col">
-                                    <h6 class="mb-2">{{ $card['label'] }}</h6>
+                                <div class="col text-right" style="max-width: 240px">
+                                    <p class="text-sm mb-0">Harga</p>
+                                    <p class="m-0">@money(123456789)</p>
+                                </div>
 
-                                    <h4 class="m-0">{{ $card['content'] }}</h4>
+                                <div class="col text-right">
+                                    <p class="text-sm mb-0">Subtotal</p>
+                                    <p class="m-0">@money(123456789)</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
-            </div>
+            </section>
         </div>
     </div>
 </div>

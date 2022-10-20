@@ -308,10 +308,6 @@ Route::group(['as' => 'frontend.', 'namespace' => 'Frontend', 'middleware' => ['
     Route::delete('production-orders/destroy', 'ProductionOrderController@massDestroy')->name('production-orders.massDestroy');
     Route::resource('production-orders', 'ProductionOrderController');
 
-    // Production Order Detail
-    Route::delete('production-order-details/destroy', 'ProductionOrderDetailController@massDestroy')->name('production-order-details.massDestroy');
-    Route::resource('production-order-details', 'ProductionOrderDetailController');
-
     // Production Order
     Route::delete('finishing-orders/destroy', 'FinishingOrderController@massDestroy')->name('finishing-orders.massDestroy');
     Route::resource('finishing-orders', 'FinishingOrderController');
