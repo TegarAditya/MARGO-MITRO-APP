@@ -753,7 +753,7 @@
                 product.find('.product-bonus').val(bonus || 0)
                     .attr('id', 'fieldBonus-'+data.id)
                     .attr('name', name+'['+data.id+'][bonus]')
-                    .attr('min', 1)
+                    .attr('min', 0)
                     .attr('required', true);
             }
 
