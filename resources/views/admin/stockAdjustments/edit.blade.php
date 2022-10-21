@@ -138,15 +138,18 @@
                     <h5 class="product-group-title">{{ $item['label'] }}</h5>
 
                     <div class="product-list">
-                        @if ($item['items']->count())
-                            @each('admin.stockAdjustments.parts.item-product', $item['items'], 'detail')
-                        @endif
-
                         @include('admin.stockAdjustments.parts.item-product', [
                             'detail' => new App\Models\StockAdjustmentDetail,
                             'modal' => $item['modal'],
                             'name' => $item['name'],
                         ])
+
+                        @if ($item['items']->count())
+                            @php
+                                $sortedProducts = $item['items']->sortBy('tipe_pg')->sortBy('halaman_id')->sortBy('kelas_id')->sortBy('product.name')->sortBy('product.jenjang_id');
+                            @endphp
+                            @each('admin.stockAdjustments.parts.item-product', $sortedProducts, 'detail')
+                        @endif
                     </div>
 
                     <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
@@ -338,14 +341,14 @@
         pointer-events: none;
     }
 
-    .product-list > .item-product:last-child .product-delete {
+    .product-list > .item-product:first-child .product-delete {
         opacity: 0.5;
         pointer-events: none;
         background-color: #aeaeae;
         border-color: #969696;
     }
 
-    .product-list > .item-product:last-child > .product-col-content {
+    .product-list > .item-product:first-child > .product-col-content {
         opacity: 0.66;
         pointer-events: none;
     }
@@ -483,7 +486,7 @@
                 var product = productFake.clone();
 
                 !products.children('.item-product').length && products.html('');
-                product.appendTo(products);
+                product.prependTo(products);
 
                 console.log('ini product add');
 
