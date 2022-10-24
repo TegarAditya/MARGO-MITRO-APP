@@ -240,6 +240,7 @@
                                 data-stock="{{ $product->stock }}"
                                 @if($bonus)
                                     data-pg="{{ $bonus->product->id }}"
+                                    data-pgstock="{{ $bonus->product->stock }}"
                                     data-pgqty="{{ $bonus->quantity }}"
                                     data-pgmoved="{{ $bonus->moved }}"
                                     data-pgmax="{{ $bonus->quantity - $bonus->moved }}"
@@ -276,7 +277,7 @@
                                             </p>
 
                                             <p class="mb-0 text-sm text-bold">
-                                                Order Qty: <span class="product-qty-max">{{ $sum_qty ?? '' }}</span>
+                                                Pesanan: <span class="product-qty-max">{{ $sum_qty ?? '' }}</span>
                                             </p>
 
                                             <p class="mb-0 text-sm text-bold">
@@ -289,10 +290,10 @@
                                         </div>
                                         <div style="display: none">
                                             <div class="product-pg">
-                                                <h6 class="text-sm product-name mb-1">Product PG/Kunci</h6>
+                                                <h6 class="text-sm product-name mb-1">Kelengkapan</h6>
 
                                                 <p class="mb-0 text-sm">
-                                                    Order Qty: <span class="product-qty-max">{{ !$bonus ? '' : $bonus->quantity }}</span>
+                                                    Pesanan: <span class="product-qty-max">{{ !$bonus ? '' : $bonus->quantity }}</span>
                                                 </p>
 
                                                 <p class="mb-0 text-sm">
@@ -444,6 +445,8 @@
         var productSelectItems = modals.find('.product-select-item');
         var productSelectTarget;
 
+        var jenjang = ['3', '4', '11'];
+
         $('.product-list-group').each(function(index, item) {
             var group = $(item);
             var products = group.find('.product-list');
@@ -494,8 +497,6 @@
                     if (value !== valueNum) {
                         el.val(value);
                     }
-
-                    console.log("PRODUCT:M", product, value, qtyMin, qtyMax);
                 });
 
                 qty.add(price).on('change keyup blur', function(e) {
@@ -503,8 +504,28 @@
                 });
 
                 qty.on('keyup blur', function(e) {
-                    let bonus_qty = Math.ceil(qty.val()/33.34);
+                    let jenjang_id = product.attr('data-jenjang');
+                    let pembagi = 100;
+                    if(jenjang.includes(jenjang_id)){
+                        pembagi = 33.34;
+                    }
+                    let bonus_qty = Math.ceil(qty.val()/pembagi);
                     bonus.val(bonus_qty).trigger('change');
+                });
+
+                bonus.on('change keyup blur', function(e) {
+                    var el = $(e.currentTarget);
+                    var qtyMax = parseInt(Math.min(product.data('pgmax'), product.data('pgstock')) || 0);
+                    var qtyMin = parseInt(0);
+                    var valueNum = parseInt(el.val());
+                    var value = (isNaN(valueNum) || valueNum <= 0) ? qtyMin : valueNum;
+
+                    value = (qtyMax >= 0 && value > qtyMax) ? qtyMax : value;
+                    value = (qtyMin && qtyMin > value) ? qtyMin : value;
+
+                    if (value !== valueNum) {
+                        el.val(value);
+                    }
                 });
 
                 product.find('.product-delete').on('click', function(e) {
@@ -622,7 +643,7 @@
             var name = product.data('name');
             var data = selected.data();
 
-            console.log("ASE", selected, data);
+            // console.log("ASE", selected, data);
 
             product.attr('data-id', data.id).data('id', data.id);
             product.attr('data-price', data.price).data('price', data.price);
@@ -649,6 +670,11 @@
             product.find('.div-product-pg').html(contentBonus);
 
             if (data.pg) {
+                product.attr('data-pg', data.pg).data('pg', data.pg);
+                product.attr('data-pgstock', data.pgstock).data('pgstock', data.pgstock);
+                product.attr('data-pgqty', data.pgqty).data('pgqty', data.pgqty);
+                product.attr('data-pgmoved', data.pgmoved).data('pgqty', data.pgmoved);
+                product.attr('data-pgmax', data.pgmax).data('pgmax', data.pgmax);
                 product.find('.div-product-pg').show();
                 product.find('.div-product-bonus').show();
                 product.find('.product-bonus').val(bonus || 0)
@@ -656,6 +682,7 @@
                     .attr('name', name+'['+data.id+'][bonus]')
                     .attr('min', data.pgmax == 0 ? 0 : 1)
                     .attr('max', data.pgmax)
+                    .attr('readonly', data.pgmax == 0 ? true : false)
                     .attr('required', true);
             }
 

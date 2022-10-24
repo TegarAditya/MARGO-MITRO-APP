@@ -29,7 +29,18 @@ $foto = !$product->foto ? null : $product->foto->first();
 $modal = !isset($modal) ? '#productModal' : $modal;
 $name = !isset($name) ? 'products' : $name;
 @endphp
-<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price }}" data-moved="{{ $order_detail->moved ?? 0 }}" data-max="{{ $qtyMax }}" data-qty="{{ $detail->quantity }}" data-stock="{{ $product->stock }}" data-name="{{ $name }}">
+<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price }}" data-moved="{{ $order_detail->moved ?? 0 }}" data-max="{{ $qtyMax }}"
+    data-qty="{{ $detail->quantity }}"
+    data-stock="{{ $product->stock }}"
+    data-name="{{ $name }}"
+    @if($bonus)
+        data-pg="{{ $bonus->product->id }}"
+        data-pgstock="{{ $bonus->product->stock }}"
+        data-pgqty="{{ $bonus->quantity }}"
+        data-pgmoved="{{ $bonus->moved }}"
+        data-pgmax="{{ $bonus->quantity - $bonus->moved }}"
+    @endif
+    >
     <div class="col-5 row">
         <div class="col-auto" style="display: {{ (!$product->id || !$foto) ? 'none' : 'block' }}">
             @if ($foto)
@@ -53,7 +64,7 @@ $name = !isset($name) ? 'products' : $name;
                     </p>
 
                     <p class="mb-0 text-sm">
-                        Order Qty: <span class="product-qty-max">{{ $order_detail->quantity ?? '' }}</span>
+                        Pesanan: <span class="product-qty-max">{{ $order_detail->quantity ?? '' }}</span>
                     </p>
 
                     <p class="mb-0 text-sm">
@@ -139,10 +150,10 @@ $name = !isset($name) ? 'products' : $name;
 
         <div class="col div-product-pg" style="max-width: 200px; display : {{ !$bonus ? 'none' : 'block' }};">
             <div class="product-pg text-center">
-                <h6 class="text-sm product-name mb-1">Product PG/Kunci</h6>
+                <h6 class="text-sm product-name mb-1">Kelengkapan</h6>
 
                 <p class="mb-0 text-sm">
-                    Order Qty: <span class="product-qty-max">{{ $bonus->quantity ?? '' }}</span>
+                    Pesanan: <span class="product-qty-max">{{ $bonus->quantity ?? '' }}</span>
                 </p>
 
                 <p class="mb-0 text-sm">
@@ -156,7 +167,7 @@ $name = !isset($name) ? 'products' : $name;
         </div>
 
         <div class="col div-product-bonus" style="max-width: 120px; display : {{ !$bonus ? 'none' : 'block' }};">
-            <p class="mb-0 text-sm">Qty PG/Kunci</p>
+            <p class="mb-0 text-sm">Qty Kirim</p>
 
             <x-admin.form-group
                 type="number"

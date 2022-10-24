@@ -61,7 +61,7 @@ class StockAdjustment extends Model
 
     public function getIsIncreaseAttribute()
     {
-        if (in_array($this->attributes['operation'], array('add'))) {
+        if (in_array($this->operation, array('add'))) {
             return true;
         } else {
             return false;
