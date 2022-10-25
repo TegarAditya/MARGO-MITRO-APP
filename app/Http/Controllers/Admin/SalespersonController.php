@@ -84,6 +84,24 @@ class SalespersonController extends Controller
     {
         abort_if(Gate::denies('salesperson_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $salesperson = Salesperson::all();
+
+        foreach($salesperson as $sales) {
+            foreach($sales->area_pemasarans as $area) {
+                $kota = KotaSale::create([
+                    'sales_id' => $sales->id,
+                    'kota_id' => $area->id,
+                    'name' => $sales->name .' - '. $area->name
+                ]);
+
+                AlamatSale::create([
+                    'kota_sales_id' => $kota->id,
+                    'alamat' => $sales->alamat,
+                ]);
+            }
+        }
+
+        dd('done');
         $cities = City::all();
 
         return view('admin.salespeople.create', compact('cities'));
