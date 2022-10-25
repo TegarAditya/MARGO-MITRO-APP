@@ -56,6 +56,11 @@ class Order extends Model
         return $this->belongsTo(Salesperson::class, 'salesperson_id');
     }
 
+    public function kotasale()
+    {
+        return $this->belongsTo(KotaSale::class, 'kota_sales_id');
+    }
+
     public function order_details()
     {
         return $this->hasMany(OrderDetail::class);

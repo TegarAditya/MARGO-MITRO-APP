@@ -53,6 +53,20 @@
                     <span class="help-block">{{ trans('cruds.order.fields.semester_helper') }}</span>
                 </div>
             </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="required" for="kota_sales_id">{{ trans('cruds.order.fields.salesperson') }}</label>
+                    <select class="form-control select2 {{ $errors->has('kota_sales') ? 'is-invalid' : '' }}" name="kota_sales_id" id="kota_sales_id">
+                        @foreach($kotasales as $id => $entry)
+                            <option value="{{ $id }}" {{ (old('kota_sales_id') ? old('kota_sales_id') : $order->kota_sales_id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('kota_sales'))
+                        <span class="text-danger">{{ $errors->first('kota_sales') }}</span>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.order.fields.salesperson_helper') }}</span>
+                </div>
+            </div>
         </div>
         <hr style="margin: .5em -15px;border-color:#ccc" />
         <div class="row">

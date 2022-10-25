@@ -11,6 +11,7 @@ use App\Models\OrderDetail;
 use App\Models\OrderPackage;
 use App\Models\Product;
 use App\Models\Salesperson;
+use App\Models\KotaSale;
 use App\Models\CustomPrice;
 use App\Models\Brand;
 use App\Models\Category;
@@ -91,19 +92,6 @@ class OrderController extends Controller
                 return $row->semester ? $row->semester->name : '';
             });
 
-            $table->addColumn('salesperson_area', function ($row) {
-                $labels = [];
-                foreach ($row->salesperson->area_pemasarans as $area_pemasaran) {
-                    if ($area_pemasaran === $row->salesperson->area_pemasarans->last()) {
-                        $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
-                    } else {
-                        $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->name);
-                    }
-                }
-
-                return implode(' ', $labels);
-            });
-
             $table->addColumn('tagihan', function ($row) {
                 return 'Total Order: Rp '. number_format($row->tagihan->total, 0, ',', '.') .
                 '<br>Total Kirim: Rp '.number_format($row->invoices->sum('nominal'), 0, ',', '.') .
@@ -135,8 +123,9 @@ class OrderController extends Controller
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $products = collect([]);
+        $kotasales = KotaSale::pluck('name', 'id')->prepend('Semua Kota', '');
 
-        return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas'));
+        return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas', 'kotasales'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -144,6 +133,7 @@ class OrderController extends Controller
         $request->validate([
             'date' => 'required|date',
             'salesperson_id' => 'required|exists:salespeople,id',
+            'kota_sales_id' => 'required|exists:kota_sales,id',
             'semester_id' => 'required|exists:semesters,id'
             // 'products' => 'required|array|min:1',
         ]);
@@ -161,6 +151,7 @@ class OrderController extends Controller
                 'no_order' => Order::generateNoOrder($request->semester_id),
                 'date' => $request->date,
                 'salesperson_id' => $request->salesperson_id,
+                'kota_sales_id' => $request->kota_sales_id,
                 'semester_id' => $request->semester_id
             ]);
 
@@ -241,6 +232,7 @@ class OrderController extends Controller
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kotasales = KotaSale::pluck('name', 'id')->prepend('Semua Kota', '');
 
         if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester) {
             $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang', 'semester']);
@@ -296,7 +288,7 @@ class OrderController extends Controller
             'semester'
         ]);
 
-        return view('admin.orders.edit', compact('order', 'salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas'));
+        return view('admin.orders.edit', compact('order', 'salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas', 'kotasales'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order)
@@ -304,6 +296,7 @@ class OrderController extends Controller
         $request->validate([
             'date' => 'required|date',
             'salesperson_id' => 'required|exists:salespeople,id',
+            'kota_sales_id' => 'required|exists:kota_sales,id',
             'semester_id' => 'required|exists:semesters,id',
         ]);
 
@@ -318,6 +311,7 @@ class OrderController extends Controller
             $order->forceFill([
                 'date' => $request->date,
                 'salesperson_id' => $request->salesperson_id,
+                'kota_sales_id' => $request->kota_sales_id,
                 'semester_id' => $request->semester_id
             ])->save();
 
@@ -333,6 +327,7 @@ class OrderController extends Controller
             $order->forceFill([
                 'date' => $request->date,
                 'salesperson_id' => $request->salesperson_id,
+                'kota_sales_id' => $request->kota_sales_id,
                 'semester_id' => $request->semester_id
             ])->save();
 

@@ -10,6 +10,7 @@ class CreateKotaSalesTable extends Migration
     {
         Schema::create('kota_sales', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name')->nullable();
             $table->unsignedBigInteger('sales_id')->nullable();
             $table->foreign('sales_id', 'sales_fk_7501442')->references('id')->on('salespeople');
             $table->unsignedBigInteger('kota_id')->nullable();

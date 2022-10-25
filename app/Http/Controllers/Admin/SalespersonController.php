@@ -10,6 +10,7 @@ use App\Http\Requests\StoreSalespersonRequest;
 use App\Http\Requests\UpdateSalespersonRequest;
 use App\Models\City;
 use App\Models\Salesperson;
+use App\Models\KotaSale;
 use App\Models\AlamatSale;
 use Gate;
 use Illuminate\Http\Request;
@@ -104,14 +105,21 @@ class SalespersonController extends Controller
             ]);
 
             City::whereIn('id', array_keys($request->alamat))->get()->each(function($item) use ($salesperson, $request) {
-                $alamat = $request->alamat[$item->id]['alamat'];
                 $city = $item->id;
+                $alamats = $request->alamat[$item->id]['alamat'];
 
-                AlamatSale::create([
-                    'alamat' => $alamat,
+                $kota_sale = KotaSale::create([
                     'sales_id' => $salesperson->id,
                     'kota_id' => $city,
+                    'name' => $salesperson->name .' - '. $item->name
                 ]);
+
+                foreach($alamats as $alamat) {
+                    AlamatSale::create([
+                        'kota_sales_id' => $kota_sale->id,
+                        'alamat' => $alamat,
+                    ]);
+                }
             });
 
             DB::commit();
@@ -130,7 +138,7 @@ class SalespersonController extends Controller
     {
         abort_if(Gate::denies('salesperson_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $salesperson->load('adresses');
+        $salesperson->load('kota');
         $cities = City::all();
 
         return view('admin.salespeople.edit', compact('cities', 'salesperson'));
@@ -152,21 +160,38 @@ class SalespersonController extends Controller
             ])->save();
 
             $kota = City::whereIn('id', array_keys($request->alamat))->get()->map(function($item) use ($salesperson, $request) {
-                $alamat = $request->alamat[$item->id]['alamat'];
                 $city = $item->id;
+                $old = $request->alamat[$item->id]['id'] ?? null;
+                $alamats = $request->alamat[$item->id]['alamat'];
 
-                AlamatSale::where('kota_id', $city)->where('sales_id', $salesperson->id)->update([
-                    'alamat' => $alamat,
-                ]);
+                $kota_sale = KotaSale::firstOrCreate(
+                    ['sales_id' => $salesperson->id, 'kota_id' => $city],
+                    ['name' => $salesperson->name .' - '. $item->name]
+                );
+
+                foreach($alamats as $key => $item) {
+                    if (isset($old[$key])) {
+                        AlamatSale::updateOrCreate(
+                            ['id' => $old[$key], 'kota_sales_id' => $kota_sale->id],
+                            ['alamat' => $item]
+                        );
+                    } else {
+                        AlamatSale::create(['kota_sales_id' => $kota_sale->id, 'alamat' => $item]);
+                    }
+                }
 
                 return [
-                    'kota_id' => $city
+                    'kota_id' => $city,
                 ];
             });
 
-            $salesperson->adresses()
-                ->whereNotIn('kota_id', $kota->pluck('kota_id'))
-                ->forceDelete();
+            $kota_deleted = KotaSale::where('sales_id', $salesperson->id)
+                ->whereNotIn('kota_id', $kota->pluck('kota_id'))->get();
+
+            foreach($kota_deleted as $item) {
+                $item->alamats()->delete();
+                $item->delete();
+            }
 
             DB::commit();
 
@@ -195,7 +220,16 @@ class SalespersonController extends Controller
     {
         abort_if(Gate::denies('salesperson_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $kota_deleted = KotaSale::where('sales_id', $salesperson->id)->get();
+
+        foreach($kota_deleted as $item) {
+            $item->alamats()->delete();
+            $item->delete();
+        }
+
         $salesperson->delete();
+
+        Alert::success('Success', 'Sales Person berhasil di hapus');
 
         return back();
     }

@@ -20,7 +20,7 @@ class KotaSale extends Model
     protected $fillable = [
         'sales_id',
         'kota_id',
-        'nama',
+        'name',
         'created_at',
         'updated_at',
     ];
@@ -33,6 +33,11 @@ class KotaSale extends Model
     public function kota()
     {
         return $this->belongsTo(City::class, 'kota_id');
+    }
+
+    public function alamats()
+    {
+        return $this->hasMany(AlamatSale::class, 'kota_sales_id');
     }
 
     protected function serializeDate(DateTimeInterface $date)
