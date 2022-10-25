@@ -92,6 +92,19 @@ class OrderController extends Controller
                 return $row->semester ? $row->semester->name : '';
             });
 
+            $table->addColumn('salesperson_area', function ($row) {
+                $labels = [];
+                foreach ($row->salesperson->area_pemasarans as $area_pemasaran) {
+                    if ($area_pemasaran === $row->salesperson->area_pemasarans->last()) {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
+                    } else {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->name);
+                    }
+                }
+
+                return implode(' ', $labels);
+            });
+
             $table->addColumn('tagihan', function ($row) {
                 return 'Total Order: Rp '. number_format($row->tagihan->total, 0, ',', '.') .
                 '<br>Total Kirim: Rp '.number_format($row->invoices->sum('nominal'), 0, ',', '.') .
