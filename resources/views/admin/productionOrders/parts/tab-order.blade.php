@@ -12,30 +12,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
     <div class="row">
         <div class="col-12">
             <div class="form-group">
-                <label for="po_number">No. Finishing Order</label>
+                <label for="po_number">No. Production Order</label>
                 <input class="form-control h-auto py-1 {{ $errors->has('po_number') ? 'is-invalid' : '' }}" type="text" name="po_number" id="po_number" value="{{ old('po_number', $productionOrder->po_number) }}" readonly placeholder="(Otomatis)">
                 @if($errors->has('po_number'))
                     <span class="text-danger">{{ $errors->first('po_number') }}</span>
-                @endif
-            </div>
-        </div>
-
-        <div class="col-6">
-            <div class="form-group">
-                <label for="no_spk">No. SPK</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" type="text" name="no_spk" id="no_spk" value="{{ old('no_spk', $productionOrder->no_spk) }}" readonly placeholder="(Otomatis)">
-                @if($errors->has('no_spk'))
-                    <span class="text-danger">{{ $errors->first('no_spk') }}</span>
-                @endif
-            </div>
-        </div>
-
-        <div class="col-6">
-            <div class="form-group">
-                <label for="no_kwitansi">No. Kwitansi</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', $productionOrder->no_kwitansi) }}" readonly placeholder="(Otomatis)">
-                @if($errors->has('no_kwitansi'))
-                    <span class="text-danger">{{ $errors->first('no_kwitansi') }}</span>
                 @endif
             </div>
         </div>
@@ -95,6 +75,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         </div>
     </div>
 
+    <hr style="margin: .5em -15px;border-color:#ccc" />
+
+    <h5 class="mb-2 mt-3">Pilih Produk</h5>
+
     @foreach ([
         [
             'label' => 'Produk Dipilih',
@@ -102,64 +86,93 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             'modal' => '#productModal',
             'name' => 'products',
             'placeholder' => 'Pilih Produk',
-        ], [
-            'label' => 'Bahan Dipilih',
-            'product_ids' => $bahan_products->pluck('id'),
-            'modal' => '#bahanModal',
-            'name' => 'products',
-            'placeholder' => 'Pilih Bahan',
         ],
     ] as $item)
         @php
         $order_details = $productionOrder->production_order_details->whereIn('product_id', $item['product_ids']);
+
+        $groups = $order_details->groupBy('group');
+
+        if (!$groups->count()) {
+            $groups->put('new', collect([]));
+        }
+
+        $groups->put('fake', collect([]));
         @endphp
-        <hr style="margin: .5em -15px;border-color:#ccc" />
+        @foreach ($groups as $group => $items)
+            @php
+            $parent = $items->first();
+            $list = $items->slice(1);
 
-        <div class="product-list-group">
-            <h5 class="product-group-title">{{ $item['label'] }}</h5>
+            $label = "Group $loop->iteration"
+            @endphp
+            <div
+                class="product-list-group{{ $group === 'fake' ? ' d-none' : '' }}"
+                data-group="{{ $group }}"
+            >
+                {{-- <h6 class="product-group-title font-weight-normal mb-0">{{ $label }}</h6> --}}
 
-            <div class="product-list">
-                @if ($order_details->count())
-                    @each('admin.productionOrders.parts.item-product', $order_details, 'detail')
-                @endif
+                <div class="product-list">
+                    @if ($parent)
+                        @include('admin.productionOrders.parts.item-product', [
+                            'detail' => $parent,
+                        ])
+                    @endif
 
-                @include('admin.productionOrders.parts.item-product', [
-                    'detail' => new App\Models\ProductionOrderDetail,
-                    'modal' => $item['modal'],
-                    'name' => $item['name'],
-                    'placeholder' => $item['placeholder'],
-                ])
-            </div>
+                    @if ($list->count())
+                        @each('admin.productionOrders.parts.item-product', $order_details, 'detail')
+                    @endif
 
-            <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
-                <div class="row justify-content-center d-none">
-                    <div class="col-auto">
-                        <button type="button" class="btn py-1 border product-add">
-                            <i class="fa fa-plus text-sm mr-1"></i>
+                    @include('admin.productionOrders.parts.item-product', [
+                        'detail' => new App\Models\ProductionOrderDetail,
+                        'modal' => $item['modal'],
+                        'name' => $item['name'],
+                        'placeholder' => $item['placeholder'],
+                    ])
+                </div>
 
-                            <span>Tambah Produk</span>
-                        </button>
+                <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
+                    <div class="row justify-content-center d-none">
+                        <div class="col-auto">
+                            <button type="button" class="btn py-1 border product-add">
+                                <i class="fa fa-plus text-sm mr-1"></i>
+
+                                <span>Tambah Produk</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    @if($errors->has($item['name']))
+                        <span class="text-danger">{{ $errors->first($item['name']) }}</span>
+                    @endif
+                </div>
+
+                <div class="product-faker d-none">
+                    @include('admin.productionOrders.parts.item-product', [
+                        'detail' => new App\Models\ProductionOrderDetail,
+                        'modal' => $item['modal'],
+                        'name' => $item['name'],
+                    ])
+            
+                    <div class="product-empty">
+                        <p>Belum ada produk yang ditambahkan</p>
                     </div>
                 </div>
-
-                @if($errors->has($item['name']))
-                    <span class="text-danger">{{ $errors->first($item['name']) }}</span>
-                @endif
             </div>
+        @endforeach
+    @endforeach
 
-            <div class="product-faker d-none">
-                @include('admin.productionOrders.parts.item-product', [
-                    'detail' => new App\Models\ProductionOrderDetail,
-                    'modal' => $item['modal'],
-                    'name' => $item['name'],
-                ])
-        
-                <div class="product-empty">
-                    <p>Belum ada produk yang ditambahkan</p>
-                </div>
+    <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn py-1 border product-group-add">
+                    <i class="fa fa-plus text-sm mr-1"></i>
+
+                    <span>Tambah Group</span>
+                </button>
             </div>
         </div>
-    @endforeach
+    </div>
 
     <div class="product-summary" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
         <div class="row border-top pt-2">
@@ -172,7 +185,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             </div>
 
             @if (!$productionOrder->id)
-                <div class="col-auto opacity-0 pl-5 order-action-placeholder" style="pointer-events: none">
+                <div class="col-auto opacity-0 pl-4 ml-1 order-action-placeholder" style="pointer-events: none">
                     <button type="button" class="btn py-1"></button>
                 </div>
             @endif
@@ -192,10 +205,6 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 <!-- Modal Products -->
 @foreach ([
     [
-        'id' => 'bahanModal',
-        'label' => 'Semua Bahan',
-        'items' => $bahan_products,
-    ], [
         'id' => 'productModal',
         'label' => 'Semua Produk',
         'items' => $buku_products,
@@ -312,6 +321,17 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
 @push('styles')
 <style>
+.product-list-group {
+    padding: .5rem 1rem;
+    border: 1px solid #eee;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 4px rgb(0 0 0 / 12%);
+}
+
+.product-list-group + .product-list-group {
+    margin-top: 1rem;
+}
+
 .product-group-title {
     position: sticky;
     position: -webkit-sticky;
@@ -327,6 +347,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 .product-pp.disabled > select {
     opacity: 0.5;
     pointer-events: none;
+}
+
+.product-list > .item-product:not(:first-child) > .col-5.row {
+    padding-left: 5rem;
 }
 
 .product-list > .item-product:last-child .product-delete {
@@ -414,6 +438,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         var type = form.find('#type');
         var people = form.find('#productionperson_id');
 
+        var groups = form.find('.product-list-group:not([data-group="fake"])');
+        var groupFake = form.find('.product-list-group[data-group="fake"]');
+        var groupAction = form.find('.product-group-action');
+        var groupAdd = form.find('.product-group-add');
         var allProducts = form.find('.product-list');
         var productEmpty = form.find('.product-faker > .product-empty');
         var productSummary = form.find('.product-summary');
@@ -444,11 +472,13 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             form.find('#total').val(total);
         };
 
-        $('.product-list-group').each(function(index, item) {
+        var bindGroup = function(item, index) {
             var group = $(item);
             var products = group.find('.product-list');
             var productAdd = group.find('.product-add');
             var productFake = group.find('.product-faker > .item-product');
+
+            console.log("BIND GROUP", groups.data());
 
             var bindProduct = function(product) {
                 var qty = product.find('.product-qty');
@@ -487,15 +517,25 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
                     product.remove();
                     calculatePrice();
+                    
+                    if (products.children('.item-product').length === 1) {
+                        if (groups.length > 1) {
+                            group.remove();
 
-                    if (!products.children('.item-product').length) {
-                        productEmpty.clone().appendTo(products);
+                            groups = groups.filter(':not([data-group="'+group.data('group')+'"])');
+                        }
+                    }
+
+                    if (groups.find('.product-list > .item-product').length === 1) {
                         productSummary.hide();
+                        groupAction.hide();
                     }
                 });
 
                 product.find('.product-pick').on('click', function(e) {
                     productSelectTarget = product;
+
+                    console.log("PRODUCT", product.closest(groups).data());
                 });
             };
 
@@ -510,11 +550,39 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
                 var product = productFake.clone();
 
+                console.log("SUCK", products);
+                console.log("PARENT", products.closest(groups));
+
                 !products.children('.item-product').length && products.html('');
                 product.appendTo(products);
 
                 bindProduct(product);
                 group.find('.product-action').hide();
+            });
+        };
+
+        groups.each(function(index, item) {
+            bindGroup(item, index);
+        });
+
+        groupAdd.on('click', function(e) {
+            e.preventDefault();
+
+            var lastGroup = groups.last();
+            var fake = groupFake.clone();
+
+            console.log("LAST GROUP", lastGroup.data());
+            console.log("fake", fake.data());
+
+            fake.removeClass('d-none').insertAfter(lastGroup);
+
+            bindGroup(fake);
+            groups = groups.add(fake);
+
+            groups.each(function(index, item) {
+                console.log("GROUP", item);
+
+                $(item).data('group', index + 1).attr('data-group', index + 1);
             });
         });
 
@@ -611,6 +679,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             modals.modal('hide');
             selected.addClass('selected');
             productSummary.show();
+            groupAction.show();
             calculatePrice();
 
             product.closest('.product-list-group').find('.product-add').trigger('click');

@@ -67,19 +67,7 @@ $placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
                 class="form-control-sm hide-arrows text-center product-qty product-qty1"
                 value="{{ $detail->order_qty ?: 0 }}"
                 min="0"
-            >
-                <x-slot name="left">
-                    <button type="button" class="btn btn-sm border-0 px-2 product-qty-act" data-target=".product-qty1" data-action="-">
-                        &minus;
-                    </button>
-                </x-slot>
-
-                <x-slot name="right">
-                    <button type="button" class="btn btn-sm border-0 px-2 product-qty-act" data-target=".product-qty1" data-action="+">
-                        &plus;
-                    </button>
-                </x-slot>
-            </x-admin.form-group>
+            />
         </div>
 
         <div class="col" style="max-width: 120px">
