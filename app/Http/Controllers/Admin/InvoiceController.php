@@ -61,7 +61,8 @@ class InvoiceController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 $viewGate = 'invoice_show';
-                $editGate = 'invoice_edit';
+                $editGate = 'invoice_edit_inactive';
+                // $editGate = 'invoice_edit';
                 $deleteGate = 'invoice_delete';
                 $crudRoutePart = 'invoices';
                 $parent = 'orders';
@@ -370,34 +371,36 @@ class InvoiceController extends Controller
             'order',
         ]);
 
-        $product_detail = InvoiceDetail::with('bonus', 'product')->where('invoice_id', $invoice->id)->get();
+        if (request('print') === 'sj') {
+            $product_detail = InvoiceDetail::with('bonus', 'product')->where('invoice_id', $invoice->id)->get();
 
-        $pg_array = collect();
+            $pg_array = collect();
 
-        $details = $product_detail->each(function ($item) use ($product_detail, $pg_array) {
-            if ($bonus = $item->bonus) {
-                $bonus_id = $bonus->product_id;
-                $bonus_qty = $bonus->quantity;
-                $ada = $product_detail->firstWhere('product_id', '=', $bonus_id);
-                if ($ada) {
-                    $pg_array->push([
-                        'id' => $ada->id
-                    ]);
-                    $bonus_qty += $ada->quantity;
+            $details = $product_detail->each(function ($item) use ($product_detail, $pg_array) {
+                if ($bonus = $item->bonus) {
+                    $bonus_id = $bonus->product_id;
+                    $bonus_qty = $bonus->quantity;
+                    $ada = $product_detail->firstWhere('product_id', '=', $bonus_id);
+                    if ($ada) {
+                        $pg_array->push([
+                            'id' => $ada->id
+                        ]);
+                        $bonus_qty += $ada->quantity;
+                    }
+                    $item->bonus->quantity = $bonus_qty;
                 }
-                $item->bonus->quantity = $bonus_qty;
-            }
-        });
+            });
 
-        $details = $details->whereNotIn('id', $pg_array->pluck('id'));
-        $inv_details = $details->where('product.tipe_pg', '===', 'non_pg');
-        $pg_details = $details->where('product.tipe_pg', '!==', 'non_pg');
+            $details = $details->whereNotIn('id', $pg_array->pluck('id'));
+            $inv_details = $details->where('product.tipe_pg', '===', 'non_pg');
+            $pg_details = $details->where('product.tipe_pg', '!==', 'non_pg');
 
-        switch (request('print')) {
-            case 'sj':
-                return view('admin.invoices.prints.surat-jalan', compact('invoice', 'inv_details', 'pg_details'));
-            case 'inv':
-                return view('admin.invoices.prints.faktur', compact('invoice', 'inv_details', 'pg_details'));
+            return view('admin.invoices.prints.surat-jalan', compact('invoice', 'inv_details', 'pg_details'));
+        } else if (request('print') === 'inv') {
+            $product_detail = InvoiceDetail::with('bonus', 'product')->where('invoice_id', $invoice->id)->get();
+
+
+            return view('admin.invoices.prints.faktur', compact('invoice'));
         }
 
         return view('admin.invoices.show', compact('invoice'));
