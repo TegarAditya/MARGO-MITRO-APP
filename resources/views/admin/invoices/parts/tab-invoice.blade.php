@@ -680,7 +680,7 @@
                 product.find('.product-bonus').val(bonus || 0)
                     .attr('id', 'fieldBonus-'+data.id)
                     .attr('name', name+'['+data.id+'][bonus]')
-                    .attr('min', data.pgmax == 0 ? 0 : 1)
+                    .attr('min', 0)
                     .attr('max', data.pgmax)
                     .attr('readonly', data.pgmax == 0 ? true : false)
                     .attr('required', true);

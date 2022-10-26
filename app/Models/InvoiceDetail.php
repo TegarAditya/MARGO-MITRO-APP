@@ -48,7 +48,7 @@ class InvoiceDetail extends Model
 
     public function bonus()
     {
-        return $this->belongsTo(InvoicePackage::class, 'invoice_detail_id');
+        return $this->hasOne(InvoicePackage::class, 'invoice_detail_id');
     }
 
     protected function serializeDate(DateTimeInterface $date)
