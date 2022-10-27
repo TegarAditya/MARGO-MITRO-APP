@@ -253,7 +253,7 @@ class HomeController
         DB::beginTransaction();
         try {
             $stocks = StockMovement::where('type', 'invoices')->whereNotIn('reference', [4, 7])->get();
-
+            dd($stocks);
             foreach($stocks as $stock) {
                 $product = $stock->product;
                 $product->update([
