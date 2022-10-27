@@ -84,7 +84,7 @@
             <div class="product-list">
                 @if ($item['items']->count())
                     @php
-                        $sortedProducts = $item['items']->sortBy('tipe_pg')->sortBy('halaman_id')->sortBy('kelas_id')->sortBy('product.name')->sortBy('product.jenjang_id');
+                        $sortedProducts = $item['items']->sortBy('product.tipe_pg')->sortBy('product.halaman_id')->sortBy('product.kelas_id')->sortBy('product.name')->sortBy('product.jenjang_id');
                     @endphp
                     @each('admin.invoices.parts.item-invoice-detail', $sortedProducts, 'detail')
                 @endif
