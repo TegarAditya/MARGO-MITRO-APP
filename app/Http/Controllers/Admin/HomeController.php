@@ -252,7 +252,7 @@ class HomeController
     public function god(){
         DB::beginTransaction();
         try {
-            $stocks = StockMovement::where('type', 'kelengkapan')->get();
+            $stocks = StockMovement::where('type', 'invoices')->whereNotIn('reference', [4, 7])->get();
 
             foreach($stocks as $stock) {
                 $product = $stock->product;
@@ -261,7 +261,7 @@ class HomeController
                 ]);
             }
 
-            StockMovement::where('type', 'kelengkapan')->forceDelete();
+            StockMovement::where('type', 'invoices')->whereNotIn('reference', [4, 7])->delete();
 
             DB::commit();
         } catch (\Exception $e) {
