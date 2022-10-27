@@ -266,7 +266,7 @@ class HomeController
         } catch (\Exception $e) {
             DB::rollback();
 
-            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+            dd($e->getMessage());
         }
 
         dd('done');
