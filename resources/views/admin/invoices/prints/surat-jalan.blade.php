@@ -1,8 +1,10 @@
 @extends('layouts.print')
 
-@section('header.right')
+@section('header.center')
 <h6>SURAT JALAN</h6>
+@endsection
 
+@section('header.left')
 <table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
     <tbody>
         <tr>
@@ -11,11 +13,11 @@
             <td>{{ $invoice->no_invoice }}</td>
         </tr>
 
-        {{-- <tr>
+        <tr>
             <td width="120"><strong>No. Surat Jalan</strong></td>
             <td width="8">:</td>
             <td>{{ $invoice->no_suratjalan }}</td>
-        </tr> --}}
+        </tr>
 
         <tr>
             <td><strong>Tanggal</strong></td>
@@ -23,6 +25,18 @@
             <td>{{ $invoice->date }}</td>
         </tr>
 
+        {{-- <tr>
+            <td><strong>{{ $invoice->type === 'Masuk' ? 'Dari' : 'Kepada' }}</strong></td>
+            <td>:</td>
+            <td style="border-bottom: 1px dotted #000"></td>
+        </tr> --}}
+    </tbody>
+</table>
+@stop
+
+@section('header.right')
+<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
+    <tbody>
         <tr>
             <td><strong>Nama Freelance</strong></td>
             <td>:</td>
@@ -40,13 +54,13 @@
         </tr>
 
         {{-- <tr>
-            <td><strong>{{ $invoice->type === 'Masuk' ? 'Dari' : 'Kepada' }}</strong></td>
+            <td><strong>Alamat</strong></td>
             <td>:</td>
-            <td style="border-bottom: 1px dotted #000"></td>
+            <td></td>
         </tr> --}}
     </tbody>
 </table>
-@stop
+@endsection
 
 @section('content')
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
@@ -118,7 +132,7 @@
 @push('styles')
 <style type="text/css" media="print">
 @page {
-    size: landscape;
+    size: portrait;
 }
 </style>
 @endpush

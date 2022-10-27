@@ -392,8 +392,10 @@ class InvoiceController extends Controller
             });
 
             $details = $details->whereNotIn('id', $pg_array->pluck('id'));
-            $inv_details = $details->where('product.tipe_pg', '===', 'non_pg');
-            $pg_details = $details->where('product.tipe_pg', '!==', 'non_pg');
+            $inv_details = $details->where('product.tipe_pg', '===', 'non_pg')->sortBy('product.kelas_id')
+                                ->sortBy('product.tiga_nama')->sortBy('product.jenjang_id');
+            $pg_details = $details->where('product.tipe_pg', '!==', 'non_pg')->sortBy('product.kelas_id')
+                                ->sortBy('product.tiga_nama')->sortBy('product.jenjang_id');
 
             return view('admin.invoices.prints.surat-jalan', compact('invoice', 'inv_details', 'pg_details'));
         } else if (request('print') === 'inv') {

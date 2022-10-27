@@ -109,7 +109,7 @@
 @push('styles')
 <style type="text/css" media="print">
 @page {
-    size: landscape;
+    size: portrait;
 }
 </style>
 @endpush
