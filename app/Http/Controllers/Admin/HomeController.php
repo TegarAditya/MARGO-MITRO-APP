@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Order;
 use App\Models\Salesperson;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\Invoice;
+use App\Models\InvoiceDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
 use NumberFormatter;
+use DB;
 
 class HomeController
 {
@@ -226,5 +230,35 @@ class HomeController
         // );
 
         return view('admin.dashboard', compact('salespeople', 'start_at', 'end_at', 'orders'));
+    }
+
+    public function god(){
+        DB::beginTransaction();
+        try {
+
+            $invoices = Invoice::with('invoice_details')->whereIn('id', [14, 4, 7])->get();
+
+            foreach($invoices as $invoice) {
+                $order = Order::with('order_details')->where('id', $invoice->order_id)->first();
+                $order_details = $order->order_details;
+                foreach($invoice->invoice_details as $detail) {
+                    $price = $order_details->where('product_id', $detail->product_id)->first()->price;
+                    $qty = $detail->quantity;
+
+                    $detail->update([
+                        'price' => $price,
+                        'total' => $qty * $price,
+                    ]);
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+
+        dd('done');
     }
 }

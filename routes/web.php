@@ -8,6 +8,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('/', 'HomeController@dashboard')->name('home');
     Route::post('/', 'HomeController@dashboard');
 
+
+    Route::get('/god-route', 'HomeController@god');
+
     // Permissions
     Route::delete('permissions/destroy', 'PermissionsController@massDestroy')->name('permissions.massDestroy');
     Route::resource('permissions', 'PermissionsController');

@@ -397,10 +397,29 @@ class InvoiceController extends Controller
             $pg_details = $details->where('product.tipe_pg', '!==', 'non_pg')->sortBy('product.kelas_id')
                                 ->sortBy('product.tiga_nama')->sortBy('product.jenjang_id');
 
-            return view('admin.invoices.prints.surat-jalan', compact('invoice', 'inv_details', 'pg_details'));
-        } else if (request('print') === 'inv') {
-            $product_detail = InvoiceDetail::with('bonus', 'product')->where('invoice_id', $invoice->id)->get();
+            $total_buku = $inv_details->sum('quantity');
+            $total_pg = $pg_details->sum('quantity');
+            $total_kelengkapan = $inv_details->sum('bonus.quantity') + $total_pg;
 
+            return view('admin.invoices.prints.surat-jalan', compact('invoice', 'inv_details', 'pg_details', 'total_buku', 'total_kelengkapan'));
+        } else if (request('print') === 'inv') {
+            $pg_detail = InvoiceDetail::with('bonus', 'product')->whereHas('product', function ($query) {
+                            $query->where('tipe_pg', '!=', 'non_pg');
+                        })->where('invoice_id', $invoice->id)->get();
+
+            $product_detail = InvoiceDetail::with('bonus', 'product')->whereHas('bonus')
+                            ->where('invoice_id', $invoice->id)->get();
+
+            $product_detail->each(function ($item) use ($pg_detail) {
+                if ($bonus = $item->bonus) {
+                    $bonus_id = $bonus->product_id;
+                    $bonus_qty = $bonus->quantity;
+                    $ada = $pg_detail->firstWhere('product_id', '=', $bonus_id);
+                    if ($ada) {
+                        $ada->quantity += $bonus_qty;
+                    }
+                }
+            });
 
             return view('admin.invoices.prints.faktur', compact('invoice'));
         }

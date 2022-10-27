@@ -235,7 +235,7 @@
                                 class="product-select-item{{ $selected ? ' selected' : '' }}{{ $disabled ? ' disabled' : '' }}"
                                 data-search="{{ strtolower($search) }}"
                                 data-id="{{ $product->id }}"
-                                data-price="{{ $product->price }}"
+                                data-price="{{ $detail->price }}"
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
                                 @if($bonus)

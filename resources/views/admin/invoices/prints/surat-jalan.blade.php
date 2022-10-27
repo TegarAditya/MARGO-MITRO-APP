@@ -102,11 +102,18 @@
                 <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
-                <td class="px-3 text-center">{{ abs($detail->quantity) }}</td>
                 <td class="px-3 text-center">-</td>
+                <td class="px-3 text-center">{{ abs($detail->quantity) }}</td>
             </tr>
         @endforeach
     </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="4" class="text-center"><strong>TOTAL</strong></th>
+            <th class="text-center"><strong>{{ $total_buku }}</strong></th>
+            <th class="text-center"><strong>{{ $total_kelengkapan }}</strong></th>
+        </tr>
+    </tfoot>
 </table>
 @endsection
 
