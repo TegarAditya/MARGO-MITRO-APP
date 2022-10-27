@@ -76,7 +76,7 @@
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
                 <td>{{ $product->jenjang->name ?? '' }}</td>
-                <td>{{ $product->kelas->name ?? '' }}</td>
+                <td class="text-center">{{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
                 <td class="text-center">{{ $detail->quantity }}</td>
