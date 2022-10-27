@@ -50,7 +50,7 @@
         <tr>
             <th rowspan="2" width="1%" class="align-middle text-center">No.</th>
             <th rowspan="2" class="align-middle">Jenjang</th>
-            <th rowspan="2" class="align-middle">Kelas</th>
+            <th rowspan="2" width="1%" class="align-middle">Kelas</th>
             <th rowspan="2" class="align-middle">Tema/Mapel</th>
             <th rowspan="2" width="1%" class="align-middle text-center">Hal</th>
             <th colspan="2" class="text-center">Pesanan</th>
@@ -76,7 +76,7 @@
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
                 <td>{{ $product->jenjang->name ?? '' }}</td>
-                <td>Kelas {{ $product->kelas->name ?? '' }}</td>
+                <td>{{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
                 <td class="text-center">{{ $detail->quantity }}</td>
