@@ -260,7 +260,7 @@ class HomeController
                     'stock' => DB::raw($product->stock - $stock->quantity),
                 ]);
             }
-            $stocks->forceDelete();
+            $stocks->delete();
 
             DB::commit();
         } catch (\Exception $e) {
