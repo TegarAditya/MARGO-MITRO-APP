@@ -260,7 +260,8 @@ class HomeController
                     'stock' => DB::raw($product->stock - $stock->quantity),
                 ]);
             }
-            $stocks->delete();
+
+            StockMovement::where('type', 'kelengkapan')->forceDelete();
 
             DB::commit();
         } catch (\Exception $e) {
