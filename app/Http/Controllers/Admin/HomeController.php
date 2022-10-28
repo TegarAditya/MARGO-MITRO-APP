@@ -262,25 +262,24 @@ class HomeController
 
     // StockMovement::where('type', 'kelengkapan')->where('reference', 4)->delete();
 
+    //update move dan quantity bonus
+    // $invoice_detail = InvoiceDetail::with('bonus')->whereHas('bonus')->where('invoice_id', 4)->get();
+    //         foreach($invoice_detail as $detail) {
+    //             $order_detail = OrderDetail::with('bonus')->whereHas('bonus')->where('order_id', 33)->where('product_id', $detail->product_id)->first();
+
+    //             $detail->bonus->update([
+    //                 'quantity' => 0
+    //             ]);
+
+    //             $order_detail->bonus->update([
+    //                 'moved' => 0
+    //             ]);
+    //         }
+
     public function god(){
         DB::beginTransaction();
         try {
-            $invoice_detail = InvoiceDetail::where('invoice_id', 4)->get();
-            foreach($invoice_detail as $detail) {
-                $order_detail = OrderDetail::where('order_id', 33)->where('product_id', $detail->id)->first();
 
-                if ($bonus = $detail->bonus) {
-                    $bonus->update([
-                        'quantity' => 0
-                    ]);
-
-                    $order_detail->bonus->update([
-                        'moved' => 0
-                    ]);
-
-                    dd($bonus);
-                }
-            }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();

@@ -54,6 +54,8 @@
                                         {{ $stockMovement->referensi->no_invoice }}
                                     @elseif ($stockMovement->type == 'adjustment')
                                         {{ $stockMovement->referensi->date.'('.App\Models\StockAdjustment::OPERATION_SELECT[$stockMovement->referensi->operation] .')' }}
+                                    @elseif ($stockMovement->type == 'kelengkapan')
+                                        {{ $stockMovement->referensi->no_invoice }}
                                     @endif
                                 </td>
                                 <td>
