@@ -51,12 +51,12 @@
                                     @if ($stockMovement->type == 'order')
                                         {{ $stockMovement->referensi->no_order }}
                                     @elseif ($stockMovement->type == 'invoice')
-                                        #{{ $stockMovement->reference }}{{ $stockMovement->referensi->no_invoice }}
+                                        {{ $stockMovement->referensi->no_invoice }}
                                     @elseif ($stockMovement->type == 'adjustment')
                                         {{ $stockMovement->referensi->date.'('.App\Models\StockAdjustment::OPERATION_SELECT[$stockMovement->referensi->operation] .')' }}
                                         <br>({{ $stockMovement->referensi->note }})
                                     @elseif ($stockMovement->type == 'kelengkapan')
-                                        #{{ $stockMovement->reference }} {{ $stockMovement->referensi->no_invoice }}
+                                        {{ $stockMovement->referensi->no_invoice }}
                                     @endif
                                 </td>
                                 <td>
