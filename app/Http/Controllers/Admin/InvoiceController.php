@@ -319,7 +319,7 @@ class InvoiceController extends Controller
                         'stock' => $bonus_product->stock + $bonus->quantity
                     ]);
                     $order_detail->bonus()->update([
-                        'moved' => 10
+                        'moved' => $order_detail->bonus->quantity - $bonus->quantity
                     ]);
                 }
             }

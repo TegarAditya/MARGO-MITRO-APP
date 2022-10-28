@@ -18,6 +18,7 @@ class StockMovement extends Model
         'adjustment' => 'Adjustment',
         'invoice' => 'Invoice',
         'realisasi' => 'Realisasi',
+        'kelengkapan' => 'Invoice',
     ];
 
     public $table = 'stock_movements';
@@ -55,6 +56,8 @@ class StockMovement extends Model
             return $this->belongsTo(StockAdjustment::class, 'reference');
         } else if ($this->attributes['type'] === 'realisasi') {
             return $this->belongsTo(Realisasi::class, 'reference');
+        } else if ($this->attributes['type'] === 'kelengkapan') {
+            return $this->belongsTo(Invoice::class, 'reference');
         }
     }
 
