@@ -277,7 +277,7 @@ class BukuController extends Controller
 
         $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman', 'isi');
 
-        $stockMovements = StockMovement::with(['product', 'referensi'])->where('product_id', $product->id)->orderBy('created_at', 'DESC')->get();
+        $stockMovements = StockMovement::with(['product'])->where('product_id', $product->id)->orderBy('created_at', 'DESC')->get();
 
         return view('admin.buku.show', compact('product', 'stockMovements'));
     }
