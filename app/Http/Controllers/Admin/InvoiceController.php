@@ -223,7 +223,7 @@ class InvoiceController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Invoice berhasil dibuat');
+            Alert::success('Success', 'Invoice berhasil disimpan');
 
             if ($request->redirect) {
                 return redirect($request->redirect)->with('activeTabs', 'invoice');
@@ -398,6 +398,8 @@ class InvoiceController extends Controller
 
             DB::commit();
 
+            Alert::success('Success', 'Invoice berhasil disimpan');
+
             if ($request->redirect) {
                 return redirect($request->redirect)->with('activeTabs', 'invoice');
             }
@@ -534,6 +536,8 @@ class InvoiceController extends Controller
 
             DB::commit();
 
+            Alert::success('Success', 'Invoice berhasil dihapus');
+
             return redirect()->route('admin.invoices.index');
         } catch (\Exception $e) {
             DB::rollback();
@@ -583,7 +587,6 @@ class InvoiceController extends Controller
 
     public function fakturReturSave(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'date' => 'required|date',
             'products' => 'required|array|min:1',
@@ -655,7 +658,7 @@ class InvoiceController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Invoice berhasil dibuat');
+            Alert::success('Success', 'Invoice berhasil disimpan');
 
             return redirect()->route('admin.invoices.retur');
         } catch (\Exception $e) {
