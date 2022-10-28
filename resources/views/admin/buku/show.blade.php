@@ -51,11 +51,14 @@
                                     @if ($stockMovement->type == 'order')
                                         {{ $stockMovement->referensi->no_order }}
                                     @elseif ($stockMovement->type == 'invoice')
+                                        <a class="px-1" title="Reference" href="{{ route('admin.invoices.show', $stockMovement->reference) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
                                         {{ $stockMovement->referensi->no_invoice }}
                                     @elseif ($stockMovement->type == 'adjustment')
+                                        <a class="px-1" title="Reference" href="{{ route('admin.stock-adjustments.show', $stockMovement->reference) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
                                         {{ $stockMovement->referensi->date.'('.App\Models\StockAdjustment::OPERATION_SELECT[$stockMovement->referensi->operation] .')' }}
                                         <br>({{ $stockMovement->referensi->note }})
                                     @elseif ($stockMovement->type == 'kelengkapan')
+                                    <a class="px-1" title="Reference" href="{{ route('admin.invoices.show', $stockMovement->reference) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
                                         {{ $stockMovement->referensi->no_invoice }}
                                     @endif
                                 </td>
