@@ -11,10 +11,12 @@ use App\Models\InvoiceDetail;
 use App\Models\InvoicePackage;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderPackage;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\Salesperson;
 use App\Models\Semester;
+use App\Models\AlamatSale;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -136,7 +138,9 @@ class InvoiceController extends Controller
             $order_details = $order_details->where('order_id', $order_id);
         }
 
-        return view('admin.invoices.create', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details'));
+        $alamats = AlamatSale::where('kota_sales_id', $order->kota_sales_id)->pluck('alamat', 'id');
+
+        return view('admin.invoices.create', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details', 'alamats'));
     }
 
     public function store(Request $request)
@@ -145,6 +149,7 @@ class InvoiceController extends Controller
             'date' => 'required|date',
             'order_id' => 'required|exists:orders,id',
             'products' => 'required|array|min:1',
+            'alamat' => 'nullable'
         ]);
 
         $order = Order::findOrFail($request->order_id);
@@ -156,6 +161,7 @@ class InvoiceController extends Controller
                 'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
                 'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
                 'date' => $request->date,
+                'alamat' => $request->alamat,
                 'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
             ]);
@@ -243,7 +249,8 @@ class InvoiceController extends Controller
             ->whereHas('product')
             ->get();
 
-        $invoice->load('invoice_details', 'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan');
+        $invoice->load('invoice_details', 'invoice_details.product', 'invoice_details.bonus',
+            'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan');
 
         $order = null;
         if ($order = $invoice->order) {
@@ -256,7 +263,9 @@ class InvoiceController extends Controller
             return $item;
         });
 
-        return view('admin.invoices.edit', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details'));
+        $alamats = AlamatSale::where('kota_sales_id', $order->kota_sales_id)->pluck('alamat', 'id');
+
+        return view('admin.invoices.edit', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details', 'alamats'));
     }
 
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
@@ -265,27 +274,31 @@ class InvoiceController extends Controller
             'date' => 'required|date',
             'order_id' => 'required|exists:orders,id',
             'products' => 'required|array|min:1',
+            'alamat' => 'nullable'
         ]);
 
         $order = Order::findOrFail($request->order_id);
+
+        $order->load([
+            'order_details', 'order_details.bonus', 'order_details.product'
+        ]);
 
         DB::beginTransaction();
         try {
             $multiplier = -1 * (int) $request->get('invoice_type', -1);
             $invoice->forceFill([
-                'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
-                'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
                 'date' => $request->date,
                 'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
+                'alamat' => $request->alamat,
             ])->save();
+
+            $invoice->load([
+                'invoice_details', 'invoice_details.product', 'invoice_details.bonus', 'invoice_details.bonus.product'
+            ]);
 
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0
-            ]);
-
-            $invoice->load([
-                'invoice_details', 'invoice_details.product',
             ]);
 
             // Restore to previous data
@@ -295,16 +308,28 @@ class InvoiceController extends Controller
                         'stock' => $product->stock + $invoice_detail->quantity
                     ]);
                 }
-
                 $order->order_details()->where('product_id', $invoice_detail->product_id)->update([
                     'moved' => DB::raw("order_details.moved - $invoice_detail->quantity"),
                 ]);
+
+                $order_detail = $order->order_details()->where('product_id', $invoice_detail->product_id)->first();
+
+                if ($bonus = $invoice_detail->bonus) {
+                    $bonus_product = Product::find($bonus->product_id);
+                    $bonus_product->update([
+                        'stock' => $bonus_product->stock + $bonus->quantity
+                    ]);
+                    $order_detail->bonus()->update([
+                        'moved' => 10
+                    ]);
+                }
             }
 
             // Update with new items
-            $invoice_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request, $multiplier) {
+            $products = Product::whereIn('id', array_keys($request->products))->get()->each(function($item) use ($invoice, $order, $request, $multiplier) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
+                $qty_bonus = $request->products[$item->id]['bonus'] ?? null;
 
                 $qty = $qty * $multiplier;
 
@@ -313,10 +338,7 @@ class InvoiceController extends Controller
                     'type' => 'invoice',
                     'product_id' => $item->id,
                 ],[
-                    'reference' => $invoice->id,
-                    'type' => 'invoice',
                     'quantity' => -1 * $qty,
-                    'product_id' => $item->id,
                 ]);
                 $item->update([ 'stock' => $item->stock - $qty ]);
 
@@ -324,29 +346,56 @@ class InvoiceController extends Controller
                     'moved' => DB::raw("order_details.moved + $qty"),
                 ]);
 
-                return [
+                $invoice_detail = InvoiceDetail::updateOrCreate([
                     'product_id' => $item->id,
-                    'invoice_id' => $invoice->id,
+                    'invoice_id' => $invoice->id
+                ],[
                     'quantity' => $qty,
                     'price' => $price,
                     'total' => $qty * $price,
+                ]);
+
+                if ($qty_bonus) {
+                    $order_package = $order->order_details()->where('product_id', $item->id)->first();
+                    $order_bonus = $order_package->bonus;
+
+                    $bonus = InvoicePackage::updateOrCreate([
+                        'product_id' => $order_bonus->product_id,
+                        'invoice_detail_id' => $invoice_detail->id
+                    ], [
+                        'quantity' => $qty_bonus
+                    ]);
+                    $order_bonus->update([
+                        'moved' => $order_bonus->move + $qty_bonus,
+                    ]);
+
+                    $bonus_product = Product::find($order_bonus->product_id);
+
+                    $bonus_product->stock_movements()->updateOrCreate([
+                        'reference' => $invoice->id,
+                        'type' => 'kelengkapan',
+                        'product_id' => $bonus_product->id
+                    ], [
+                        'quantity' => -1 * $qty_bonus,
+                    ]);
+                    $bonus_product->update([ 'stock' => $bonus_product->stock - $qty_bonus ]);
+                }
+
+                return [
+                    'product_id' => $item->id,
+                    'invoice_id' => $invoice->id,
+                    'invoice_detail_id' =>  $invoice_detail->id
                 ];
             });
 
-            foreach ($invoice_details as $invoice_detail) {
-                $exists = $invoice->invoice_details->where('product_id', $invoice_detail['product_id'])->first() ?: new InvoiceDetail;
-
-                $exists->forceFill($invoice_detail)->save();
-            }
-
-            // Delete items if removed
-            $invoice->invoice_details()
-                ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
-                ->forceDelete();
-            StockMovement::where('reference', $invoice->id)
-                ->where('type', 'invoice')
-                ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
-                ->delete();
+            // // Delete items if removed
+            // $invoice->invoice_details()
+            //     ->whereNotIn('product_id', $products->pluck('product_id'))
+            //     ->forceDelete();
+            // StockMovement::where('reference', $invoice->id)
+            //     ->where('type', 'invoice')
+            //     ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
+            //     ->delete();
 
             DB::commit();
 

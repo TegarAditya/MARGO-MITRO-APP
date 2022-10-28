@@ -66,6 +66,20 @@
                 </div>
             @endif
         </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label for="alamat">Alamat</label>
+                <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="alamat" id="alamat">
+                    @foreach($alamats as $id => $entry)
+                        <option value="{{ $entry }}" {{ (old('alamat') ? old('alamat') : $invoice->alamat ?? '') == $entry ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('order'))
+                    <span class="text-danger">{{ $errors->first('order') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.invoice.fields.order_helper') }}</span>
+            </div>
+        </div>
     </div>
 
     @foreach ([
@@ -82,18 +96,18 @@
             <h5 class="product-group-title">{{ $item['label'] }}</h5>
 
             <div class="product-list">
-                @if ($item['items']->count())
-                    @php
-                        $sortedProducts = $item['items']->sortBy('product.tipe_pg')->sortBy('product.halaman_id')->sortBy('product.kelas_id')->sortBy('product.name')->sortBy('product.jenjang_id');
-                    @endphp
-                    @each('admin.invoices.parts.item-invoice-detail', $sortedProducts, 'detail')
-                @endif
-
                 @include('admin.invoices.parts.item-invoice-detail', [
                     'detail' => new App\Models\OrderDetail,
                     'modal' => $item['modal'],
                     'name' => $item['name'],
                 ])
+
+                @if ($item['items']->count())
+                    @php
+                        $sortedProducts = $item['items']->sortByDesc('product.tipe_pg')->sortBy('product.halaman_id')->sortBy('product.kelas_id')->sortBy('product.name')->sortBy('product.jenjang_id');
+                    @endphp
+                    @each('admin.invoices.parts.item-invoice-detail', $sortedProducts, 'detail')
+                @endif
             </div>
 
             <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
@@ -347,14 +361,14 @@
         pointer-events: none;
     }
 
-    .product-list > .item-product:last-child .product-delete {
+    .product-list > .item-product:first-child .product-delete {
         opacity: 0.5;
         pointer-events: none;
         background-color: #aeaeae;
         border-color: #969696;
     }
 
-    .product-list > .item-product:last-child > .product-col-content {
+    .product-list > .item-product:first-child > .product-col-content {
         opacity: 0.66;
         pointer-events: none;
     }
@@ -564,7 +578,7 @@
                 var product = productFake.clone();
 
                 !products.children('.item-product').length && products.html('');
-                product.appendTo(products);
+                product.prependTo(products);
 
                 bindProduct(product);
                 group.find('.product-action').hide();

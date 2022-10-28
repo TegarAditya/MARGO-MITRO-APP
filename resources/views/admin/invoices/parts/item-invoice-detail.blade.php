@@ -38,7 +38,7 @@ $name = !isset($name) ? 'products' : $name;
         data-pgstock="{{ $bonus->product->stock }}"
         data-pgqty="{{ $bonus->quantity }}"
         data-pgmoved="{{ $bonus->moved }}"
-        data-pgmax="{{ $bonus->quantity - $bonus->moved }}"
+        data-pgmax="{{ $bonus->quantity }}"
     @endif
     >
     <div class="col-5 row">
