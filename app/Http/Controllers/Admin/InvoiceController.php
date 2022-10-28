@@ -63,8 +63,7 @@ class InvoiceController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 $viewGate = 'invoice_show';
-                $editGate = 'invoice_edit_inactive';
-                // $editGate = 'invoice_edit';
+                $editGate = 'invoice_edit';
                 $deleteGate = 'invoice_delete';
                 $crudRoutePart = 'invoices';
                 $parent = 'orders';
