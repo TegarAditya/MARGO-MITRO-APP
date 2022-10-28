@@ -233,6 +233,7 @@ class HomeController
         return view('admin.dashboard', compact('salespeople', 'start_at', 'end_at', 'orders'));
     }
 
+    //update price
     // $invoices = Invoice::with('invoice_details')->whereIn('id', [14, 4, 7])->get();
 
     // foreach($invoices as $invoice) {
@@ -249,20 +250,37 @@ class HomeController
     //     }
     // }
 
+    //update movement
+    // $stocks = StockMovement::where('type', 'kelengkapan')->where('reference', 4)->get();
+
+    // foreach($stocks as $stock) {
+    //     $product = $stock->product;
+    //     $product->update([
+    //         'stock' => DB::raw($product->stock + $stock->quantity),
+    //     ]);
+    // }
+
+    // StockMovement::where('type', 'kelengkapan')->where('reference', 4)->delete();
+
     public function god(){
         DB::beginTransaction();
         try {
-            $stocks = StockMovement::where('type', 'kelengkapan')->where('reference', 4)->get();
+            $invoice_detail = InvoiceDetail::where('invoice_id', 4)->get();
+            foreach($invoice_detail as $detail) {
+                $order_detail = OrderDetail::where('order_id', 33)->where('product_id', $detail->id)->first();
 
-            foreach($stocks as $stock) {
-                $product = $stock->product;
-                $product->update([
-                    'stock' => DB::raw($product->stock - $stock->quantity),
-                ]);
+                if ($bonus = $detail->bonus) {
+                    $bonus->update([
+                        'quantity' => 0
+                    ]);
+
+                    $order_detail->bonus->update([
+                        'moved' => 0
+                    ]);
+
+                    dd($bonus);
+                }
             }
-
-            StockMovement::where('type', 'kelengkapan')->where('reference', 4)->delete();
-
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
