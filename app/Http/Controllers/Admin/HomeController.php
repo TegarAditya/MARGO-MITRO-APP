@@ -257,7 +257,7 @@ class HomeController
             foreach($stocks as $stock) {
                 $product = $stock->product;
                 $product->update([
-                    'stock' => DB::raw($product->stock - $stock->quantity),
+                    'stock' => DB::raw($product->stock + $stock->quantity),
                 ]);
             }
 
