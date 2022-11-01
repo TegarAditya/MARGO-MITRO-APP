@@ -60,9 +60,6 @@
 @section('content')
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
-        <th colspan="7">Buku</th>
-    </thead>
-    <thead>
         <th width="1%" class="text-center">No.</th>
         <th>Jenjang - Kelas</th>
         <th>Tema/Mapel</th>
@@ -92,15 +89,7 @@
     <thead>
         <th colspan="7">Kelengkapan</th>
     </thead>
-    <thead>
-        <th width="1%" class="text-center">No.</th>
-        <th>Jenjang - Kelas</th>
-        <th>Tema/Mapel</th>
-        <th width="1%" class="text-center">Hal</th>
-        <th width="15%" class="text-right">Harga</th>
-        <th width="1%" class="text-center">Qty</th>
-        <th width="20%" class="text-right">Subtotal</th>
-    </thead>
+
     <tbody>
         @foreach ($kelengkapan as $item)
             @php
