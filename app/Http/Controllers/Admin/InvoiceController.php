@@ -467,11 +467,18 @@ class InvoiceController extends Controller
                     $ada = $pg_detail->firstWhere('product_id', '=', $bonus_id);
                     if ($ada) {
                         $ada->quantity += $bonus_qty;
+                    } else {
+                        $pg_detail->push($bonus);
                     }
                 }
             });
 
-            return view('admin.invoices.prints.faktur', compact('invoice'));
+            $kelengkapan = $pg_detail->sortBy('product.kelas_id')->sortBy('product.tiga_nama')
+                            ->sortBy('product.jenjang_id');
+            $buku = $product_detail->sortBy('product.kelas_id')->sortBy('product.tiga_nama')
+                        ->sortBy('product.jenjang_id');
+
+            return view('admin.invoices.prints.faktur', compact('invoice', 'buku', 'kelengkapan'));
         }
 
         return view('admin.invoices.show', compact('invoice'));

@@ -1,8 +1,10 @@
 @extends('layouts.print')
 
-@section('header.right')
+@section('header.center')
 <h6>FAKTUR {{ $invoice->type === 'Masuk' ? 'RETURN' : '' }}</h6>
+@endsection
 
+@section('header.left')
 <table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
     <tbody>
         <tr>
@@ -11,18 +13,24 @@
             <td>{{ $invoice->no_invoice }}</td>
         </tr>
 
-        {{-- <tr>
+        <tr>
             <td width="120"><strong>No. Surat Jalan</strong></td>
             <td width="8">:</td>
             <td>{{ $invoice->no_suratjalan }}</td>
-        </tr> --}}
+        </tr>
 
         <tr>
             <td><strong>Tanggal</strong></td>
             <td>:</td>
             <td>{{ Carbon\Carbon::parse($invoice->date)->format('d-m-Y') }}</td>
         </tr>
+    </tbody>
+</table>
+@stop
 
+@section('header.right')
+<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
+    <tbody>
         <tr>
             <td><strong>Nama Freelance</strong></td>
             <td>:</td>
@@ -52,6 +60,9 @@
 @section('content')
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
+        <th colspan="7">Buku</th>
+    </thead>
+    <thead>
         <th width="1%" class="text-center">No.</th>
         <th>Jenjang - Kelas</th>
         <th>Tema/Mapel</th>
@@ -62,18 +73,37 @@
     </thead>
 
     <tbody>
-        @foreach ($invoice->invoice_details as $invoice_detail)
+        @foreach ($buku as $item)
             @php
-            $product = $invoice_detail->product;
+            $product = $item->product;
             @endphp
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
                 <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
-                <td class="text-right">@money($invoice_detail->price)</td>
-                <td class="text-center">{{ abs($invoice_detail->quantity) }}</td>
-                <td class="text-right">@money(abs($invoice_detail->total))</td>
+                <td class="text-right">@money($item->price)</td>
+                <td class="text-center">{{ abs($item->quantity) }}</td>
+                <td class="text-right">@money(abs($item->total))</td>
+            </tr>
+        @endforeach
+    </tbody>
+    <thead>
+        <th colspan="7">Kelengkapan</th>
+    </thead>
+    <tbody>
+        @foreach ($kelengkapan as $item)
+            @php
+            $product = $item->product;
+            @endphp
+            <tr>
+                <td class="text-center">{{ $loop->iteration }}</td>
+                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
+                <td>{{ $product->name }}</td>
+                <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
+                <td class="text-center">-</td>
+                <td class="text-center">{{ abs($item->quantity) }}</td>
+                <td class="text-right">@money(abs($item->total))</td>
             </tr>
         @endforeach
     </tbody>
