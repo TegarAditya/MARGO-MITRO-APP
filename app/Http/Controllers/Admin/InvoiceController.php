@@ -457,8 +457,7 @@ class InvoiceController extends Controller
                             $query->where('tipe_pg', '!=', 'non_pg');
                         })->where('invoice_id', $invoice->id)->get();
 
-            $product_detail = InvoiceDetail::with('bonus', 'product')->whereHas('bonus')
-                            ->where('invoice_id', $invoice->id)->get();
+            $product_detail = InvoiceDetail::with('bonus', 'product')->where('invoice_id', $invoice->id)->get();
 
             $product_detail->each(function ($item) use ($pg_detail) {
                 if ($bonus = $item->bonus) {
