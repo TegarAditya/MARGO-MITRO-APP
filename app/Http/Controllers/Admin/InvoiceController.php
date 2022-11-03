@@ -318,7 +318,7 @@ class InvoiceController extends Controller
                     $bonus_product->update([
                         'stock' => $bonus_product->stock + $bonus->quantity
                     ]);
-                    $order_detail->bonus()->update([
+                    $order_detail->bonus->update([
                         'moved' => $order_detail->bonus->quantity - $bonus->quantity
                     ]);
                 }
@@ -354,7 +354,7 @@ class InvoiceController extends Controller
                     'total' => $qty * $price,
                 ]);
 
-                if ($qty_bonus) {
+                if (isset($qty_bonus)) {
                     $order_package = $order->order_details()->where('product_id', $item->id)->first();
                     $order_bonus = $order_package->bonus;
 
@@ -379,22 +379,7 @@ class InvoiceController extends Controller
                     ]);
                     $bonus_product->update([ 'stock' => $bonus_product->stock - $qty_bonus ]);
                 }
-
-                return [
-                    'product_id' => $item->id,
-                    'invoice_id' => $invoice->id,
-                    'invoice_detail_id' =>  $invoice_detail->id
-                ];
             });
-
-            // // Delete items if removed
-            // $invoice->invoice_details()
-            //     ->whereNotIn('product_id', $products->pluck('product_id'))
-            //     ->forceDelete();
-            // StockMovement::where('reference', $invoice->id)
-            //     ->where('type', 'invoice')
-            //     ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
-            //     ->delete();
 
             DB::commit();
 
@@ -488,6 +473,82 @@ class InvoiceController extends Controller
         abort_if(Gate::denies('invoice_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $order = Order::findOrFail($invoice->order_id);
+
+        DB::beginTransaction();
+        try {
+            $invoice->load([
+                'invoice_details', 'invoice_details.product',
+            ]);
+
+            // Restore to previous data
+            foreach ($invoice->invoice_details as $invoice_detail) {
+                if ($product = $invoice_detail->product) {
+                    $product->update([
+                        'stock' => $product->stock + $invoice_detail->quantity
+                    ]);
+                }
+
+                $order->order_details()->where('product_id', $invoice_detail->product_id)->update([
+                    'moved' => DB::raw("order_details.moved - $invoice_detail->quantity"),
+                ]);
+
+                if ($bonus = $invoice_detail->bonus) {
+                    $bonus_product = $bonus->product;
+
+                    $bonus_product->update([
+                        'stock' => $bonus_product->stock + $bonus->quantity
+                    ]);
+
+                    $bonus->update([
+                        'moved' => DB::raw("order_packages.moved - $bonus->quantity"),
+                    ]);
+
+                    StockMovement::where('reference', $invoice->id)
+                        ->where('type', 'kelengkapan')
+                        ->where('product_id', $bonus->product_id)
+                        ->forceDelete();
+                }
+            }
+
+            // Delete items if removed
+            $invoice->invoice_details()
+                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->forceDelete();
+            StockMovement::where('reference', $invoice->id)
+                ->where('type', 'invoice')
+                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->forceDelete();
+
+            $invoice->delete();
+
+            $order->tagihan()->update([
+                'tagihan' => $order->invoices()->sum('nominal') ?: 0
+            ]);
+
+            DB::commit();
+
+            Alert::success('Success', 'Invoice berhasil dihapus');
+
+            return redirect()->route('admin.invoices.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function delete(Request $request)
+    {
+        $order_detail = OrderDetail::find($request->id);
+
+        // // Delete items if removed
+            // $invoice->invoice_details()
+            //     ->whereNotIn('product_id', $products->pluck('product_id'))
+            //     ->forceDelete();
+            // StockMovement::where('reference', $invoice->id)
+            //     ->where('type', 'invoice')
+            //     ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
+            //     ->delete();
 
         DB::beginTransaction();
         try {

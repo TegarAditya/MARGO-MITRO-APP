@@ -64,7 +64,7 @@ class StockOpnameController extends Controller
             $table->addColumn('value', '&nbsp;');
 
             $table->editColumn('name', function ($row) {
-                return '<a href="'.route('admin.products.show', $row->id).'">'.$row->nama_isi_buku .'</a>';
+                return '<a href="'.route('admin.buku.show', $row->id).'">'.$row->nama_isi_buku .'</a>';
             });
             $table->addColumn('category_name', function ($row) {
                 return $row->category ? $row->category->name : '';
