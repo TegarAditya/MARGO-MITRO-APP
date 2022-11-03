@@ -80,6 +80,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
+    public function productionperson()
+    {
+        return $this->hasOne(Productionperson::class);
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');

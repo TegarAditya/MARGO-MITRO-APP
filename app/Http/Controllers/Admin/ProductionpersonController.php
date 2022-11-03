@@ -15,6 +15,8 @@ use Yajra\DataTables\Facades\DataTables;
 use Excel;
 use App\Imports\ProductionpersonImport;
 use Alert;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class ProductionpersonController extends Controller
 {
@@ -68,12 +70,37 @@ class ProductionpersonController extends Controller
     {
         abort_if(Gate::denies('productionperson_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.productionpeople.create');
+        $login = new User();
+
+        return view('admin.productionpeople.create', compact('login'));
     }
 
     public function store(StoreProductionpersonRequest $request)
     {
         $productionperson = Productionperson::create($request->all());
+
+        if (!empty($request->email)) {
+            if (User::where('email', $request->email)->count()) {
+                Alert::error('Error', 'Email sudah terdaftar!');
+
+                return redirect()
+                    ->route('admin.productionpeople.edit', $productionperson->id)
+                    ->withInput([
+                        'email' => $request->email,
+                    ])
+                    ->withErrors([
+                        'email' => 'Email sudah terdaftar',
+                    ]);
+            }
+
+            $login = $productionperson->user()->create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            $productionperson->attachUser($login);
+        }
 
         return redirect()->route('admin.productionpeople.index');
     }
@@ -82,12 +109,41 @@ class ProductionpersonController extends Controller
     {
         abort_if(Gate::denies('productionperson_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.productionpeople.edit', compact('productionperson'));
+        $login = $productionperson->user ?: new User();
+
+        return view('admin.productionpeople.edit', compact('productionperson', 'login'));
     }
 
     public function update(UpdateProductionpersonRequest $request, Productionperson $productionperson)
     {
         $productionperson->update($request->all());
+
+        if (!empty($request->email)) {
+            $emailExists = User::where('email', $request->email)->where('id', '!=', $productionperson->user_id)->count();
+
+            if ($emailExists) {
+                Alert::error('Error', 'Email sudah terdaftar!');
+
+                return redirect()
+                    ->route('admin.productionpeople.edit', $productionperson->id)
+                    ->withInput([
+                        'email' => $request->email,
+                    ])
+                    ->withErrors([
+                        'email' => 'Email sudah terdaftar',
+                    ]);
+            }
+        }
+
+        $login = $productionperson->user ?: new User();
+
+        $login->name = $request->input('name', $login->name);
+        $login->email = $request->input('email', $login->email);
+        $login->password = !$request->password ? $login->password : Hash::make($request->password);
+
+        $login->save();
+
+        $productionperson->attachUser($login);
 
         return redirect()->route('admin.productionpeople.index');
     }
