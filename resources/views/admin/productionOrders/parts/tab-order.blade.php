@@ -4,6 +4,8 @@ $bahan_products = $products->whereIn('category_id', [$bahan_cat->id, ...$bahan_c
 
 $buku_cat = $categories->where('slug', 'buku')->first();
 $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat->child()->pluck('id')]);
+
+$status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDING;
 @endphp
 
 <div class="model-products pt-3">
@@ -12,10 +14,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
     <div class="row">
         <div class="col-12">
             <div class="form-group">
-                <label for="po_number">No. Production Order</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('po_number') ? 'is-invalid' : '' }}" type="text" name="po_number" id="po_number" value="{{ old('po_number', $productionOrder->po_number) }}" readonly placeholder="(Otomatis)">
-                @if($errors->has('po_number'))
-                    <span class="text-danger">{{ $errors->first('po_number') }}</span>
+                <label for="no_order">No. Production Order</label>
+                <input class="form-control h-auto py-1 {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $productionOrder->no_order) }}" readonly placeholder="(Otomatis)">
+                @if($errors->has('no_order'))
+                    <span class="text-danger">{{ $errors->first('no_order') }}</span>
                 @endif
             </div>
         </div>
@@ -38,8 +40,8 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 <label class="required" for="type">Jenis</label>
                 <select class="form-control select2 {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
                     <option value="">Please select</option>
-                    <option value="finishing" {{ $productionOrder->type == 'finishing' ? 'selected' : '' }}>Finishing</option>
-                    <option value="percetakan" {{ $productionOrder->type == 'percetakan' ? 'selected' : '' }}>Percetakan</option>
+                    <option value="finishing" {{ old('type', $productionOrder->type) == 'finishing' ? 'selected' : '' }}>Finishing</option>
+                    <option value="percetakan" {{ old('type', $productionOrder->type) == 'percetakan' ? 'selected' : '' }}>Percetakan</option>
                 </select>
                 @if($errors->has('type'))
                     <span class="text-danger">{{ $errors->first('type') }}</span>
@@ -59,7 +61,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                         <option
                             value="{{ $person->id }}"
                             data-type="{{ $person->type }}"
-                            {{ (old('productionperson_id') ? old('productionperson_id') : $productionOrder->productionperson->id ?? '') == $person->id ? 'selected' : '' }}
+                            {{ old('productionperson_id', $productionOrder->productionperson_id) == $person->id ? 'selected' : '' }}
                         >{{ $person->name }}</option>
                     @endforeach
                 </select>
@@ -77,19 +79,19 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
     <hr style="margin: .5em -15px;border-color:#ccc" />
 
-    <h5 class="mb-2 mt-3">Pilih Produk</h5>
+    <h5 class="mb-2 mt-3">
+        {{ !$productionOrder->id ? "Pilih Produk" : "Produk Dipilih" }}
+    </h5>
 
     @foreach ([
         [
-            'label' => 'Produk Dipilih',
-            'product_ids' => $buku_products->pluck('id'),
             'modal' => '#productModal',
             'name' => 'products',
             'placeholder' => 'Pilih Produk',
         ],
     ] as $item)
         @php
-        $order_details = $productionOrder->production_order_details->whereIn('product_id', $item['product_ids']);
+        $order_details = $productionOrder->production_order_details;
 
         $groups = $order_details->groupBy('group');
 
@@ -120,15 +122,17 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                     @endif
 
                     @if ($list->count())
-                        @each('admin.productionOrders.parts.item-product', $order_details, 'detail')
+                        @each('admin.productionOrders.parts.item-product', $list, 'detail')
                     @endif
 
-                    @include('admin.productionOrders.parts.item-product', [
-                        'detail' => new App\Models\ProductionOrderDetail,
-                        'modal' => $item['modal'],
-                        'name' => $item['name'],
-                        'placeholder' => $item['placeholder'],
-                    ])
+                    @if ($status === 0)
+                        @include('admin.productionOrders.parts.item-product', [
+                            'detail' => new App\Models\ProductionOrderDetail,
+                            'modal' => $item['modal'],
+                            'name' => $item['name'],
+                            'placeholder' => $item['placeholder'],
+                        ])
+                    @endif
                 </div>
 
                 <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
@@ -162,17 +166,19 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         @endforeach
     @endforeach
 
-    <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
-        <div class="row">
-            <div class="col">
-                <button type="button" class="btn py-1 border product-group-add">
-                    <i class="fa fa-plus text-sm mr-1"></i>
+    @if ($status === 0)
+        <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn py-1 border product-group-add">
+                        <i class="fa fa-plus text-sm mr-1"></i>
 
-                    <span>Tambah Group</span>
-                </button>
+                        <span>Tambah Group</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <div class="product-summary" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
         <div class="row border-top pt-2">
@@ -360,7 +366,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
     border-color: #969696;
 }
 
-.product-list > .item-product:last-child > .product-col-content {
+.product-list > .item-product.item-product-status-0:last-child > .product-col-content {
     opacity: 0.66;
     pointer-events: none;
 }
@@ -474,17 +480,18 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
         var bindGroup = function(item, index) {
             var group = $(item);
+            var groupId = group.data('group');
             var products = group.find('.product-list');
             var productAdd = group.find('.product-add');
             var productFake = group.find('.product-faker > .item-product');
-
-            console.log("BIND GROUP", groups.data());
 
             var bindProduct = function(product) {
                 var qty = product.find('.product-qty');
                 var actions = product.find('.product-qty-act');
                 var price = product.find('.product-price');
                 var priceText = product.find('.product-price_text');
+
+                !isNaN(groupId) && product.find('.product-group').val(groupId);
 
                 actions.on('click', function (e) {
                     var el = $(e.currentTarget);
@@ -534,8 +541,6 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
                 product.find('.product-pick').on('click', function(e) {
                     productSelectTarget = product;
-
-                    console.log("PRODUCT", product.closest(groups).data());
                 });
             };
 
@@ -549,9 +554,6 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 e.preventDefault();
 
                 var product = productFake.clone();
-
-                console.log("SUCK", products);
-                console.log("PARENT", products.closest(groups));
 
                 !products.children('.item-product').length && products.html('');
                 product.appendTo(products);
@@ -571,19 +573,20 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             var lastGroup = groups.last();
             var fake = groupFake.clone();
 
-            console.log("LAST GROUP", lastGroup.data());
-            console.log("fake", fake.data());
-
             fake.removeClass('d-none').insertAfter(lastGroup);
 
-            bindGroup(fake);
+            bindGroup(fake, groups.length + 1);
             groups = groups.add(fake);
 
             groups.each(function(index, item) {
-                console.log("GROUP", item);
+                var group = $(item);
+                var groupId = index + 1;
 
-                $(item).data('group', index + 1).attr('data-group', index + 1);
+                group.data('group', groupId).attr('data-group', groupId);
+                group.find('.product-group').val(groupId);
             });
+
+            allProducts = groups.find('.product-list');
         });
 
         $('.field-select2').each((index, item) => {
@@ -661,9 +664,9 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 .attr('name', name+'['+data.id+'][qty]')
                 .attr('min', 1)
                 .attr('required', true);
-            product.find('.product-qty2').val(qty || 0)
-                .attr('id', 'fieldQtyProd-'+data.id)
-                .attr('name', name+'['+data.id+'][prod]')
+            product.find('.product-group')
+                .attr('id', 'fieldGroupProd-'+data.id)
+                .attr('name', name+'['+data.id+'][group]')
                 .attr('required', true);
             product.find('.product-price').val(price != 0 ? price : data.price)
                 .attr('name', name+'['+data.id+'][price]');

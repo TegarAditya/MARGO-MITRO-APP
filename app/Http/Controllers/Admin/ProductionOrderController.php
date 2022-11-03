@@ -54,11 +54,8 @@ class ProductionOrderController extends Controller
             ));
             });
 
-            $table->editColumn('po_number', function ($row) {
-                return $row->po_number ? $row->po_number : '';
-            });
-            $table->editColumn('no_spk', function ($row) {
-                return $row->no_spk ? $row->no_spk : '';
+            $table->editColumn('no_order', function ($row) {
+                return $row->no_order ? $row->no_order : '';
             });
             $table->addColumn('productionperson_name', function ($row) {
                 return $row->productionperson ? $row->productionperson->name : '';
@@ -134,26 +131,29 @@ class ProductionOrderController extends Controller
             $productionOrder = new ProductionOrder();
 
             $productionOrder->forceFill([
+                'user_id' => $user->id,
+                'order_id' => $request->order_id,
+                'finishing_order_id' => $request->finishing_order_id,
                 'productionperson_id' => $request->productionperson_id,
+                'no_order' => ProductionOrder::generateNoPO(),
+                'type' => $request->type,
                 'date' => $request->date,
                 'total' => $request->total ?: 0,
-                'type' => $request->type,
-                'po_number' => ProductionOrder::generateNoPO(),
-                'no_spk' => ProductionOrder::generateNoSPK(),
-                'no_kwitansi' => ProductionOrder::generateNoKwitansi(),
-                'created_by_id' => $user->id,
             ])->save();
 
             $order_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($productionOrder, $request) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
-                $prod = (int) $request->products[$item->id]['prod'] ?: 0;
+                $group = (int) $request->products[$item->id]['group'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
 
                 return [
                     'product_id' => $item->id,
+                    'order_id' => $request->order_id,
                     'production_order_id' => $productionOrder->id,
+                    'productionperson_id' => $request->productionperson_id,
+                    'finishing_order_id' => $request->finishing_order_id,
                     'order_qty' => $qty,
-                    'prod_qty' => $prod,
+                    'group' => $group,
                     'ongkos_satuan' => $price,
                     'ongkos_total' => $price * $qty,
                 ];
@@ -163,7 +163,7 @@ class ProductionOrderController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Finishing Order berhasil di simpan');
+            Alert::success('Success', 'Production Order berhasil di simpan');
 
             return redirect()->route('admin.production-orders.edit', $productionOrder->id);
         } catch (\Exception $e) {
@@ -177,7 +177,11 @@ class ProductionOrderController extends Controller
     {
         abort_if(Gate::denies('production_order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $productionOrder->load('productionperson', 'created_by', 'production_order_details');
+        $productionOrder->load([
+            'productionperson',
+            'created_by',
+            'production_order_details', 'production_order_details.production_order',
+        ]);
 
         $productionpeople = Productionperson::get();
 
@@ -199,26 +203,37 @@ class ProductionOrderController extends Controller
 
         $user = $request->user();
 
+        if ($productionOrder->status !== ProductionOrder::STATUS_PENDING) {
+            Alert::error('Error', 'Production Order sedang dalam proses dan tidak dapat diubah.');
+
+            return redirect()->route('admin.production-orders.edit', $productionOrder->id);
+        }
+
         DB::beginTransaction();
         try {
             $productionOrder->forceFill([
+                'user_id' => $user->id,
+                'order_id' => $request->order_id,
+                'finishing_order_id' => $request->finishing_order_id,
                 'productionperson_id' => $request->productionperson_id,
+                'type' => $request->type,
                 'date' => $request->date,
                 'total' => $request->total ?: 0,
-                'type' => $request->type,
-                'created_by_id' => $user->id,
             ])->save();
 
             $order_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($productionOrder, $request) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
-                $prod = (int) $request->products[$item->id]['prod'] ?: 0;
+                $group = (int) $request->products[$item->id]['group'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
 
                 return [
                     'product_id' => $item->id,
+                    'order_id' => $request->order_id,
                     'production_order_id' => $productionOrder->id,
+                    'productionperson_id' => $request->productionperson_id,
+                    'finishing_order_id' => $request->finishing_order_id,
                     'order_qty' => $qty,
-                    'prod_qty' => $prod,
+                    'group' => $group,
                     'ongkos_satuan' => $price,
                     'ongkos_total' => $price * $qty,
                 ];
@@ -237,7 +252,7 @@ class ProductionOrderController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Finishing Order berhasil di simpan');
+            Alert::success('Success', 'Production Order berhasil di simpan');
 
             return redirect()->route('admin.production-orders.edit', $productionOrder->id);
         } catch (\Exception $e) {

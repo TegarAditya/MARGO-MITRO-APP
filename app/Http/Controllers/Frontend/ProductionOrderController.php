@@ -8,6 +8,7 @@ use App\Http\Requests\MassDestroyProductionOrderRequest;
 use App\Http\Requests\StoreProductionOrderRequest;
 use App\Http\Requests\UpdateProductionOrderRequest;
 use App\Models\ProductionOrder;
+use App\Models\ProductionOrderDetail;
 use App\Models\Productionperson;
 use Gate;
 use Illuminate\Http\Request;
@@ -17,11 +18,19 @@ class ProductionOrderController extends Controller
 {
     use CsvImportTrait;
 
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('production_order_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $productionOrders = ProductionOrder::with(['productionperson', 'created_by'])->get();
+        $user = $request->user();
+
+        $query = ProductionOrder::with(['productionperson', 'created_by']);
+
+        if ($user && $productionperson = $user->productionperson) {
+            $query->where('productionperson_id', $productionperson->id);
+        }
+
+        $productionOrders = $query->get();
 
         return view('frontend.productionOrders.index', compact('productionOrders'));
     }
@@ -67,6 +76,70 @@ class ProductionOrderController extends Controller
         $productionOrder->load('productionperson', 'created_by');
 
         return view('frontend.productionOrders.show', compact('productionOrder'));
+    }
+
+    public function process(Request $request, Int $id)
+    {
+        abort_if(Gate::denies('production_order_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $user = $request->user();
+        $productionperson = $user->productionperson;
+
+        $productionOrder = ProductionOrder::with(['productionperson', 'created_by'])
+            ->where('productionperson_id', $productionperson->id ?? -1)
+            ->findOrFail($id);
+
+        if ($productionOrder->status === ProductionOrder::STATUS_PENDING) {
+            $productionOrder->update([ 'status' => ProductionOrder::STATUS_CHECKING ]);
+        }
+
+        return view('frontend.productionOrders.process', compact('productionOrder'));
+    }
+
+    public function processSubmit(Request $request, Int $id)
+    {
+        abort_if(Gate::denies('production_order_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $user = $request->user();
+        $productionperson = $user->productionperson;
+
+        $productionOrder = ProductionOrder::with([
+                'productionperson', 'created_by',
+                'production_order_details',
+            ])
+            ->where('productionperson_id', $productionperson->id ?? -1)
+            ->findOrFail($id);
+
+        $products = $request->product ?: [];
+
+        $productionOrder->production_order_details()
+            ->whereNotIn('product_id', array_keys($products))
+            ->update([
+                'file' => 0,
+                'plate' => 0,
+                'plate_ambil' => 0,
+            ]);
+
+        $upserts = [];
+
+        foreach ($productionOrder->production_order_details as $detail) {
+            if (!isset($products[$detail->product_id])) {
+                continue;
+            }
+
+            $product = $products[$detail->product_id];
+
+            $upserts[] = [
+                'id' => $detail->id,
+                'file' => isset($product['file']) ? 1 : 0,
+                'plate' => isset($product['plate']) ? 1 : 0,
+                'plate_ambil' => isset($product['plate_ambil']) ? 1 : 0,
+            ];
+        }
+
+        ProductionOrderDetail::upsert($upserts, ['id']);
+
+        return redirect()->route('frontend.production-orders.process', $productionOrder->id);
     }
 
     public function destroy(ProductionOrder $productionOrder)

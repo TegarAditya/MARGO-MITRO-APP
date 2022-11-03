@@ -33,6 +33,8 @@ class ProductionOrder extends Model
         'date',
         'total',
         'type',
+        'status',
+        'note',
         'created_by_id',
         'created_at',
         'updated_at',
@@ -42,6 +44,12 @@ class ProductionOrder extends Model
     protected $casts = [
         'total' => 'double',
     ];
+
+    public const STATUS_PENDING = 0;
+    public const STATUS_CHECKING = 1;
+    public const STATUS_CHECKED = 2;
+    public const STATUS_FINISH = 3;
+    public const STATUS_FAIL = 4;
 
     public function productionperson()
     {
@@ -70,7 +78,7 @@ class ProductionOrder extends Model
 
     public function created_by()
     {
-        return $this->belongsTo(User::class, 'created_by_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     protected function serializeDate(DateTimeInterface $date)

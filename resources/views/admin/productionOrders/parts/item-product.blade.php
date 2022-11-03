@@ -16,8 +16,10 @@ $foto = !$product->foto ? null : $product->foto->first();
 $modal = !isset($modal) ? '#productModal' : $modal;
 $name = !isset($name) ? 'products' : $name;
 $placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
+
+$po_status = $detail->production_order->status ?? 0;
 @endphp
-<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}">
+<div class="item-product row item-product-status-{{ $po_status }}" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}">
     <div class="col-5 row">
         <div class="col-auto" style="display: {{ (!$product->id || !$foto) ? 'none' : 'block' }}">
             @if ($foto)
@@ -67,27 +69,19 @@ $placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
                 class="form-control-sm hide-arrows text-center product-qty product-qty1"
                 value="{{ $detail->order_qty ?: 0 }}"
                 min="0"
-            />
-        </div>
-
-        <div class="col" style="max-width: 120px">
-            <p class="mb-0 text-sm">Qty Produksi</p>
-
-            <x-admin.form-group
-                type="number"
-                id="fieldQtyProd-{{ $product->id }}"
-                :name="!$product->id ? null : $name.'['.$product->id.'][prod]'"
-                containerClass=" m-0"
-                boxClass=" p-0"
-                class="form-control-sm hide-arrows text-center product-qty product-qty2"
-                value="{{ $detail->prod_qty ?: 0 }}"
-                min="0"
-                readonly
+                :readonly="0 !== $po_status"
             />
         </div>
 
         <div class="col" style="max-width: 240px">
             <p class="mb-0 text-sm">Harga</p>
+
+            <input
+                type="hidden"
+                class="product-group"
+                name="{{ !$product->id ? null : $name.'['.$product->id.'][group]' }}"
+                value="{{ $detail->group ?: 0 }}"
+            />
 
             <input
                 type="hidden"
@@ -105,6 +99,7 @@ $placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
                 class="form-control-sm product-price_text"
                 value="{{ $detail->ongkos_satuan ?: 0 }}"
                 min="0"
+                :readonly="0 !== $po_status"
             />
         </div>
 
@@ -114,9 +109,15 @@ $placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
         </div>
 
         <div class="col-auto pl-4 item-product-action">
-            <a href="#" class="btn {{ !$detail->prod_qty ? 'btn-danger' : 'btn-default disabled' }} btn-sm product-delete">
-                <i class="fa fa-trash"></i>
-            </a>
+            @if ($po_status === 0)
+                <a href="#" class="btn {{ !$detail->prod_qty ? 'btn-danger' : 'btn-default disabled' }} btn-sm product-delete">
+                    <i class="fa fa-trash"></i>
+                </a>
+            @elseif ($po_status === 2)
+                <a href="#" class="btn btn-info btn-sm product-process">
+                    <i class="fa fa-check"></i>
+                </a>
+            @endif
         </div>
     </div>
 </div>

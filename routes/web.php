@@ -1,6 +1,8 @@
 <?php
 
-Route::view('/', 'welcome');
+Route::any('/', function() {
+    return redirect()->route('frontend.home');
+});
 Auth::routes(['register' => false]);
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'middleware' => ['auth', 'admin']], function () {
@@ -307,6 +309,8 @@ Route::group(['as' => 'frontend.', 'namespace' => 'Frontend', 'middleware' => ['
     // Production Order
     Route::delete('production-orders/destroy', 'ProductionOrderController@massDestroy')->name('production-orders.massDestroy');
     Route::resource('production-orders', 'ProductionOrderController');
+    Route::get('production-orders/{id}/process', 'ProductionOrderController@process')->name('production-orders.process');
+    Route::post('production-orders/{id}/process', 'ProductionOrderController@processSubmit');
 
     // Production Order
     Route::delete('finishing-orders/destroy', 'FinishingOrderController@massDestroy')->name('finishing-orders.massDestroy');

@@ -3,22 +3,18 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            @can('production_order_create')
+            @can('user_edit')
                 <div style="margin-bottom: 10px;" class="row">
                     <div class="col-lg-12">
                         <a class="btn btn-success" href="{{ route('frontend.production-orders.create') }}">
-                            {{ trans('global.add') }} {{ trans('cruds.productionOrder.title_singular') }}
+                            {{ trans('global.add') }} Production Order
                         </a>
-                        <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
-                            {{ trans('global.app_csvImport') }}
-                        </button>
-                        @include('csvImport.modal', ['model' => 'ProductionOrder', 'route' => 'admin.production-orders.parseCsvImport'])
                     </div>
                 </div>
             @endcan
             <div class="card">
                 <div class="card-header">
-                    {{ trans('cruds.productionOrder.title_singular') }} {{ trans('global.list') }}
+                    Production Order {{ trans('global.list') }}
                 </div>
 
                 <div class="card-body">
@@ -27,10 +23,7 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        {{ trans('cruds.productionOrder.fields.po_number') }}
-                                    </th>
-                                    <th>
-                                        {{ trans('cruds.productionOrder.fields.no_spk') }}
+                                        {{ trans('cruds.productionOrder.fields.no_order') }}
                                     </th>
                                     <th>
                                         {{ trans('cruds.productionOrder.fields.productionperson') }}
@@ -50,10 +43,7 @@
                                 @foreach($productionOrders as $key => $productionOrder)
                                     <tr data-entry-id="{{ $productionOrder->id }}">
                                         <td>
-                                            {{ $productionOrder->po_number ?? '' }}
-                                        </td>
-                                        <td>
-                                            {{ $productionOrder->no_spk ?? '' }}
+                                            {{ $productionOrder->no_order ?? '' }}
                                         </td>
                                         <td>
                                             {{ $productionOrder->productionperson->name ?? '' }}
@@ -72,12 +62,18 @@
                                             @endcan
 
                                             @can('production_order_edit')
-                                                <a class="btn btn-xs btn-info" href="{{ route('frontend.production-orders.edit', $productionOrder->id) }}">
+                                                <a class="btn btn-xs btn-info" href="{{ route('frontend.production-orders.process', $productionOrder->id) }}">
+                                                    Proses
+                                                </a>
+                                            @endcan
+
+                                            @can('user_edit')
+                                                <a class="btn btn-xs btn-default" href="{{ route('frontend.production-orders.edit', $productionOrder->id) }}">
                                                     {{ trans('global.edit') }}
                                                 </a>
                                             @endcan
 
-                                            @can('production_order_delete')
+                                            @can('user_delete')
                                                 <form action="{{ route('frontend.production-orders.destroy', $productionOrder->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
                                                     <input type="hidden" name="_method" value="DELETE">
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
