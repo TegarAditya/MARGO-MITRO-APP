@@ -60,8 +60,8 @@
                 <h5>Area Pemasaran dan Alamat</h5>
 
                 <div class="alamat-list">
-                    @if ($salesperson->adresses->count())
-                        @each('admin.salespeople.parts.item-alamat', $salesperson->adresses, 'detail')
+                    @if ($salesperson->kota->count())
+                        @each('admin.salespeople.parts.item-alamat', $salesperson->kota, 'detail')
                     @else
                         <div class="alamat-empty">
                             <p>Belum ada alamat yang ditambahkan</p>
@@ -140,11 +140,21 @@
                 var highlightTO;
 
                 alamat.find('.detail-delete').on('click', function(e) {
+                    e.preventDefault();
                     alamat.remove();
 
                     if (!alamats.children('.item-alamat').length) {
                         alamatEmpty.clone().appendTo(alamats);
                     }
+                });
+
+                alamat.find('.detail-add').on('click', function(e) {
+                    e.preventDefault();
+                    var alamatContainer = alamat.find('.alamat-container').first();
+                    var areaAlamat = alamat.find('.detail-alamat').first();
+                    var newAlamat = areaAlamat.clone();
+
+                    newAlamat.appendTo(alamatContainer);
                 });
 
                 alamat.on('highlight', function() {
@@ -184,7 +194,7 @@
                 alamat.attr('data-id', selected.data('id'));
                 alamat.find('.detail-kota').html(selected.html());
                 alamat.find('.detail-alamat').val('')
-                    .attr('name', 'alamat['+selected.data('id')+'][alamat]')
+                    .attr('name', 'alamat['+selected.data('id')+'][alamat][]')
                     .attr('required', true)
 
                 !alamats.children('.item-alamat').length && alamats.html('');

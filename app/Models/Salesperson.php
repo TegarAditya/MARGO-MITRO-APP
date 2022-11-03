@@ -90,6 +90,11 @@ class Salesperson extends Model implements HasMedia
         return $this->hasMany(Tagihan::class);
     }
 
+    public function kota()
+    {
+        return $this->hasMany(KotaSale::class, 'sales_id');
+    }
+
     public function getNamaSalesAttribute() {
         $nama = $this->name;
         if (!$this->area_pemasarans->isEmpty()) {

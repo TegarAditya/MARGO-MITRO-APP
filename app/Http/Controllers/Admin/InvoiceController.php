@@ -11,10 +11,12 @@ use App\Models\InvoiceDetail;
 use App\Models\InvoicePackage;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderPackage;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\Salesperson;
 use App\Models\Semester;
+use App\Models\AlamatSale;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -135,7 +137,9 @@ class InvoiceController extends Controller
             $order_details = $order_details->where('order_id', $order_id);
         }
 
-        return view('admin.invoices.create', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details'));
+        $alamats = AlamatSale::where('kota_sales_id', $order->kota_sales_id)->pluck('alamat', 'id');
+
+        return view('admin.invoices.create', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details', 'alamats'));
     }
 
     public function store(Request $request)
@@ -144,6 +148,7 @@ class InvoiceController extends Controller
             'date' => 'required|date',
             'order_id' => 'required|exists:orders,id',
             'products' => 'required|array|min:1',
+            'alamat' => 'nullable'
         ]);
 
         $order = Order::findOrFail($request->order_id);
@@ -155,6 +160,7 @@ class InvoiceController extends Controller
                 'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
                 'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
                 'date' => $request->date,
+                'alamat' => $request->alamat,
                 'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
             ]);
@@ -162,8 +168,6 @@ class InvoiceController extends Controller
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0
             ]);
-
-            // dd($request->all());
 
             $products = Product::whereIn('id', array_keys($request->products))->get()->each(function($item) use ($invoice, $order, $request, $multiplier) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
@@ -194,14 +198,13 @@ class InvoiceController extends Controller
 
                 if ($qty_bonus) {
                     $order_package = $order->order_details()->where('product_id', $item->id)->first();
+                    $order_bonus = $order_package->bonus;
 
                     $bonus = InvoicePackage::create([
-                        'product_id' => $item->id,
+                        'product_id' => $order_bonus->product_id,
                         'invoice_detail_id' => $invoice_detail->id,
                         'quantity' => $qty_bonus
                     ]);
-
-                    $order_bonus = $order_package->bonus;
                     $order_bonus->update([
                         'moved' => $order_bonus->move + $qty_bonus,
                     ]);
@@ -210,8 +213,8 @@ class InvoiceController extends Controller
 
                     $bonus_product->stock_movements()->create([
                         'reference' => $invoice->id,
-                        'type' => 'invoice',
-                        'quantity' => -1 * $qty,
+                        'type' => 'kelengkapan',
+                        'quantity' => -1 * $qty_bonus,
                         'product_id' => $bonus_product->id,
                     ]);
                     $bonus_product->update([ 'stock' => $bonus_product->stock - $qty_bonus ]);
@@ -220,7 +223,7 @@ class InvoiceController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Invoice berhasil dibuat');
+            Alert::success('Success', 'Invoice berhasil disimpan');
 
             if ($request->redirect) {
                 return redirect($request->redirect)->with('activeTabs', 'invoice');
@@ -245,7 +248,8 @@ class InvoiceController extends Controller
             ->whereHas('product')
             ->get();
 
-        $invoice->load('invoice_details', 'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan');
+        $invoice->load('invoice_details', 'invoice_details.product', 'invoice_details.bonus',
+            'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan');
 
         $order = null;
         if ($order = $invoice->order) {
@@ -258,7 +262,9 @@ class InvoiceController extends Controller
             return $item;
         });
 
-        return view('admin.invoices.edit', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details'));
+        $alamats = AlamatSale::where('kota_sales_id', $order->kota_sales_id)->pluck('alamat', 'id');
+
+        return view('admin.invoices.edit', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details', 'alamats'));
     }
 
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
@@ -267,27 +273,31 @@ class InvoiceController extends Controller
             'date' => 'required|date',
             'order_id' => 'required|exists:orders,id',
             'products' => 'required|array|min:1',
+            'alamat' => 'nullable'
         ]);
 
         $order = Order::findOrFail($request->order_id);
+
+        $order->load([
+            'order_details', 'order_details.bonus', 'order_details.product'
+        ]);
 
         DB::beginTransaction();
         try {
             $multiplier = -1 * (int) $request->get('invoice_type', -1);
             $invoice->forceFill([
-                'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
-                'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
                 'date' => $request->date,
                 'nominal' => $multiplier * (float) $request->nominal,
                 'order_id' => $request->order_id,
+                'alamat' => $request->alamat,
             ])->save();
+
+            $invoice->load([
+                'invoice_details', 'invoice_details.product', 'invoice_details.bonus', 'invoice_details.bonus.product'
+            ]);
 
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0
-            ]);
-
-            $invoice->load([
-                'invoice_details', 'invoice_details.product',
             ]);
 
             // Restore to previous data
@@ -297,16 +307,28 @@ class InvoiceController extends Controller
                         'stock' => $product->stock + $invoice_detail->quantity
                     ]);
                 }
-
                 $order->order_details()->where('product_id', $invoice_detail->product_id)->update([
                     'moved' => DB::raw("order_details.moved - $invoice_detail->quantity"),
                 ]);
+
+                $order_detail = $order->order_details()->where('product_id', $invoice_detail->product_id)->first();
+
+                if ($bonus = $invoice_detail->bonus) {
+                    $bonus_product = Product::find($bonus->product_id);
+                    $bonus_product->update([
+                        'stock' => $bonus_product->stock + $bonus->quantity
+                    ]);
+                    $order_detail->bonus->update([
+                        'moved' => $order_detail->bonus->quantity - $bonus->quantity
+                    ]);
+                }
             }
 
             // Update with new items
-            $invoice_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($invoice, $order, $request, $multiplier) {
+            $products = Product::whereIn('id', array_keys($request->products))->get()->each(function($item) use ($invoice, $order, $request, $multiplier) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $price = (float) $request->products[$item->id]['price'] ?: 0;
+                $qty_bonus = $request->products[$item->id]['bonus'] ?? null;
 
                 $qty = $qty * $multiplier;
 
@@ -315,10 +337,7 @@ class InvoiceController extends Controller
                     'type' => 'invoice',
                     'product_id' => $item->id,
                 ],[
-                    'reference' => $invoice->id,
-                    'type' => 'invoice',
                     'quantity' => -1 * $qty,
-                    'product_id' => $item->id,
                 ]);
                 $item->update([ 'stock' => $item->stock - $qty ]);
 
@@ -326,31 +345,45 @@ class InvoiceController extends Controller
                     'moved' => DB::raw("order_details.moved + $qty"),
                 ]);
 
-                return [
+                $invoice_detail = InvoiceDetail::updateOrCreate([
                     'product_id' => $item->id,
-                    'invoice_id' => $invoice->id,
+                    'invoice_id' => $invoice->id
+                ],[
                     'quantity' => $qty,
                     'price' => $price,
                     'total' => $qty * $price,
-                ];
+                ]);
+
+                if (isset($qty_bonus)) {
+                    $order_package = $order->order_details()->where('product_id', $item->id)->first();
+                    $order_bonus = $order_package->bonus;
+
+                    $bonus = InvoicePackage::updateOrCreate([
+                        'product_id' => $order_bonus->product_id,
+                        'invoice_detail_id' => $invoice_detail->id
+                    ], [
+                        'quantity' => $qty_bonus
+                    ]);
+                    $order_bonus->update([
+                        'moved' => $order_bonus->move + $qty_bonus,
+                    ]);
+
+                    $bonus_product = Product::find($order_bonus->product_id);
+
+                    $bonus_product->stock_movements()->updateOrCreate([
+                        'reference' => $invoice->id,
+                        'type' => 'kelengkapan',
+                        'product_id' => $bonus_product->id
+                    ], [
+                        'quantity' => -1 * $qty_bonus,
+                    ]);
+                    $bonus_product->update([ 'stock' => $bonus_product->stock - $qty_bonus ]);
+                }
             });
 
-            foreach ($invoice_details as $invoice_detail) {
-                $exists = $invoice->invoice_details->where('product_id', $invoice_detail['product_id'])->first() ?: new InvoiceDetail;
-
-                $exists->forceFill($invoice_detail)->save();
-            }
-
-            // Delete items if removed
-            $invoice->invoice_details()
-                ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
-                ->forceDelete();
-            StockMovement::where('reference', $invoice->id)
-                ->where('type', 'invoice')
-                ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
-                ->delete();
-
             DB::commit();
+
+            Alert::success('Success', 'Invoice berhasil disimpan');
 
             if ($request->redirect) {
                 return redirect($request->redirect)->with('activeTabs', 'invoice');
@@ -370,14 +403,66 @@ class InvoiceController extends Controller
 
         $invoice->load([
             'invoice_details',
-            'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan', 'invoice_details.bonus',
+            'order',
         ]);
 
-        switch (request('print')) {
-            case 'sj':
-                return view('admin.invoices.prints.surat-jalan', compact('invoice'));
-            case 'inv':
-                return view('admin.invoices.prints.faktur', compact('invoice'));
+        if (request('print') === 'sj') {
+            $product_detail = InvoiceDetail::with('bonus', 'product')->where('invoice_id', $invoice->id)->get();
+
+            $pg_array = collect();
+
+            $details = $product_detail->each(function ($item) use ($product_detail, $pg_array) {
+                if ($bonus = $item->bonus) {
+                    $bonus_id = $bonus->product_id;
+                    $bonus_qty = $bonus->quantity;
+                    $ada = $product_detail->firstWhere('product_id', '=', $bonus_id);
+                    if ($ada) {
+                        $pg_array->push([
+                            'id' => $ada->id
+                        ]);
+                        $bonus_qty += $ada->quantity;
+                    }
+                    $item->bonus->quantity = $bonus_qty;
+                }
+            });
+
+            $details = $details->whereNotIn('id', $pg_array->pluck('id'));
+            $inv_details = $details->where('product.tipe_pg', '===', 'non_pg')->sortBy('product.kelas_id')
+                                ->sortBy('product.tiga_nama')->sortBy('product.jenjang_id');
+            $pg_details = $details->where('product.tipe_pg', '!==', 'non_pg')->sortBy('product.kelas_id')
+                                ->sortBy('product.tiga_nama')->sortBy('product.jenjang_id');
+
+            $total_buku = $inv_details->sum('quantity');
+            $total_pg = $pg_details->sum('quantity');
+            $total_kelengkapan = $inv_details->sum('bonus.quantity') + $total_pg;
+
+            return view('admin.invoices.prints.surat-jalan', compact('invoice', 'inv_details', 'pg_details', 'total_buku', 'total_kelengkapan'));
+        } else if (request('print') === 'inv') {
+            $pg_detail = InvoiceDetail::with('bonus', 'product')->whereHas('product', function ($query) {
+                            $query->where('tipe_pg', '!=', 'non_pg');
+                        })->where('invoice_id', $invoice->id)->get();
+
+            $product_detail = InvoiceDetail::with('bonus', 'product')->where('invoice_id', $invoice->id)->get();
+
+            $product_detail->each(function ($item) use ($pg_detail) {
+                if ($bonus = $item->bonus) {
+                    $bonus_id = $bonus->product_id;
+                    $bonus_qty = $bonus->quantity;
+                    $ada = $pg_detail->firstWhere('product_id', '=', $bonus_id);
+                    if ($ada) {
+                        $ada->quantity += $bonus_qty;
+                    } else {
+                        $pg_detail->push($bonus);
+                    }
+                }
+            });
+
+            $kelengkapan = $pg_detail->sortBy('product.kelas_id')->sortBy('product.tiga_nama')
+                            ->sortBy('product.jenjang_id');
+            $buku = $product_detail->sortBy('product.kelas_id')->sortBy('product.tiga_nama')
+                        ->sortBy('product.jenjang_id');
+
+            return view('admin.invoices.prints.faktur', compact('invoice', 'buku', 'kelengkapan'));
         }
 
         return view('admin.invoices.show', compact('invoice'));
@@ -406,6 +491,23 @@ class InvoiceController extends Controller
                 $order->order_details()->where('product_id', $invoice_detail->product_id)->update([
                     'moved' => DB::raw("order_details.moved - $invoice_detail->quantity"),
                 ]);
+
+                if ($bonus = $invoice_detail->bonus) {
+                    $bonus_product = $bonus->product;
+
+                    $bonus_product->update([
+                        'stock' => $bonus_product->stock + $bonus->quantity
+                    ]);
+
+                    $bonus->update([
+                        'moved' => DB::raw("order_packages.moved - $bonus->quantity"),
+                    ]);
+
+                    StockMovement::where('reference', $invoice->id)
+                        ->where('type', 'kelengkapan')
+                        ->where('product_id', $bonus->product_id)
+                        ->forceDelete();
+                }
             }
 
             // Delete items if removed
@@ -415,7 +517,7 @@ class InvoiceController extends Controller
             StockMovement::where('reference', $invoice->id)
                 ->where('type', 'invoice')
                 ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
-                ->delete();
+                ->forceDelete();
 
             $invoice->delete();
 
@@ -424,6 +526,84 @@ class InvoiceController extends Controller
             ]);
 
             DB::commit();
+
+            Alert::success('Success', 'Invoice berhasil dihapus');
+
+            return redirect()->route('admin.invoices.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function delete(Request $request)
+    {
+        $order_detail = OrderDetail::find($request->id);
+
+        // // Delete items if removed
+            // $invoice->invoice_details()
+            //     ->whereNotIn('product_id', $products->pluck('product_id'))
+            //     ->forceDelete();
+            // StockMovement::where('reference', $invoice->id)
+            //     ->where('type', 'invoice')
+            //     ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
+            //     ->delete();
+
+        DB::beginTransaction();
+        try {
+            $invoice->load([
+                'invoice_details', 'invoice_details.product',
+            ]);
+
+            // Restore to previous data
+            foreach ($invoice->invoice_details as $invoice_detail) {
+                if ($product = $invoice_detail->product) {
+                    $product->update([
+                        'stock' => $product->stock + $invoice_detail->quantity
+                    ]);
+                }
+
+                $order->order_details()->where('product_id', $invoice_detail->product_id)->update([
+                    'moved' => DB::raw("order_details.moved - $invoice_detail->quantity"),
+                ]);
+
+                if ($bonus = $invoice_detail->bonus) {
+                    $bonus_product = $bonus->product;
+
+                    $bonus_product->update([
+                        'stock' => $bonus_product->stock + $bonus->quantity
+                    ]);
+
+                    $bonus->update([
+                        'moved' => DB::raw("order_packages.moved - $bonus->quantity"),
+                    ]);
+
+                    StockMovement::where('reference', $invoice->id)
+                        ->where('type', 'kelengkapan')
+                        ->where('product_id', $bonus->product_id)
+                        ->forceDelete();
+                }
+            }
+
+            // Delete items if removed
+            $invoice->invoice_details()
+                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->forceDelete();
+            StockMovement::where('reference', $invoice->id)
+                ->where('type', 'invoice')
+                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->forceDelete();
+
+            $invoice->delete();
+
+            $order->tagihan()->update([
+                'tagihan' => $order->invoices()->sum('nominal') ?: 0
+            ]);
+
+            DB::commit();
+
+            Alert::success('Success', 'Invoice berhasil dihapus');
 
             return redirect()->route('admin.invoices.index');
         } catch (\Exception $e) {
@@ -474,7 +654,6 @@ class InvoiceController extends Controller
 
     public function fakturReturSave(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'date' => 'required|date',
             'products' => 'required|array|min:1',
@@ -546,7 +725,7 @@ class InvoiceController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Invoice berhasil dibuat');
+            Alert::success('Success', 'Invoice berhasil disimpan');
 
             return redirect()->route('admin.invoices.retur');
         } catch (\Exception $e) {

@@ -38,7 +38,7 @@ $name = !isset($name) ? 'products' : $name;
         data-pgstock="{{ $bonus->product->stock }}"
         data-pgqty="{{ $bonus->quantity }}"
         data-pgmoved="{{ $bonus->moved }}"
-        data-pgmax="{{ $bonus->quantity - $bonus->moved }}"
+        data-pgmax="{{ $bonus->quantity }}"
     @endif
     >
     <div class="col-5 row">
@@ -176,7 +176,7 @@ $name = !isset($name) ? 'products' : $name;
                 containerClass=" m-0"
                 boxClass=" p-0"
                 class="form-control-sm hide-arrows text-center product-bonus product-bonus1"
-                value="{{ !$bonus? 0 : abs($bonus->quantity) }}"
+                value="{{ !$bonus? 0 : (!isset($detail->bonus) ? 0 :  abs($detail->bonus->quantity)) }}"
                 min="0"
                 max="{{ $maxBonus }}"
             >

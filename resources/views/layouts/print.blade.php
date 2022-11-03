@@ -16,18 +16,19 @@
     <div class="print-header">
         @section('header')
             <div class="row align-items-center">
-                <div class="col-auto">
-                    <img src="{{ asset('images/logo.png') }}" class="print-logo" />
+                <div class="col-12 text-center">
+                    <img src="{{ asset('images/amplop.png') }}" class="print-logo" style="max-width: 100%; height: auto"/>
                 </div>
-
-                {{-- <div class="col">
-                    @section('header.content')
-                        <h3 class="mb-1">Margo Mitro Joyo</h3>
-
-                        <p class="mb-0">Jl. Pangrango, Perdana, Pare, Kec. Pare, Kabupaten Kediri, Jawa Timur 64211</p>
-                    @show
-                </div> --}}
-
+            </div>
+            <div class="row  mt-3">
+                <div class="col-12">
+                    @yield('header.center')
+                </div>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    @yield('header.left')
+                </div>
                 <div class="col-auto align-self-start">
                     @yield('header.right')
                 </div>

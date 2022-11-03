@@ -50,10 +50,15 @@
                                 <td>
                                     @if ($stockMovement->type == 'order')
                                         {{ $stockMovement->referensi->no_order }}
-                                    @elseif ($stockMovement->type == 'faktur')
+                                    @elseif ($stockMovement->type == 'invoice')
+                                        <a class="px-1" title="Reference" href="{{ route('admin.invoices.show', $stockMovement->reference) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
                                         {{ $stockMovement->referensi->no_invoice }}
                                     @elseif ($stockMovement->type == 'adjustment')
+                                        <a class="px-1" title="Reference" href="{{ route('admin.stock-adjustments.show', $stockMovement->reference) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
                                         {{ $stockMovement->referensi->date.'('.App\Models\StockAdjustment::OPERATION_SELECT[$stockMovement->referensi->operation] .')' }}
+                                    @elseif ($stockMovement->type == 'kelengkapan')
+                                    <a class="px-1" title="Reference" href="{{ route('admin.invoices.show', $stockMovement->reference) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
+                                        {{ $stockMovement->referensi->no_invoice }}
                                     @endif
                                 </td>
                                 <td>
@@ -73,7 +78,7 @@
                     </tbody>
                 </table>
             </div>
-            <h3 class="mt-3 mb-4">#BUKU: {{ $product->name }}</h3>
+            <h3 class="mt-3 mb-4">#BUKU: {{ $product->nama_isi_buku }}</h3>
             <table class="table table-bordered table-striped">
                 <tbody>
                     <tr>
@@ -122,6 +127,14 @@
                         </th>
                         <td>
                             {{ $product->halaman->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-left" width="20%" style="padding-left: 20px">
+                            Semester
+                        </th>
+                        <td>
+                            {{ $product->semester->name ?? '' }}
                         </td>
                     </tr>
                     <tr>
