@@ -100,6 +100,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('invoices/destroy', 'InvoiceController@massDestroy')->name('invoices.massDestroy');
     Route::get('invoices/retur', 'InvoiceController@fakturRetur')->name('invoices.retur');
     Route::post('invoices/retursave', 'InvoiceController@fakturReturSave')->name('invoices.saveretur');
+    Route::post('invoices/delete', 'InvoiceController@delete')->name('invoices.delete');
     Route::resource('invoices', 'InvoiceController');
 
     // Invoice Detail
@@ -192,6 +193,21 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('realisasis/process-csv-import', 'RealisasiController@processCsvImport')->name('realisasis.processCsvImport');
     Route::post('realisasis/paid', 'RealisasiController@setPaid')->name('realisasis.paid');
     Route::resource('realisasis', 'RealisasiController');
+
+    // Preorder
+    Route::delete('preorders/destroy', 'PreorderController@massDestroy')->name('preorders.massDestroy');
+    Route::resource('preorders', 'PreorderController');
+
+    // Preorder Detail
+    Route::delete('preorder-details/destroy', 'PreorderDetailController@massDestroy')->name('preorder-details.massDestroy');
+    Route::resource('preorder-details', 'PreorderDetailController');
+
+    // Summary Order
+    Route::resource('summary-orders', 'SummaryOrderController', ['except' => ['create', 'store', 'edit', 'update', 'destroy']]);
+
+    // History Production
+    Route::delete('history-productions/destroy', 'HistoryProductionController@massDestroy')->name('history-productions.massDestroy');
+    Route::resource('history-productions', 'HistoryProductionController', ['except' => ['create', 'store', 'edit', 'update']]);
 
     Route::get('system-calendar', 'SystemCalendarController@index')->name('systemCalendar');
     Route::get('messenger', 'MessengerController@index')->name('messenger.index');
