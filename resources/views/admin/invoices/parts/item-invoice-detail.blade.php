@@ -205,6 +205,13 @@ $name = !isset($name) ? 'products' : $name;
                     <i class="fa fa-trash"></i>
                 </a>
             </div>
+        @else
+            <div class="col-auto pl-5 item-product-action">
+                <a href="{{ route('admin.invoices.delete') }}" class="btn btn-danger btn-sm detail-invoice-delete"
+                    data-invoice="{{ $detail->id }}" data-order="{{ $order_detail->id }}">
+                    <i class="fa fa-trash"></i>
+                </a>
+            </div>
         @endif
     </div>
 </div>

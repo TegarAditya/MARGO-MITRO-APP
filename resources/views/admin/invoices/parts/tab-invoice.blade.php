@@ -711,6 +711,28 @@
 
             product.closest('.product-list-group').find('.product-add').trigger('click');
         });
+
+        $('.detail-invoice-delete').on('click', function(e) {
+            e.preventDefault();
+
+            var el = $(e.currentTarget);
+            var url = el.attr('href');
+            var invoice = el.data('invoice');
+            var order = el.data('order');
+
+            if (confirm('{{ trans('global.areYouSure') }}')) {
+                $.ajax({
+                    headers: {'x-csrf-token': _token},
+                    method: 'POST',
+                    url: url,
+                    data: {
+                        invoice, order
+                    }
+                }).done(function () {
+                    location.reload();
+                });
+            }
+        });
     });
 })(jQuery, window.numeral);
 </script>
