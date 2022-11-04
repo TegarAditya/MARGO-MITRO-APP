@@ -121,6 +121,7 @@ class ProductionOrderController extends Controller
             ]);
 
         $upserts = [];
+        $finished_products = [];
 
         foreach ($productionOrder->production_order_details as $detail) {
             if (!isset($products[$detail->product_id])) {
@@ -135,9 +136,25 @@ class ProductionOrderController extends Controller
                 'plate' => isset($product['plate']) ? 1 : 0,
                 'plate_ambil' => isset($product['plate_ambil']) ? 1 : 0,
             ];
+
+            // Push ke `$finished_products` ketika semua sudah tercentang
+            if (
+                isset($product['file'])
+                && isset($product['plate'])
+                && isset($product['plate_ambil'])
+            ) {
+                $finished_products[] = $detail->product_id;
+            }
         }
 
         ProductionOrderDetail::upsert($upserts, ['id']);
+
+        // Update `status` ketika semua sudah finished
+        if (count($finished_products) >= $productionOrder->production_order_details->count()) {
+            $productionOrder->update([ 'status' => ProductionOrder::STATUS_CHECKED ]);
+        } elseif ($productionOrder->status === ProductionOrder::STATUS_CHECKED) {
+            $productionOrder->update([ 'status' => ProductionOrder::STATUS_CHECKING ]);
+        }
 
         return redirect()->route('frontend.production-orders.process', $productionOrder->id);
     }

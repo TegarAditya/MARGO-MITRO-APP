@@ -56,68 +56,104 @@ $po_status = $detail->production_order->status ?? 0;
         </div>
     </div>
 
-    <div class="col product-col-content row align-items-end align-self-center">
-        <div class="col" style="max-width: 120px">
-            <p class="mb-0 text-sm">Qty Order</p>
+    <div class="col product-col-content">
+        <div class="row align-items-end align-self-center">
+            <div class="col" style="max-width: 120px">
+                <p class="mb-0 text-sm">Qty Order</p>
 
-            <x-admin.form-group
-                type="number"
-                id="fieldQty-{{ $product->id }}"
-                :name="!$product->id ? null : $name.'['.$product->id.'][qty]'"
-                containerClass=" m-0"
-                boxClass=" p-0"
-                class="form-control-sm hide-arrows text-center product-qty product-qty1"
-                value="{{ $detail->order_qty ?: 0 }}"
-                min="0"
-                :readonly="0 !== $po_status"
-            />
+                <x-admin.form-group
+                    type="number"
+                    id="fieldQty-{{ $product->id }}"
+                    :name="!$product->id ? null : $name.'['.$product->id.'][qty]'"
+                    containerClass=" m-0"
+                    boxClass=" p-0"
+                    class="form-control-sm hide-arrows text-center product-qty product-qty1"
+                    value="{{ $detail->order_qty ?: 0 }}"
+                    min="0"
+                    :readonly="0 !== $po_status"
+                />
+            </div>
+
+            <div class="col" style="max-width: 240px">
+                <p class="mb-0 text-sm">Harga</p>
+
+                <input
+                    type="hidden"
+                    class="product-group"
+                    name="{{ !$product->id ? null : $name.'['.$product->id.'][group]' }}"
+                    value="{{ $detail->group ?: 0 }}"
+                />
+
+                <input
+                    type="hidden"
+                    class="product-price"
+                    name="{{ !$product->id ? null : $name.'['.$product->id.'][price]' }}"
+                    value="{{ $detail->ongkos_satuan ?: 0 }}"
+                />
+
+                <x-admin.form-group
+                    type="text"
+                    id="fieldPrice-{{ $product->id }}"
+                    :name="!$product->id ? null : $name.'['.$product->id.'][price_text]'"
+                    containerClass=" m-0"
+                    boxClass=" px-2 py-0"
+                    class="form-control-sm product-price_text"
+                    value="{{ $detail->ongkos_satuan ?: 0 }}"
+                    min="0"
+                    :readonly="0 !== $po_status"
+                />
+            </div>
+
+            <div class="col text-right">
+                <p class="text-sm mb-0">Subtotal</p>
+                <p class="m-0 product-subtotal">@money($detail->ongkos_total)</p>
+            </div>
+
+            <div class="col-auto pl-4 item-product-action">
+                @if ($po_status === 0)
+                    <a href="#" class="btn {{ !$detail->prod_qty ? 'btn-danger' : 'btn-default disabled' }} btn-sm product-delete">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                @elseif ($po_status === 2)
+                    <a href="#" class="btn btn-info btn-sm product-process">
+                        <i class="fa fa-check"></i>
+                    </a>
+                @endif
+            </div>
         </div>
 
-        <div class="col" style="max-width: 240px">
-            <p class="mb-0 text-sm">Harga</p>
+        @if ($po_status !== 0)
+            <p class="mt-2 pt-1 mb-0 text-sm">
+                Proses Produksi
+            </p>
 
-            <input
-                type="hidden"
-                class="product-group"
-                name="{{ !$product->id ? null : $name.'['.$product->id.'][group]' }}"
-                value="{{ $detail->group ?: 0 }}"
-            />
+            <div class="row">
+                @foreach ([
+                    [
+                        'col' => 'file',
+                        'label' => 'File Mentah',
+                        'checked' => $detail->file,
+                    ],
+                    [
+                        'col' => 'plate',
+                        'label' => 'Cetak Plate',
+                        'checked' => $detail->plate,
+                    ],
+                    [
+                        'col' => 'plate_ambil',
+                        'label' => 'Ambil Plate',
+                        'checked' => $detail->plate_ambil,
+                    ],
+                ] as $item)
+                    <div class="col-4">
+                        <i class="fa {{ !$item['checked'] ? 'fa-times' : 'fa-check text-success'}}"></i>
 
-            <input
-                type="hidden"
-                class="product-price"
-                name="{{ !$product->id ? null : $name.'['.$product->id.'][price]' }}"
-                value="{{ $detail->ongkos_satuan ?: 0 }}"
-            />
-
-            <x-admin.form-group
-                type="text"
-                id="fieldPrice-{{ $product->id }}"
-                :name="!$product->id ? null : $name.'['.$product->id.'][price_text]'"
-                containerClass=" m-0"
-                boxClass=" px-2 py-0"
-                class="form-control-sm product-price_text"
-                value="{{ $detail->ongkos_satuan ?: 0 }}"
-                min="0"
-                :readonly="0 !== $po_status"
-            />
-        </div>
-
-        <div class="col text-right">
-            <p class="text-sm mb-0">Subtotal</p>
-            <p class="m-0 product-subtotal">@money($detail->ongkos_total)</p>
-        </div>
-
-        <div class="col-auto pl-4 item-product-action">
-            @if ($po_status === 0)
-                <a href="#" class="btn {{ !$detail->prod_qty ? 'btn-danger' : 'btn-default disabled' }} btn-sm product-delete">
-                    <i class="fa fa-trash"></i>
-                </a>
-            @elseif ($po_status === 2)
-                <a href="#" class="btn btn-info btn-sm product-process">
-                    <i class="fa fa-check"></i>
-                </a>
-            @endif
-        </div>
+                        <span>
+                            {{ $item['label'] }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </div>
