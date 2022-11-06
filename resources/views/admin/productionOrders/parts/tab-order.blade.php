@@ -9,6 +9,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 @endphp
 
 <div class="model-products pt-3">
+    <input type="hidden" name="status" value="{{ $productionOrder->status }}" id="status" />
     <input type="hidden" name="total" value="{{ $productionOrder->total }}" id="total" />
 
     <div class="row">
@@ -119,6 +120,10 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
             @php
             $parent = $items->first();
             $list = $items->slice(1);
+            $all_check = $items->count() === $items->where('file', 1)
+                ->where('plate', 1)
+                ->where('plate_ambil', 1)
+                ->count();
 
             $label = "Group $loop->iteration"
             @endphp
@@ -504,6 +509,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 var actions = product.find('.product-qty-act');
                 var price = product.find('.product-price');
                 var priceText = product.find('.product-price_text');
+                var check = product.find('.product-check');
 
                 !isNaN(groupId) && product.find('.product-group').val(groupId);
 
@@ -555,6 +561,27 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 
                 product.find('.product-pick').on('click', function(e) {
                     productSelectTarget = product;
+                });
+
+                product.find('.product-check-process').on('click', function(e) {
+                    e.preventDefault();
+
+                    var checkBtn = $(e.currentTarget);
+                    var isChecked = check.val() == 1;
+
+                    if (isChecked) {
+                        products.find('.product-check').val(0);
+
+                        group.removeClass('border-success');
+                        checkBtn.removeClass('btn-success')
+                            .addClass('btn-light border');
+                    } else {
+                        products.find('.product-check').val(1);
+
+                        group.addClass('border-success');
+                        checkBtn.addClass('btn-success')
+                            .removeClass('btn-light border');
+                    }
                 });
             };
 

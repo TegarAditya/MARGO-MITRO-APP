@@ -18,6 +18,7 @@ $name = !isset($name) ? 'products' : $name;
 $placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
 
 $po_status = $detail->production_order->status ?? 0;
+$all_check = !isset($all_check) ? false : $all_check;
 @endphp
 <div class="item-product row item-product-status-{{ $po_status }}" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}">
     <div class="col-5 row">
@@ -91,6 +92,13 @@ $po_status = $detail->production_order->status ?? 0;
                     value="{{ $detail->ongkos_satuan ?: 0 }}"
                 />
 
+                <input
+                    type="hidden"
+                    class="product-check"
+                    name="{{ !$product->id ? null : $name.'['.$product->id.'][check]' }}"
+                    value="{{ $detail->is_check ?: 0 }}"
+                />
+
                 <x-admin.form-group
                     type="text"
                     id="fieldPrice-{{ $product->id }}"
@@ -114,10 +122,16 @@ $po_status = $detail->production_order->status ?? 0;
                     <a href="#" class="btn {{ !$detail->prod_qty ? 'btn-danger' : 'btn-default disabled' }} btn-sm product-delete">
                         <i class="fa fa-trash"></i>
                     </a>
-                @elseif ($po_status === 2)
-                    <a href="#" class="btn btn-info btn-sm product-process">
+                @elseif ($all_check && !$detail->is_check)
+                    <a href="#" class="btn btn-light btn-sm product-check-process border" title="Tandai sebagai selesai">
                         <i class="fa fa-check"></i>
                     </a>
+                @elseif ($all_check && $detail->is_check)
+                    <span class="btn text-success btn-sm border-success" style="cursor: default" title="Sudah diselesaikan">
+                        <i class="fa fa-check"></i>
+                    </span>
+                @elseif (in_array($po_status, [1, 2]))
+                    <div style="width: 2rem"></div>
                 @endif
             </div>
         </div>
