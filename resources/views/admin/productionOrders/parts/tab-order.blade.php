@@ -14,7 +14,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     <div class="row">
         <div class="col-12">
             <div class="form-group">
-                <label for="no_order">No. Production Order</label>
+                <label for="no_order">No. Order Cetak</label>
                 <input class="form-control h-auto py-1 {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $productionOrder->no_order) }}" readonly placeholder="(Otomatis)">
                 @if($errors->has('no_order'))
                     <span class="text-danger">{{ $errors->first('no_order') }}</span>
@@ -82,6 +82,20 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     <h5 class="mb-2 mt-3">
         {{ !$productionOrder->id ? "Pilih Produk" : "Produk Dipilih" }}
     </h5>
+
+    @if ($status === 0)
+        <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn py-1 border product-group-add" data-add="before">
+                        <i class="fa fa-plus text-sm mr-1"></i>
+
+                        <span>Tambah Group</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 
     @foreach ([
         [
@@ -359,14 +373,14 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     padding-left: 5rem;
 }
 
-.product-list > .item-product:last-child .product-delete {
+.product-list > .item-product:not(.is-removable):last-child .product-delete {
     opacity: 0.5;
     pointer-events: none;
     background-color: #aeaeae;
     border-color: #969696;
 }
 
-.product-list > .item-product.item-product-status-0:last-child > .product-col-content {
+.product-list > .item-product.item-product-status-0:last-child > .product-col-content .col {
     opacity: 0.66;
     pointer-events: none;
 }
@@ -525,7 +539,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                     product.remove();
                     calculatePrice();
                     
-                    if (products.children('.item-product').length === 1) {
+                    if (products.children('.item-product').length <= 1) {
                         if (groups.length > 1) {
                             group.remove();
 
@@ -533,7 +547,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                         }
                     }
 
-                    if (groups.find('.product-list > .item-product').length === 1) {
+                    if (groups.find('.product-list > .item-product').length <= 1) {
                         productSummary.hide();
                         groupAction.hide();
                     }
@@ -570,10 +584,13 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         groupAdd.on('click', function(e) {
             e.preventDefault();
 
-            var lastGroup = groups.last();
+            var addBtn = $(e.currentTarget);
+            var addAfter = (addBtn.data('add') || 'after') === 'after';
+            var lastGroup = addAfter ? groups.last() : groups.first();
             var fake = groupFake.clone();
 
-            fake.removeClass('d-none').insertAfter(lastGroup);
+            fake.find('.product-list > .item-product').addClass('is-removable');
+            fake.removeClass('d-none')[addAfter ? 'insertAfter' : 'insertBefore'](lastGroup);
 
             bindGroup(fake, groups.length + 1);
             groups = groups.add(fake);
@@ -685,6 +702,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
             groupAction.show();
             calculatePrice();
 
+            product.removeClass('is-removable');
             product.closest('.product-list-group').find('.product-add').trigger('click');
         });
     });
