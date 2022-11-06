@@ -12,7 +12,7 @@
 
                 <div class="card">
                     <div class="card-header">
-                        Production Order
+                        Order Cetak
                     </div>
 
                     <div class="card-body">

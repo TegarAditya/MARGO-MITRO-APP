@@ -358,7 +358,7 @@
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-print"></i>
                             <p>
-                                Production Order
+                                Order Cetak
                                 <i class="right fa fa-fw fa-angle-left nav-icon"></i>
                             </p>
                         </a>
@@ -368,7 +368,7 @@
                                     <a href="{{ route("admin.production-orders.dashboard") }}" class="nav-link {{ request()->is("admin/production-orders/dashboard") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-print"></i>
                                         <p>
-                                            Rangkuman PO
+                                            Rangkuman Cetak
                                         </p>
                                     </a>
                                 </li>
@@ -380,7 +380,7 @@
                                         && !request()->is('admin/production-orders/dashboard') ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-print"></i>
                                         <p>
-                                            Production Order
+                                            Order Cetak
                                         </p>
                                     </a>
                                 </li>
@@ -390,7 +390,7 @@
                                     <a href="{{ route("admin.realisasis.index") }}" class="nav-link {{ request()->is("admin/realisasis") || request()->is("admin/realisasis/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-list"></i>
                                         <p>
-                                            Realisasi PO
+                                            Realisasi Cetak
                                         </p>
                                     </a>
                                 </li>

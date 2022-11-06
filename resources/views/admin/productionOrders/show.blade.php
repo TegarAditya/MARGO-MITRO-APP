@@ -10,7 +10,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.show') }} {{ trans('cruds.order.title') }}
+        {{ trans('global.show') }} Order Cetak
     </div>
 
     <div class="card-body">
