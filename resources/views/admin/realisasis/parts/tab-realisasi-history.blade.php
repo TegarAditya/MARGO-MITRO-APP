@@ -3,13 +3,13 @@
         <div class="col">
             <h5 class="mb-0">Riwayat Realisasi</h5>
 
-            @if ($productionOrder)
-                <p class="mb-0">PO #{{ $productionOrder->po_number }}</p>
+            @if ($finishingOrder)
+                <p class="mb-0">PO #{{ $finishingOrder->po_number }}</p>
             @endif
         </div>
 
         <div class="col-auto">
-            <a href="{{ route('admin.realisasis.create', ['production_order_id' => $productionOrder->id]) }}" class="btn btn-sm btn-success">Tambah Realisasi</a>
+            <a href="{{ route('admin.realisasis.create', ['finishing_order_id' => $finishingOrder->id]) }}" class="btn btn-sm btn-success">Tambah Realisasi</a>
         </div>
     </div>
 
@@ -32,8 +32,8 @@
             </tr>
         </thead>
 
-        @if ($productionOrder && count($productionOrder->realisasis))
-            @foreach ($productionOrder->realisasis as $row)
+        @if ($finishingOrder && count($finishingOrder->realisasis))
+            @foreach ($finishingOrder->realisasis as $row)
                 <tbody>
                     @php
                     $rowspan = $row->realisasi_details->count();

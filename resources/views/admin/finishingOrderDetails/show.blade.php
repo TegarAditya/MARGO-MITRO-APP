@@ -20,7 +20,7 @@
                             {{ trans('cruds.productionOrderDetail.fields.production_order') }}
                         </th>
                         <td>
-                            {{ $productionOrderDetail->production_order->po_number ?? '' }}
+                            {{ $finishingOrderDetail->finishing_order->po_number ?? '' }}
                         </td>
                     </tr>
                     <tr>
@@ -28,7 +28,7 @@
                             {{ trans('cruds.productionOrderDetail.fields.product') }}
                         </th>
                         <td>
-                            {{ $productionOrderDetail->product->name ?? '' }}
+                            {{ $finishingOrderDetail->product->name ?? '' }}
                         </td>
                     </tr>
                     <tr>
@@ -36,7 +36,7 @@
                             {{ trans('cruds.productionOrderDetail.fields.order_qty') }}
                         </th>
                         <td>
-                            {{ $productionOrderDetail->order_qty }}
+                            {{ $finishingOrderDetail->order_qty }}
                         </td>
                     </tr>
                     <tr>
@@ -44,7 +44,7 @@
                             {{ trans('cruds.productionOrderDetail.fields.prod_qty') }}
                         </th>
                         <td>
-                            {{ $productionOrderDetail->prod_qty }}
+                            {{ $finishingOrderDetail->prod_qty }}
                         </td>
                     </tr>
                     <tr>
@@ -52,7 +52,7 @@
                             {{ trans('cruds.productionOrderDetail.fields.ongkos_satuan') }}
                         </th>
                         <td>
-                            {{ $productionOrderDetail->ongkos_satuan }}
+                            {{ $finishingOrderDetail->ongkos_satuan }}
                         </td>
                     </tr>
                     <tr>
@@ -60,7 +60,7 @@
                             {{ trans('cruds.productionOrderDetail.fields.ongkos_total') }}
                         </th>
                         <td>
-                            {{ $productionOrderDetail->ongkos_total }}
+                            {{ $finishingOrderDetail->ongkos_total }}
                         </td>
                     </tr>
                 </tbody>

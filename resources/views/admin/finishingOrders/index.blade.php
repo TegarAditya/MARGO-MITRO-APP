@@ -1,44 +1,41 @@
 @extends('layouts.admin')
 @section('content')
-@can('production_order_detail_create')
+@can('production_order_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.production-order-details.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.productionOrderDetail.title_singular') }}
+            <a class="btn btn-success" href="{{ route('admin.finishing-orders.create') }}">
+                {{ trans('global.add') }} {{ trans('cruds.productionOrder.title_singular') }}
             </a>
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.productionOrderDetail.title_singular') }} {{ trans('global.list') }}
+        {{ trans('cruds.productionOrder.title_singular') }} {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
-        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-ProductionOrderDetail">
+        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-FinishingOrder">
             <thead>
                 <tr>
                     <th width="10">
 
                     </th>
                     <th>
-                        {{ trans('cruds.productionOrderDetail.fields.production_order') }}
+                        {{ trans('cruds.productionOrder.fields.po_number') }}
                     </th>
                     <th>
-                        {{ trans('cruds.productionOrderDetail.fields.product') }}
+                        {{ trans('cruds.productionOrder.fields.no_spk') }}
                     </th>
                     <th>
-                        {{ trans('cruds.productionOrderDetail.fields.order_qty') }}
+                        {{ trans('cruds.productionOrder.fields.productionperson') }}
                     </th>
                     <th>
-                        {{ trans('cruds.productionOrderDetail.fields.prod_qty') }}
+                        {{ trans('cruds.productionOrder.fields.date') }}
                     </th>
-                    <th>
-                        {{ trans('cruds.productionOrderDetail.fields.ongkos_satuan') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.productionOrderDetail.fields.ongkos_total') }}
-                    </th>
+                    {{-- <th>
+                        {{ trans('cruds.productionOrder.fields.created_by') }}
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -56,11 +53,11 @@
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('production_order_detail_delete')
+@can('production_order_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.production-order-details.massDestroy') }}",
+    url: "{{ route('admin.finishing-orders.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
@@ -87,32 +84,31 @@
 @endcan
 
   let dtOverrideGlobals = {
-    buttons: dtButtons,
+    // buttons: dtButtons,
     processing: true,
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.production-order-details.index') }}",
+    ajax: "{{ route('admin.finishing-orders.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
-{ data: 'production_order_po_number', name: 'production_order.po_number' },
-{ data: 'product_name', name: 'product.name' },
-{ data: 'order_qty', name: 'order_qty' },
-{ data: 'prod_qty', name: 'prod_qty' },
-{ data: 'ongkos_satuan', name: 'ongkos_satuan' },
-{ data: 'ongkos_total', name: 'ongkos_total' },
+{ data: 'po_number', name: 'po_number' },
+{ data: 'no_spk', name: 'no_spk' },
+{ data: 'productionperson_name', name: 'productionperson.name' },
+{ data: 'date', name: 'date' },
+// { data: 'created_by_name', name: 'created_by.name' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
     pageLength: 100,
   };
-  let table = $('.datatable-ProductionOrderDetail').DataTable(dtOverrideGlobals);
+  let table = $('.datatable-FinishingOrder').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

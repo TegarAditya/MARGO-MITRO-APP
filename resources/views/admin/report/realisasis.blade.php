@@ -15,15 +15,15 @@
                 <div class="col row">
                     <div class="col-3">
                         <div class="form-group mb-0">
-                            <label class="small mb-0" for="production_order_id">Production Order</label>
-                            <select class="form-control select2 {{ $errors->has('production_order_id') ? 'is-invalid' : '' }}" name="production_order_id" id="production_order_id">
+                            <label class="small mb-0" for="finishing_order_id">Production Order</label>
+                            <select class="form-control select2 {{ $errors->has('finishing_order_id') ? 'is-invalid' : '' }}" name="finishing_order_id" id="finishing_order_id">
                                 <option value="">Semua Order</option>
-                                @foreach($productionOrders as $productionOrder)
-                                    <option value="{{ $productionOrder->id }}" {{ (old('production_order_id') ? old('production_order_id') : (request('production_order_id') == $productionOrder->id ? 'selected' : '')) }}>{{ $productionOrder->po_number }}</option>
+                                @foreach($finishingOrders as $finishingOrder)
+                                    <option value="{{ $finishingOrder->id }}" {{ (old('finishing_order_id') ? old('finishing_order_id') : (request('finishing_order_id') == $finishingOrder->id ? 'selected' : '')) }}>{{ $finishingOrder->po_number }}</option>
                                 @endforeach
                             </select>
-                            @if($errors->has('production_order_id'))
-                                <span class="text-danger">{{ $errors->first('production_order_id') }}</span>
+                            @if($errors->has('finishing_order_id'))
+                                <span class="text-danger">{{ $errors->first('finishing_order_id') }}</span>
                             @endif
                         </div>
                     </div>
@@ -123,13 +123,13 @@
 
             @forelse ($realisasis as $realisasi)
                 @php
-                $productionOrder = $realisasi->production_order;
+                $finishingOrder = $realisasi->finishing_order;
                 $rowspan = $realisasi->realisasi_details->count();
                 $link = route('admin.realisasis.edit', $realisasi->id);
                 $print = function($type) use ($realisasi) {
                     return route('admin.realisasis.show', ['realisasi' => $realisasi->id, 'print' => $type]);
                 };
-                $type = ucfirst($productionOrder->type);
+                $type = ucfirst($finishingOrder->type);
                 $no = $loop->iteration;
                 @endphp
 
@@ -144,7 +144,7 @@
                                             <p class="mb-0">
                                                 <strong class="text-xs">No. PO</strong>
                                                 <br />
-                                                <a href="{{ route('admin.production-orders.show', $productionOrder->id) }}">{{ $productionOrder->po_number }}</a>
+                                                <a href="{{ route('admin.finishing-orders.show', $finishingOrder->id) }}">{{ $finishingOrder->po_number }}</a>
                                             </p>
                                         </div>
 
@@ -152,7 +152,7 @@
                                             <p class="mb-0">
                                                 <strong class="text-xs">Production Person</strong>
                                                 <br />
-                                                <span>{{ data_get($productionOrder, 'productionperson.name', '-') }}</span>
+                                                <span>{{ data_get($finishingOrder, 'productionperson.name', '-') }}</span>
                                             </p>
                                         </div>
                                     </div>
@@ -162,7 +162,7 @@
                                             <p class="mb-0">
                                                 <strong class="text-xs">No. SPK</strong>
                                                 <br />
-                                                <a href="{{ route('admin.production-orders.edit', $productionOrder->id) }}">{{ $productionOrder->no_spk }}</a>
+                                                <a href="{{ route('admin.finishing-orders.edit', $finishingOrder->id) }}">{{ $finishingOrder->no_spk }}</a>
                                             </p>
                                         </div>
 
@@ -170,14 +170,14 @@
                                             <p class="mb-0">
                                                 <strong class="text-xs">No. Kwitansi</strong>
                                                 <br />
-                                                <a href="{{ route('admin.production-orders.edit', $productionOrder->id) }}">{{ $productionOrder->no_kwitansi }}</a>
+                                                <a href="{{ route('admin.finishing-orders.edit', $finishingOrder->id) }}">{{ $finishingOrder->no_kwitansi }}</a>
                                             </p>
                                         </div>
                                     </div>
 
                                     <div class="row pt-1 mt-1 border-top">
                                         <div class="col-12">
-                                            <p class="pt-3 text-center mb-0 {{ $productionOrder->type === 'percetakan' ? 'text-info' : 'text-success' }}">
+                                            <p class="pt-3 text-center mb-0 {{ $finishingOrder->type === 'percetakan' ? 'text-info' : 'text-success' }}">
                                                 <strong class="text-xs">{{ $type }}</strong>
                                             </p>
                                         </div>

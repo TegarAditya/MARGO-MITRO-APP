@@ -8,25 +8,25 @@
         <tr>
             <td width="136"><strong>No. PO</strong></td>
             <td width="12">:</td>
-            <td>{{ $productionOrder->po_number }}</td>
+            <td>{{ $finishingOrder->po_number }}</td>
         </tr>
 
         <tr>
             <td width="120"><strong>No. Kwitansi</strong></td>
             <td width="8">:</td>
-            <td>{{ $productionOrder->no_kwitansi }}</td>
+            <td>{{ $finishingOrder->no_kwitansi }}</td>
         </tr>
 
         <tr>
             <td><strong>Tanggal</strong></td>
             <td>:</td>
-            <td>{{ $productionOrder->date }}</td>
+            <td>{{ $finishingOrder->date }}</td>
         </tr>
 
         <tr>
             <td><strong>Subkontraktor</strong></td>
             <td>:</td>
-            <td>{{ $productionOrder->productionperson->name }}</td>
+            <td>{{ $finishingOrder->productionperson->name }}</td>
         </tr>
     </tbody>
 </table>
@@ -45,7 +45,7 @@
     </thead>
 
     <tbody>
-        @foreach ($productionOrder->production_order_details as $detail)
+        @foreach ($finishingOrder->finishing_order_details as $detail)
             @php
             $product = $detail->product;
             $selisih = $detail->order_qty - $detail->prod_qty;
@@ -67,7 +67,7 @@
     <tfoot>
         <tr>
             <td colspan="6" class="text-center px-3"><strong>Total</strong></td>
-            <td class="text-right">@money(abs($productionOrder->total))</td>
+            <td class="text-right">@money(abs($finishingOrder->total))</td>
         </tr>
     </tfoot>
 </table>

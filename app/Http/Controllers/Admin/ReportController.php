@@ -153,11 +153,11 @@ class ReportController extends Controller
         abort_if(Gate::denies('production_order_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $products = Product::get();
-        $productionOrders = ProductionOrder::get();
+        $finishingOrders = ProductionOrder::get();
         $productionpeople = Productionperson::get();
         $realisasiQuery = Realisasi::query()->with([
-            'production_order',
-            'production_order.productionperson',
+            'finishing_order',
+            'finishing_order.productionperson',
             'realisasi_details',
             'realisasi_details.product',
         ]);
@@ -171,12 +171,12 @@ class ReportController extends Controller
         }
         $realisasiQuery->whereBetween('date', [$start, $end]);
 
-        if ($production_order_id = $request->production_order_id) {
-            $realisasiQuery->where('production_order_id', $production_order_id);
+        if ($finishing_order_id = $request->finishing_order_id) {
+            $realisasiQuery->where('finishing_order_id', $finishing_order_id);
         }
 
         if ($productionperson_id = $request->productionperson_id) {
-            $realisasiQuery->whereHas('production_order', function($query) use ($productionperson_id) {
+            $realisasiQuery->whereHas('finishing_order', function($query) use ($productionperson_id) {
                 $query->where('productionperson_id', $productionperson_id);
             });
         }
@@ -196,9 +196,9 @@ class ReportController extends Controller
         $realisasis = $realisasiQuery->orderByDesc('date')->get();
 
         if ($request->export === 'excel') {
-            return (new ReportRealisasisExport($realisasis))->download('report-production-order.xlsx');
+            return (new ReportRealisasisExport($realisasis))->download('report-finishing-order.xlsx');
         }
 
-        return view('admin.report.realisasis', compact('productionOrders', 'productionpeople', 'realisasis', 'products'));
+        return view('admin.report.realisasis', compact('finishingOrders', 'productionpeople', 'realisasis', 'products'));
     }
 }

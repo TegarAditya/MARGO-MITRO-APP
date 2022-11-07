@@ -13,7 +13,7 @@
         @if ($productionOrder->id)
             <div class="row mb-4">
                 <div class="col">
-                    <h4>PO No. #{{ $productionOrder->po_number }}</h4>
+                    <h4>PO No. #{{ $productionOrder->no_order }}</h4>
 
                     <div class="row">
                         <div class="col-auto">
@@ -39,22 +39,8 @@
                             </a>
 
                             <div class="col text-muted px-2">
-                                <span class="text-xs">No. SPK</span>
-                                <p class="m-0">{{ $productionOrder->no_spk }}</p>
-                            </div>
-                        </div>
-
-                        <div class="col-auto ml-3 d-flex align-items-center">
-                            <a href="{{ route('admin.production-orders.show', [
-                                'production_order' => $productionOrder->id,
-                                'print' => 'kwitansi'
-                            ]) }}" target="_blank" title="Cetak Kwitansi" class="btn btn-sm btn-default border py-0 px-1">
-                                <i class="fa fa-print text-info"></i>
-                            </a>
-
-                            <div class="col text-muted px-2">
-                                <span class="text-xs">No. Kwitansi</span>
-                                <p class="m-0">{{ $productionOrder->no_kwitansi }}</p>
+                                <span class="text-xs">No. Order</span>
+                                <p class="m-0">{{ $productionOrder->no_order }}</p>
                             </div>
                         </div>
                     </div>

@@ -73,6 +73,42 @@
                 <p class="mb-2">Total pemesanan: {{ $order->order_details->count() }} produk</p>
 
                 @foreach ($order->order_details as $order_detail)
+                    @if (!$order_detail->product)
+                        <div class="card">
+                            <div class="card-body px-3 py-2">
+                                <h6 class="text-sm product-name mb-0">
+                                    Produk #{{ $order_detail->product_id }}
+
+                                    <span class="ml-1 text-danger">(Dihapus)</span>
+                                </h6>
+
+                                <div class="row align-items-end align-self-center">
+                                    <div class="col" style="max-width: 120px">
+                                        <p class="mb-0 text-sm">
+                                            Pesanan: {{ $order_detail->quantity }}
+                                        </p>
+
+                                        <p class="mb-0 text-sm">
+                                            Terkirim: {{ $order_detail->moved }}
+                                        </p>
+                                    </div>
+
+                                    <div class="col text-right" style="max-width: 240px">
+                                        <p class="text-sm mb-0">Harga</p>
+                                        <p class="m-0">@money($order_detail->price)</p>
+                                    </div>
+
+                                    <div class="col text-right">
+                                        <p class="text-sm mb-0">Subtotal</p>
+                                        <p class="m-0">@money($order_detail->total)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @continue
+                    @endif
+
                     @php
                     $product = $order_detail->product;
                     $category = $product->category;

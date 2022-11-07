@@ -358,6 +358,51 @@
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-print"></i>
                             <p>
+                                Order Cetak
+                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('production_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.production-orders.dashboard") }}" class="nav-link {{ request()->is("admin/production-orders/dashboard") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-print"></i>
+                                        <p>
+                                            Rangkuman Cetak
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('production_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.production-orders.index") }}" class="nav-link {{
+                                        (request()->is("admin/production-orders") || request()->is("admin/production-orders/*"))
+                                        && !request()->is('admin/production-orders/dashboard') ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-print"></i>
+                                        <p>
+                                            Order Cetak
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('production_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.realisasis.index") }}" class="nav-link {{ request()->is("admin/realisasis") || request()->is("admin/realisasis/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-list"></i>
+                                        <p>
+                                            Realisasi Cetak
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
+                @can('production_access')
+                    <li class="nav-item has-treeview {{ request()->is("admin/finishing-orders*") ? "menu-open" : "" }} {{ request()->is("admin/realisasis*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
+                            <i class="fa-fw nav-icon fas fa-print"></i>
+                            <p>
                                 {{ trans('cruds.productionOrder.title') }}
                                 <i class="right fa fa-fw fa-angle-left nav-icon"></i>
                             </p>
@@ -365,7 +410,7 @@
                         <ul class="nav nav-treeview">
                             @can('production_access')
                                 <li class="nav-item">
-                                    <a href="{{ route("admin.production-orders.index") }}" class="nav-link {{ request()->is("admin/production-orders") || request()->is("admin/production-orders/*") ? "active" : "" }}">
+                                    <a href="{{ route("admin.finishing-orders.index") }}" class="nav-link {{ request()->is("admin/finishing-orders") || request()->is("admin/finishing-orders/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-print">
 
                                         </i>

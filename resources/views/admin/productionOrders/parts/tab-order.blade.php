@@ -4,38 +4,21 @@ $bahan_products = $products->whereIn('category_id', [$bahan_cat->id, ...$bahan_c
 
 $buku_cat = $categories->where('slug', 'buku')->first();
 $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat->child()->pluck('id')]);
+
+$status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDING;
 @endphp
 
 <div class="model-products pt-3">
+    <input type="hidden" name="status" value="{{ $productionOrder->status }}" id="status" />
     <input type="hidden" name="total" value="{{ $productionOrder->total }}" id="total" />
 
     <div class="row">
         <div class="col-12">
             <div class="form-group">
-                <label for="po_number">No. Production Order</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('po_number') ? 'is-invalid' : '' }}" type="text" name="po_number" id="po_number" value="{{ old('po_number', $productionOrder->po_number) }}" readonly placeholder="(Otomatis)">
-                @if($errors->has('po_number'))
-                    <span class="text-danger">{{ $errors->first('po_number') }}</span>
-                @endif
-            </div>
-        </div>
-
-        <div class="col-6">
-            <div class="form-group">
-                <label for="no_spk">No. SPK</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" type="text" name="no_spk" id="no_spk" value="{{ old('no_spk', $productionOrder->no_spk) }}" readonly placeholder="(Otomatis)">
-                @if($errors->has('no_spk'))
-                    <span class="text-danger">{{ $errors->first('no_spk') }}</span>
-                @endif
-            </div>
-        </div>
-
-        <div class="col-6">
-            <div class="form-group">
-                <label for="no_kwitansi">No. Kwitansi</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', $productionOrder->no_kwitansi) }}" readonly placeholder="(Otomatis)">
-                @if($errors->has('no_kwitansi'))
-                    <span class="text-danger">{{ $errors->first('no_kwitansi') }}</span>
+                <label for="no_order">No. Order Cetak</label>
+                <input class="form-control h-auto py-1 {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $productionOrder->no_order) }}" readonly placeholder="(Otomatis)">
+                @if($errors->has('no_order'))
+                    <span class="text-danger">{{ $errors->first('no_order') }}</span>
                 @endif
             </div>
         </div>
@@ -58,8 +41,8 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 <label class="required" for="type">Jenis</label>
                 <select class="form-control select2 {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
                     <option value="">Please select</option>
-                    <option value="finishing" {{ $productionOrder->type == 'finishing' ? 'selected' : '' }}>Finishing</option>
-                    <option value="percetakan" {{ $productionOrder->type == 'percetakan' ? 'selected' : '' }}>Percetakan</option>
+                    <option value="finishing" {{ old('type', $productionOrder->type) == 'finishing' ? 'selected' : '' }}>Finishing</option>
+                    <option value="percetakan" {{ old('type', $productionOrder->type) == 'percetakan' ? 'selected' : '' }}>Percetakan</option>
                 </select>
                 @if($errors->has('type'))
                     <span class="text-danger">{{ $errors->first('type') }}</span>
@@ -79,7 +62,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                         <option
                             value="{{ $person->id }}"
                             data-type="{{ $person->type }}"
-                            {{ (old('productionperson_id') ? old('productionperson_id') : $productionOrder->productionperson->id ?? '') == $person->id ? 'selected' : '' }}
+                            {{ old('productionperson_id', $productionOrder->productionperson_id) == $person->id ? 'selected' : '' }}
                         >{{ $person->name }}</option>
                     @endforeach
                 </select>
@@ -95,68 +78,126 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         </div>
     </div>
 
-    @foreach ([
-        [
-            'label' => 'Produk Dipilih',
-            'product_ids' => $buku_products->pluck('id'),
-            'modal' => '#productModal',
-            'name' => 'products',
-        ], [
-            'label' => 'Bahan Dipilih',
-            'product_ids' => $bahan_products->pluck('id'),
-            'modal' => '#bahanModal',
-            'name' => 'products',
-        ],
-    ] as $item)
-        @php
-        $order_details = $productionOrder->production_order_details->whereIn('product_id', $item['product_ids']);
-        @endphp
-        <hr style="margin: .5em -15px;border-color:#ccc" />
+    <hr style="margin: .5em -15px;border-color:#ccc" />
 
-        <div class="product-list-group">
-            <h5 class="product-group-title">{{ $item['label'] }}</h5>
+    <h5 class="mb-2 mt-3">
+        {{ !$productionOrder->id ? "Pilih Produk" : "Produk Dipilih" }}
+    </h5>
 
-            <div class="product-list">
-                @if ($order_details->count())
-                    @each('admin.productionOrders.parts.item-product', $order_details, 'detail')
-                @endif
+    @if ($status === 0)
+        <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn py-1 border product-group-add" data-add="before">
+                        <i class="fa fa-plus text-sm mr-1"></i>
 
-                @include('admin.productionOrders.parts.item-product', [
-                    'detail' => new App\Models\ProductionOrderDetail,
-                    'modal' => $item['modal'],
-                    'name' => $item['name'],
-                ])
-            </div>
-
-            <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
-                <div class="row justify-content-center d-none">
-                    <div class="col-auto">
-                        <button type="button" class="btn py-1 border product-add">
-                            <i class="fa fa-plus text-sm mr-1"></i>
-
-                            <span>Tambah Produk</span>
-                        </button>
-                    </div>
-                </div>
-
-                @if($errors->has($item['name']))
-                    <span class="text-danger">{{ $errors->first($item['name']) }}</span>
-                @endif
-            </div>
-
-            <div class="product-faker d-none">
-                @include('admin.productionOrders.parts.item-product', [
-                    'detail' => new App\Models\ProductionOrderDetail,
-                    'modal' => $item['modal'],
-                    'name' => $item['name'],
-                ])
-        
-                <div class="product-empty">
-                    <p>Belum ada produk yang ditambahkan</p>
+                        <span>Tambah Group</span>
+                    </button>
                 </div>
             </div>
         </div>
+    @endif
+
+    @foreach ([
+        [
+            'modal' => '#productModal',
+            'name' => 'products',
+            'placeholder' => 'Pilih Produk',
+        ],
+    ] as $item)
+        @php
+        $order_details = $productionOrder->production_order_details;
+
+        $groups = $order_details->groupBy('group');
+
+        if (!$groups->count()) {
+            $groups->put('new', collect([]));
+        }
+
+        $groups->put('fake', collect([]));
+        @endphp
+        @foreach ($groups as $group => $items)
+            @php
+            $parent = $items->first();
+            $list = $items->slice(1);
+            $all_check = $items->count() === $items->where('file', 1)
+                ->where('plate', 1)
+                ->where('plate_ambil', 1)
+                ->count();
+
+            $label = "Group $loop->iteration"
+            @endphp
+            <div
+                class="product-list-group{{ $group === 'fake' ? ' d-none' : '' }}"
+                data-group="{{ $group }}"
+            >
+                {{-- <h6 class="product-group-title font-weight-normal mb-0">{{ $label }}</h6> --}}
+
+                <div class="product-list">
+                    @if ($parent)
+                        @include('admin.productionOrders.parts.item-product', [
+                            'detail' => $parent,
+                        ])
+                    @endif
+
+                    @if ($list->count())
+                        @each('admin.productionOrders.parts.item-product', $list, 'detail')
+                    @endif
+
+                    @if ($status === 0)
+                        @include('admin.productionOrders.parts.item-product', [
+                            'detail' => new App\Models\ProductionOrderDetail,
+                            'modal' => $item['modal'],
+                            'name' => $item['name'],
+                            'placeholder' => $item['placeholder'],
+                        ])
+                    @endif
+                </div>
+
+                <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
+                    <div class="row justify-content-center d-none">
+                        <div class="col-auto">
+                            <button type="button" class="btn py-1 border product-add">
+                                <i class="fa fa-plus text-sm mr-1"></i>
+
+                                <span>Tambah Produk</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    @if($errors->has($item['name']))
+                        <span class="text-danger">{{ $errors->first($item['name']) }}</span>
+                    @endif
+                </div>
+
+                <div class="product-faker d-none">
+                    @include('admin.productionOrders.parts.item-product', [
+                        'detail' => new App\Models\ProductionOrderDetail,
+                        'modal' => $item['modal'],
+                        'name' => $item['name'],
+                    ])
+            
+                    <div class="product-empty">
+                        <p>Belum ada produk yang ditambahkan</p>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     @endforeach
+
+    @if ($status === 0)
+        <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn py-1 border product-group-add">
+                        <i class="fa fa-plus text-sm mr-1"></i>
+
+                        <span>Tambah Group</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <div class="product-summary" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
         <div class="row border-top pt-2">
@@ -169,7 +210,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             </div>
 
             @if (!$productionOrder->id)
-                <div class="col-auto opacity-0 pl-5 order-action-placeholder" style="pointer-events: none">
+                <div class="col-auto opacity-0 pl-4 ml-1 order-action-placeholder" style="pointer-events: none">
                     <button type="button" class="btn py-1"></button>
                 </div>
             @endif
@@ -189,10 +230,6 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 <!-- Modal Products -->
 @foreach ([
     [
-        'id' => 'bahanModal',
-        'label' => 'Semua Bahan',
-        'items' => $bahan_products,
-    ], [
         'id' => 'productModal',
         'label' => 'Semua Produk',
         'items' => $buku_products,
@@ -309,6 +346,17 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
 @push('styles')
 <style>
+.product-list-group {
+    padding: .5rem 1rem;
+    border: 1px solid #eee;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 4px rgb(0 0 0 / 12%);
+}
+
+.product-list-group + .product-list-group {
+    margin-top: 1rem;
+}
+
 .product-group-title {
     position: sticky;
     position: -webkit-sticky;
@@ -326,14 +374,18 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
     pointer-events: none;
 }
 
-.product-list > .item-product:last-child .product-delete {
+.product-list > .item-product:not(:first-child) > .col-5.row {
+    padding-left: 5rem;
+}
+
+.product-list > .item-product:not(.is-removable):last-child .product-delete {
     opacity: 0.5;
     pointer-events: none;
     background-color: #aeaeae;
     border-color: #969696;
 }
 
-.product-list > .item-product:last-child > .product-col-content {
+.product-list > .item-product.item-product-status-0:last-child > .product-col-content .col {
     opacity: 0.66;
     pointer-events: none;
 }
@@ -411,6 +463,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         var type = form.find('#type');
         var people = form.find('#productionperson_id');
 
+        var groups = form.find('.product-list-group:not([data-group="fake"])');
+        var groupFake = form.find('.product-list-group[data-group="fake"]');
+        var groupAction = form.find('.product-group-action');
+        var groupAdd = form.find('.product-group-add');
         var allProducts = form.find('.product-list');
         var productEmpty = form.find('.product-faker > .product-empty');
         var productSummary = form.find('.product-summary');
@@ -441,8 +497,9 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             form.find('#total').val(total);
         };
 
-        $('.product-list-group').each(function(index, item) {
+        var bindGroup = function(item, index) {
             var group = $(item);
+            var groupId = group.data('group');
             var products = group.find('.product-list');
             var productAdd = group.find('.product-add');
             var productFake = group.find('.product-faker > .item-product');
@@ -452,6 +509,9 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 var actions = product.find('.product-qty-act');
                 var price = product.find('.product-price');
                 var priceText = product.find('.product-price_text');
+                var check = product.find('.product-check');
+
+                !isNaN(groupId) && product.find('.product-group').val(groupId);
 
                 actions.on('click', function (e) {
                     var el = $(e.currentTarget);
@@ -484,15 +544,44 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
                     product.remove();
                     calculatePrice();
+                    
+                    if (products.children('.item-product').length <= 1) {
+                        if (groups.length > 1) {
+                            group.remove();
 
-                    if (!products.children('.item-product').length) {
-                        productEmpty.clone().appendTo(products);
+                            groups = groups.filter(':not([data-group="'+group.data('group')+'"])');
+                        }
+                    }
+
+                    if (groups.find('.product-list > .item-product').length <= 1) {
                         productSummary.hide();
+                        groupAction.hide();
                     }
                 });
 
                 product.find('.product-pick').on('click', function(e) {
                     productSelectTarget = product;
+                });
+
+                product.find('.product-check-process').on('click', function(e) {
+                    e.preventDefault();
+
+                    var checkBtn = $(e.currentTarget);
+                    var isChecked = check.val() == 1;
+
+                    if (isChecked) {
+                        products.find('.product-check').val(0);
+
+                        group.removeClass('border-success');
+                        checkBtn.removeClass('btn-success')
+                            .addClass('btn-light border');
+                    } else {
+                        products.find('.product-check').val(1);
+
+                        group.addClass('border-success');
+                        checkBtn.addClass('btn-success')
+                            .removeClass('btn-light border');
+                    }
                 });
             };
 
@@ -513,6 +602,35 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 bindProduct(product);
                 group.find('.product-action').hide();
             });
+        };
+
+        groups.each(function(index, item) {
+            bindGroup(item, index);
+        });
+
+        groupAdd.on('click', function(e) {
+            e.preventDefault();
+
+            var addBtn = $(e.currentTarget);
+            var addAfter = (addBtn.data('add') || 'after') === 'after';
+            var lastGroup = addAfter ? groups.last() : groups.first();
+            var fake = groupFake.clone();
+
+            fake.find('.product-list > .item-product').addClass('is-removable');
+            fake.removeClass('d-none')[addAfter ? 'insertAfter' : 'insertBefore'](lastGroup);
+
+            bindGroup(fake, groups.length + 1);
+            groups = groups.add(fake);
+
+            groups.each(function(index, item) {
+                var group = $(item);
+                var groupId = index + 1;
+
+                group.data('group', groupId).attr('data-group', groupId);
+                group.find('.product-group').val(groupId);
+            });
+
+            allProducts = groups.find('.product-list');
         });
 
         $('.field-select2').each((index, item) => {
@@ -590,9 +708,9 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 .attr('name', name+'['+data.id+'][qty]')
                 .attr('min', 1)
                 .attr('required', true);
-            product.find('.product-qty2').val(qty || 0)
-                .attr('id', 'fieldQtyProd-'+data.id)
-                .attr('name', name+'['+data.id+'][prod]')
+            product.find('.product-group')
+                .attr('id', 'fieldGroupProd-'+data.id)
+                .attr('name', name+'['+data.id+'][group]')
                 .attr('required', true);
             product.find('.product-price').val(price != 0 ? price : data.price)
                 .attr('name', name+'['+data.id+'][price]');
@@ -608,8 +726,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             modals.modal('hide');
             selected.addClass('selected');
             productSummary.show();
+            groupAction.show();
             calculatePrice();
 
+            product.removeClass('is-removable');
             product.closest('.product-list-group').find('.product-add').trigger('click');
         });
     });

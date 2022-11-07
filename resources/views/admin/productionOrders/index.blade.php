@@ -4,14 +4,14 @@
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
             <a class="btn btn-success" href="{{ route('admin.production-orders.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.productionOrder.title_singular') }}
+                {{ trans('global.add') }} Order Cetak
             </a>
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.productionOrder.title_singular') }} {{ trans('global.list') }}
+        Order Cetak {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
@@ -22,10 +22,7 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.productionOrder.fields.po_number') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.productionOrder.fields.no_spk') }}
+                        No. Order
                     </th>
                     <th>
                         {{ trans('cruds.productionOrder.fields.productionperson') }}
@@ -92,8 +89,7 @@
     ajax: "{{ route('admin.production-orders.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
-{ data: 'po_number', name: 'po_number' },
-{ data: 'no_spk', name: 'no_spk' },
+{ data: 'no_order', name: 'no_order' },
 { data: 'productionperson_name', name: 'productionperson.name' },
 { data: 'date', name: 'date' },
 // { data: 'created_by_name', name: 'created_by.name' },
