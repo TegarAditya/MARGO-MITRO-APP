@@ -6,10 +6,14 @@
             <a class="btn btn-success" href="{{ route('admin.productionpeople.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.productionperson.title_singular') }}
             </a>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
+            </button>
             <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
                 {{ trans('global.app_csvImport') }}
             </button>
             @include('csvImport.modal', ['model' => 'Productionperson', 'route' => 'admin.productionpeople.parseCsvImport'])
+            @include('csvImport.import_modal', ['model' => 'Productionperson', 'route' => 'admin.productionpeople.import'])
         </div>
     </div>
 @endcan
@@ -90,21 +94,21 @@
     ajax: "{{ route('admin.productionpeople.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
-{ data: 'code', name: 'code' },
+{ data: 'code', name: 'code', class:'text-center' },
 { data: 'name', name: 'name' },
-{ data: 'type', name: 'type' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+{ data: 'type', name: 'type', class:'text-center' },
+{ data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 25,
   };
   let table = $('.datatable-Productionperson').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

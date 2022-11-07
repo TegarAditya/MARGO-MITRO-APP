@@ -16,6 +16,14 @@ class Category extends Model
     use HasFactory;
     use Sluggable;
 
+    public const TYPE_SELECT = [
+        'kelas'   => 'Kelas',
+        'halaman' => 'Halaman',
+        'jenjang' => 'Jenjang',
+        'isi' => 'Isi',
+        'bahan' => 'Bahan',
+    ];
+
     public $table = 'categories';
 
     protected $dates = [
@@ -27,6 +35,7 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
+        'type',
         'parent_id',
         'created_at',
         'updated_at',

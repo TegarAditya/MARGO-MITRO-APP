@@ -22,7 +22,7 @@ class StoreProductRequest extends FormRequest
                 'required',
             ],
             'category_id' => [
-                'required',
+                'nullable',
                 'integer',
             ],
             'unit_id' => [
@@ -47,6 +47,9 @@ class StoreProductRequest extends FormRequest
             'foto' => [
                 'array',
             ],
+            'kelas' => [
+                'array',
+            ]
         ];
     }
 }

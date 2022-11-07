@@ -22,7 +22,7 @@
                 </li>
                 @can('user_management_access')
                     <li class="nav-item has-treeview {{ request()->is("admin/permissions*") ? "menu-open" : "" }} {{ request()->is("admin/roles*") ? "menu-open" : "" }} {{ request()->is("admin/users*") ? "menu-open" : "" }} {{ request()->is("admin/audit-logs*") ? "menu-open" : "" }} {{ request()->is("admin/user-alerts*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/permissions*") ? "active" : "" }} {{ request()->is("admin/roles*") ? "active" : "" }} {{ request()->is("admin/users*") ? "active" : "" }} {{ request()->is("admin/audit-logs*") ? "active" : "" }} {{ request()->is("admin/user-alerts*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-users">
 
                             </i>
@@ -68,7 +68,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('audit_log_access')
+                            {{-- @can('audit_log_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.audit-logs.index") }}" class="nav-link {{ request()->is("admin/audit-logs") || request()->is("admin/audit-logs/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-file-alt">
@@ -79,8 +79,8 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
-                            @can('user_alert_access')
+                            @endcan --}}
+                            {{-- @can('user_alert_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.user-alerts.index") }}" class="nav-link {{ request()->is("admin/user-alerts") || request()->is("admin/user-alerts/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-bell">
@@ -91,13 +91,13 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
                         </ul>
                     </li>
                 @endcan
                 @can('master_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/brands*") ? "menu-open" : "" }} {{ request()->is("admin/cities*") ? "menu-open" : "" }} {{ request()->is("admin/categories*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/brands*") ? "menu-open" : "" }} {{ request()->is("admin/cities*") ? "menu-open" : "" }} {{ request()->is("admin/categories*") ? "menu-open" : "" }} {{ request()->is("admin/custom-prices*") ? "menu-open" : "" }} {{ request()->is("admin/semesters*") ? "menu-open" : "" }} {{ request()->is("admin/prices*") ? "menu-open" : "" }} {{ request()->is("admin/price-details*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/units*") ? "active" : "" }} {{ request()->is("admin/brands*") ? "active" : "" }} {{ request()->is("admin/cities*") ? "active" : "" }} {{ request()->is("admin/categories*") ? "active" : "" }} {{ request()->is("admin/custom-prices*") ? "active" : "" }} {{ request()->is("admin/semesters*") ? "active" : "" }} {{ request()->is("admin/prices*") ? "active" : "" }} {{ request()->is("admin/price-details*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-cogs">
 
                             </i>
@@ -107,6 +107,18 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @can('semester_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.semesters.index") }}" class="nav-link {{ request()->is("admin/semesters") || request()->is("admin/semesters/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon far fa-clock">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.semester.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('unit_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.units.index") }}" class="nav-link {{ request()->is("admin/units") || request()->is("admin/units/*") ? "active" : "" }}">
@@ -155,6 +167,30 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('price_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.prices.index") }}" class="nav-link {{ request()->is("admin/prices") || request()->is("admin/prices/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-dollar-sign">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.price.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('price_detail_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.price-details.index") }}" class="nav-link {{ request()->is("admin/price-details") || request()->is("admin/price-details/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-dollar-sign">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.priceDetail.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcan
@@ -183,15 +219,38 @@
                     </li>
                 @endcan
                 @can('product_access')
-                    <li class="nav-item">
-                        <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is("admin/products") || request()->is("admin/products/*") ? "active" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/product/*") || request()->is("admin/buku*") || request()->is("admin/bahan*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-book">
 
                             </i>
                             <p>
                                 {{ trans('cruds.product.title') }}
+                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
                             </p>
                         </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route("admin.buku.index") }}" class="nav-link {{ request()->is("admin/buku") || request()->is("admin/buku/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-book">
+
+                                    </i>
+                                    <p>
+                                        Buku
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route("admin.bahan.index") }}" class="nav-link {{ request()->is("admin/bahan") || request()->is("admin/bahan/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-flask">
+
+                                    </i>
+                                    <p>
+                                        Bahan
+                                    </p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 @endcan
                 @can('stock_access')
@@ -246,11 +305,9 @@
                     </li>
                 @endcan
                 @can('sales_order_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/orders*") ? "menu-open" : "" }} {{ request()->is("admin/order-details*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/orders*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/pembayarans*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
-                            <i class="fa-fw nav-icon fas fa-hand-holding-usd">
-
-                            </i>
+                            <i class="fa-fw nav-icon fas fa-hand-holding-usd"></i>
                             <p>
                                 {{ trans('cruds.salesOrder.title') }}
                                 <i class="right fa fa-fw fa-angle-left nav-icon"></i>
@@ -269,34 +326,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('order_detail_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.order-details.index") }}" class="nav-link {{ request()->is("admin/order-details") || request()->is("admin/order-details/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-money-bill-alt">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.orderDetail.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-                @endcan
-                @can('invoice_menu_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoice-details*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
-                            <i class="fa-fw nav-icon fas fa-file-invoice-dollar">
-
-                            </i>
-                            <p>
-                                {{ trans('cruds.invoiceMenu.title') }}
-                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            @can('invoice_access')
+                            @can('invoice_menu_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.invoices.index") }}" class="nav-link {{ request()->is("admin/invoices") || request()->is("admin/invoices/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-file-invoice-dollar">
@@ -308,73 +338,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('invoice_detail_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.invoice-details.index") }}" class="nav-link {{ request()->is("admin/invoice-details") || request()->is("admin/invoice-details/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-money-bill-alt">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.invoiceDetail.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-                @endcan
-                @can('tagihan_menu_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/tagihans*") ? "menu-open" : "" }} {{ request()->is("admin/tagihan-movements*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
-                            <i class="fa-fw nav-icon far fa-money-bill-alt">
-
-                            </i>
-                            <p>
-                                {{ trans('cruds.tagihanMenu.title') }}
-                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            @can('tagihan_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.tagihans.index") }}" class="nav-link {{ request()->is("admin/tagihans") || request()->is("admin/tagihans/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon far fa-money-bill-alt">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.tagihan.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('tagihan_movement_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.tagihan-movements.index") }}" class="nav-link {{ request()->is("admin/tagihan-movements") || request()->is("admin/tagihan-movements/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon far fa-money-bill-alt">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.tagihanMovement.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-                @endcan
-                @can('pembayaran_menu_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/pembayarans*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle" href="#">
-                            <i class="fa-fw nav-icon fas fa-dollar-sign">
-
-                            </i>
-                            <p>
-                                {{ trans('cruds.pembayaranMenu.title') }}
-                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            @can('pembayaran_access')
+                            @can('pembayaran_menu_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.pembayarans.index") }}" class="nav-link {{ request()->is("admin/pembayarans") || request()->is("admin/pembayarans/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-dollar-sign">
@@ -390,18 +354,16 @@
                     </li>
                 @endcan
                 @can('production_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/production-orders*") ? "menu-open" : "" }} {{ request()->is("admin/production-order-details*") ? "menu-open" : "" }}">
+                    <li class="nav-item has-treeview {{ request()->is("admin/production-orders*") ? "menu-open" : "" }} {{ request()->is("admin/realisasis*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
-                            <i class="fa-fw nav-icon fas fa-print">
-
-                            </i>
+                            <i class="fa-fw nav-icon fas fa-print"></i>
                             <p>
-                                {{ trans('cruds.production.title') }}
+                                {{ trans('cruds.productionOrder.title') }}
                                 <i class="right fa fa-fw fa-angle-left nav-icon"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            @can('production_order_access')
+                            @can('production_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.production-orders.index") }}" class="nav-link {{ request()->is("admin/production-orders") || request()->is("admin/production-orders/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-print">
@@ -413,18 +375,71 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('production_order_detail_access')
+                            @can('production_access')
                                 <li class="nav-item">
-                                    <a href="{{ route("admin.production-order-details.index") }}" class="nav-link {{ request()->is("admin/production-order-details") || request()->is("admin/production-order-details/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-cogs">
+                                    <a href="{{ route("admin.realisasis.index") }}" class="nav-link {{ request()->is("admin/realisasis") || request()->is("admin/realisasis/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-list">
 
                                         </i>
                                         <p>
-                                            {{ trans('cruds.productionOrderDetail.title') }}
+                                            Realisasi Finishing
                                         </p>
                                     </a>
                                 </li>
                             @endcan
+                        </ul>
+                    </li>
+                @endcan
+                @can('sales_order_access')
+                    <li class="nav-item has-treeview {{ request()->is("admin/report/*") ? "menu-open" : "" }} {{ request()->is("admin/report/*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
+                            <i class="fa-fw nav-icon fas fa-file"></i>
+                            <p>
+                                Laporan
+                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route("admin.report.orders") }}" class="nav-link {{ request()->is("admin/report/orders") || request()->is("admin/report/orders/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-print">
+
+                                    </i>
+                                    <p>
+                                        History Pemesanan
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route("admin.report.invoices") }}" class="nav-link {{ request()->is("admin/report/invoices") || request()->is("admin/report/invoices/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-print">
+
+                                    </i>
+                                    <p>
+                                        History Pengiriman
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route("admin.report.payment") }}" class="nav-link {{ request()->is("admin/report/payment") || request()->is("admin/report/payment/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-print">
+
+                                    </i>
+                                    <p>
+                                        History Pembayaran
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route("admin.report.realisasis") }}" class="nav-link {{ request()->is("admin/report/realisasis") || request()->is("admin/report/realisasis/*") ? "active" : "" }}">
+                                    <i class="fa-fw nav-icon fas fa-print">
+
+                                    </i>
+                                    <p>
+                                        History Penerimaan
+                                    </p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endcan
@@ -438,42 +453,42 @@
                         </p>
                     </a>
                 </li>
-                @php($unread = \App\Models\QaTopic::unreadCount())
-                    <li class="nav-item">
-                        <a href="{{ route("admin.messenger.index") }}" class="{{ request()->is("admin/messenger") || request()->is("admin/messenger/*") ? "active" : "" }} nav-link">
-                            <i class="fa-fw fa fa-envelope nav-icon">
+                {{-- @php($unread = \App\Models\QaTopic::unreadCount())
+                <li class="nav-item">
+                    <a href="{{ route("admin.messenger.index") }}" class="{{ request()->is("admin/messenger") || request()->is("admin/messenger/*") ? "active" : "" }} nav-link">
+                        <i class="fa-fw fa fa-envelope nav-icon">
+
+                        </i>
+                        <p>{{ trans('global.messages') }}</p>
+                        @if($unread > 0)
+                            <strong>( {{ $unread }} )</strong>
+                        @endif
+
+                    </a>
+                </li> --}}
+                @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
+                    @can('profile_password_edit')
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('profile/password') || request()->is('profile/password/*') ? 'active' : '' }}" href="{{ route('profile.password.edit') }}">
+                                <i class="fa-fw fas fa-key nav-icon">
+                                </i>
+                                <p>
+                                    {{ trans('global.change_password') }}
+                                </p>
+                            </a>
+                        </li>
+                    @endcan
+                @endif
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logoutform').submit();">
+                        <p>
+                            <i class="fas fa-fw fa-sign-out-alt nav-icon">
 
                             </i>
-                            <p>{{ trans('global.messages') }}</p>
-                            @if($unread > 0)
-                                <strong>( {{ $unread }} )</strong>
-                            @endif
-
-                        </a>
-                    </li>
-                    @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
-                        @can('profile_password_edit')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->is('profile/password') || request()->is('profile/password/*') ? 'active' : '' }}" href="{{ route('profile.password.edit') }}">
-                                    <i class="fa-fw fas fa-key nav-icon">
-                                    </i>
-                                    <p>
-                                        {{ trans('global.change_password') }}
-                                    </p>
-                                </a>
-                            </li>
-                        @endcan
-                    @endif
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logoutform').submit();">
-                            <p>
-                                <i class="fas fa-fw fa-sign-out-alt nav-icon">
-
-                                </i>
-                                <p>{{ trans('global.logout') }}</p>
-                            </p>
-                        </a>
-                    </li>
+                            <p>{{ trans('global.logout') }}</p>
+                        </p>
+                    </a>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

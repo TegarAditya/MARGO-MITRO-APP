@@ -1,8 +1,8 @@
 <div class="order-tagihan pt-3">
     <div class="row mb-4">
-        <div class="col-auto">
+        <div class="col-auto border-right pr-3 mr-2">
             <p class="mb-0">
-                <strong>Total Tagihan</strong>
+                <strong>Total Order</strong>
                 <br />
                 <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.total', 0))</span>
             </p>
@@ -10,9 +10,17 @@
 
         <div class="col-auto">
             <p class="mb-0">
+                <strong>Total Tagihan</strong>
+                <br />
+                <span class="h5 mb-0 tagihan-total">@money($order->invoices->sum('nominal'))</span>
+            </p>
+        </div>
+
+        <div class="col-auto">
+            <p class="mb-0">
                 <strong>Total Pembayaran</strong>
                 <br />
-                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.saldo', 0))</span>
+                <span class="h5 mb-0 tagihan-total">@money($order->pembayarans->sum('nominal'))</span>
             </p>
         </div>
 
@@ -20,7 +28,7 @@
             <p class="mb-0">
                 <strong>Sisa Tagihan</strong>
                 <br />
-                <span class="h5 mb-0 tagihan-total">@money(data_get($order, 'tagihan.selisih', 0))</span>
+                <span class="h5 mb-0 tagihan-total">@money($order->sisa_tagihan)</span>
             </p>
         </div>
     </div>
@@ -32,7 +40,7 @@
 
         @if ($tagihan = $order->tagihan)
             <div class="col-auto">
-                <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success{{ 0 >= data_get($order, 'tagihan.selisih', 0) ? ' disabled' : '' }} ">Tambah Pembayaran</a>
+                <a href="{{ route('admin.pembayarans.create', ['tagihan_id' => $tagihan->id]) }}" class="btn btn-sm btn-success{{ 0 >= $order->sisa_tagihan ? ' disabled' : '' }} ">Tambah Pembayaran</a>
             </div>
         @endif
     </div>
@@ -43,10 +51,10 @@
                 <th width="1%">No.</th>
                 <th>No. Kwintansi</th>
                 <th>Tanggal</th>
-                <th class="text-center" width="1%">Nominal</th>
-                <th class="text-center" width="1%">Diskon</th>
                 <th class="text-center" width="1%">Bayar</th>
-                <th class="text-center" width="1%"></th>
+                <th class="text-center" width="1%">Diskon</th>
+                <th class="text-center" width="1%">Nominal</th>
+                <th class="text-center" width="1%">Action</th>
             </tr>
         </thead>
 
@@ -56,9 +64,16 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>
                         <a href="{{ route('admin.pembayarans.edit', $row->id) }}">{{ $row->no_kwitansi }}</a>
+
+                        <a href="{{ route('admin.pembayarans.show', [
+                            'pembayaran' => $row->id,
+                            'print' => 'on'
+                        ]) }}" target="_blank" title="Cetak Kwitansi" class="ml-1">
+                            <i class="fa fa-print text-dark"></i>
+                        </a>
                     </td>
                     <td>{{ $row->tanggal }}</td>
-                    <td class="text-right">@money($row->nominal)</td>
+                    <td class="text-right">@money($row->bayar)</td>
                     <td class="text-right">
                         @if (!$row->diskon)
                             <span>-</span>
@@ -66,34 +81,54 @@
                             @money($row->diskon)
                         @endif
                     </td>
-                    <td class="text-right">@money($row->bayar)</td>
-                    <td class="text-center px-3">
-                        <a href="{{ route('admin.pembayarans.show', [
-                            'pembayaran' => $row->id,
-                            'print' => 'on'
-                        ]) }}" target="_blank">
-                            <i class="fa fa-print text-dark"></i>
+                    <td class="text-right">@money($row->nominal)</td>
+                    <td class="text-center">
+                        <a href="{{ route('admin.pembayarans.destroy', $row->id) }}" class="pembayaran-delete-btn">
+                            <i class="fa fa-trash text-danger"></i>
                         </a>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center">
+                    <td colspan="6" class="text-center">
                         <p class="mb-0">Belum ada riwayat pembayaran</p>
                     </td>
+                    <td>&nbsp;</td>
                 </tr>
             @endforelse
         </tbody>
 
         @if ($order->pembayarans->count() && $tagihan = $order->tagihan)
             <tfoot>
-                <td colspan="5" class="text-right">
-                    <strong>Sisa Tagihan</strong>
-                </td>
+                <tr>
+                    <td colspan="5" class="text-right">
+                        <strong>Total</strong>
+                    </td>
 
-                <td class="text-right">
-                    @money($tagihan->selisih)
-                </td>
+                    <td class="text-right">
+                        @money($order->pembayarans->sum('nominal'))
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="5" class="text-right py-2">
+                        <strong>Total Tagihan</strong>
+                    </td>
+
+                    <td class="text-right py-2">
+                        @money($order->invoices->sum('nominal'))
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="5" class="text-right py-2">
+                        <strong>Sisa Tagihan</strong>
+                    </td>
+
+                    <td class="text-right py-2">
+                        @money($order->sisa_tagihan)
+                    </td>
+                </tr>
             </tfoot>
         @endif
     </table>
@@ -113,6 +148,20 @@
     $(function() {
         var form = $('#orderForm');
 
+        $('.pembayaran-delete-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var url = $(e.currentTarget).attr('href');
+
+            if (url && confirm('{{ trans('global.areYouSure') }}')) {
+                $.ajax({
+                    headers: {'x-csrf-token': _token},
+                    method: 'POST',
+                    url: url,
+                    data: { _method: 'DELETE' }
+                }).done(function () { location.reload() })
+            }
+        });
     });
 })(jQuery, window.numeral);
 </script>

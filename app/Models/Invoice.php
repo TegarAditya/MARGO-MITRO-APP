@@ -18,6 +18,8 @@ class Invoice extends Model
 
     public $table = 'invoices';
 
+    public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
+
     protected $dates = [
         'date',
         'created_at',
@@ -65,24 +67,26 @@ class Invoice extends Model
         return $date->format('Y-m-d H:i:s');
     }
 
-    public static function generateNoSJ() {
-        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+    public static function generateNoSJ($semester) {
+        $data = self::join('orders', 'orders.id', '=', 'invoices.order_id')->where('orders.semester_id', $semester)->count();
+        $semester = Semester::find($semester);
 
         $order_number = !$data ? 1 : ($data + 1);
 
-        $prefix = 'SJ'.Date::now()->format('dm');
-        $code = $prefix.sprintf("%04d", $order_number);
+        $prefix = 'SJ/'.$semester->tipe.'/MMJ/'.ORDER::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
+        $code = $prefix.sprintf("%03d", $order_number);
 
         return $code;
     }
 
-    public static function generateNoInvoice() {
-        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+    public static function generateNoInvoice($semester) {
+        $data = self::join('orders', 'orders.id', '=', 'invoices.order_id')->where('orders.semester_id', $semester)->count();
+        $semester = Semester::find($semester);
 
         $order_number = !$data ? 1 : ($data + 1);
 
-        $prefix = 'INV'.Date::now()->format('dm');
-        $code = $prefix.sprintf("%04d", $order_number);
+        $prefix = 'INV/'.$semester->tipe.'/MMJ/'.ORDER::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
+        $code = $prefix.sprintf("%03d", $order_number);
 
         return $code;
     }

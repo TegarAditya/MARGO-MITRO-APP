@@ -32,6 +32,8 @@ class Productionperson extends Model
         'name',
         'type',
         'contact',
+        'alamat',
+        'company',
         'created_at',
         'updated_at',
         'deleted_at',

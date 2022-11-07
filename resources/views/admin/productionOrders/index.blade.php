@@ -6,10 +6,6 @@
             <a class="btn btn-success" href="{{ route('admin.production-orders.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.productionOrder.title_singular') }}
             </a>
-            <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
-                {{ trans('global.app_csvImport') }}
-            </button>
-            @include('csvImport.modal', ['model' => 'ProductionOrder', 'route' => 'admin.production-orders.parseCsvImport'])
         </div>
     </div>
 @endcan
@@ -37,9 +33,9 @@
                     <th>
                         {{ trans('cruds.productionOrder.fields.date') }}
                     </th>
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.productionOrder.fields.created_by') }}
-                    </th>
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -88,7 +84,7 @@
 @endcan
 
   let dtOverrideGlobals = {
-    buttons: dtButtons,
+    // buttons: dtButtons,
     processing: true,
     serverSide: true,
     retrieve: true,
@@ -100,7 +96,7 @@
 { data: 'no_spk', name: 'no_spk' },
 { data: 'productionperson_name', name: 'productionperson.name' },
 { data: 'date', name: 'date' },
-{ data: 'created_by_name', name: 'created_by.name' },
+// { data: 'created_by_name', name: 'created_by.name' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
@@ -112,7 +108,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

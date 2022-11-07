@@ -462,6 +462,86 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 113,
                 'title' => 'profile_password_edit',
             ],
+            [
+                'id'    => 114,
+                'title' => 'custom_price_create',
+            ],
+            [
+                'id'    => 115,
+                'title' => 'custom_price_edit',
+            ],
+            [
+                'id'    => 116,
+                'title' => 'custom_price_show',
+            ],
+            [
+                'id'    => 117,
+                'title' => 'custom_price_delete',
+            ],
+            [
+                'id'    => 118,
+                'title' => 'custom_price_access',
+            ],
+            [
+                'id'    => 119,
+                'title' => 'semester_create',
+            ],
+            [
+                'id'    => 120,
+                'title' => 'semester_edit',
+            ],
+            [
+                'id'    => 121,
+                'title' => 'semester_show',
+            ],
+            [
+                'id'    => 122,
+                'title' => 'semester_delete',
+            ],
+            [
+                'id'    => 123,
+                'title' => 'semester_access',
+            ],
+            [
+                'id'    => 124,
+                'title' => 'price_create',
+            ],
+            [
+                'id'    => 125,
+                'title' => 'price_edit',
+            ],
+            [
+                'id'    => 126,
+                'title' => 'price_show',
+            ],
+            [
+                'id'    => 127,
+                'title' => 'price_delete',
+            ],
+            [
+                'id'    => 128,
+                'title' => 'price_access',
+            ],
+            [
+                'id'    => 129,
+                'title' => 'price_detail_create',
+            ],
+            [
+                'id'    => 130,
+                'title' => 'price_detail_edit',
+            ],
+            [
+                'id'    => 131,
+                'title' => 'price_detail_show',
+            ],
+            [
+                'id'    => 132,
+                'title' => 'price_detail_delete',
+            ],
+            [
+                'id'    => 133,
+                'title' => 'price_detail_access',
+            ],
         ];
 
         Permission::insert($permissions);

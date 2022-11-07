@@ -1,6 +1,7 @@
 <div class="tab-pembayaran pt-3">
     <input type="hidden" name="diskon" value="{{ $pembayaran->diskon }}" />
-    <input type="hidden" name="bayar" value="{{ $pembayaran->bayar }}" />
+    <input type="hidden" name="nominal" value="{{ $pembayaran->nominal }}" />
+    <input type="hidden" name="bayar" value="{{ $pembayaran->nominal }}" />
 
     <div class="form-group">
         <label for="no_kwitansi">{{ trans('cruds.pembayaran.fields.no_kwitansi') }}</label>
@@ -16,11 +17,16 @@
             <option value="">Please Select</option>
 
             @foreach($tagihans as $entry)
+                @php
+                $order = $entry->order;
+
+                if (!$order) { continue; }
+                @endphp
                 <option
                     value="{{ $entry->id }}"
-                    data-total="{{ $entry->total }}"
-                    data-saldo="{{ $entry->saldo }}"
-                    data-selisih="{{ $entry->selisih }}"
+                    data-total="{{ $order->invoices->sum('nominal') }}"
+                    data-saldo="{{ $order->pembayarans->sum('nominal') }}"
+                    data-sisa="{{ $order->sisa_tagihan }}"
                     {{(
                         old('tagihan_id') ? old('tagihan_id') : $pembayaran->tagihan->id ?? ''
                     ) == $entry->id ? 'selected' : (
@@ -59,23 +65,24 @@
                 <p class="mb-0">
                     <small class="font-weight-bold">Sisa Tagihan</small>
                     <br />
-                    <span class="tagihan-selisih">x</span>
+                    <span class="tagihan-sisa">x</span>
                 </p>
             </div>
         </div>
     </div>
 
     <div class="form-group">
-        <label class="required" for="nominal">Nominal Bayar</label>
+        <label class="required" for="bayar">Bayar</label>
+
         <x-admin.form-group
-            type="number"
-            id="nominal"
-            name="nominal"
+            type="text"
+            id="bayar_text"
+            name="bayar_text"
             containerClass=" m-0"
             boxClass=" px-2 py-0"
-            value="{{ $pembayaran->nominal }}"
+            value="{{ $pembayaran->bayar }}"
+            data-editable="{{ !$pembayaran->id ? 'true' : 'false' }}"
             min="1"
-            required
         >
             <x-slot name="left">
                 <span class="mr-1">Rp</span>
@@ -132,18 +139,20 @@
     </div>
 
     <div class="form-group">
-        <label class="required" for="bayar">{{ trans('cruds.pembayaran.fields.bayar') }}</label>
+        <label class="required" for="nominal">Nominal Bayar</label>
+
         <x-admin.form-group
             type="text"
-            id="bayar"
-            name="bayar_text"
+            id="nominal"
+            name="nominal_text"
             containerClass=" m-0"
             boxClass=" px-2 py-0"
-            value="Rp{{ number_format($pembayaran->bayar, 0, ',', '.') }}"
+            value="Rp{{ number_format($pembayaran->nominal, 0, ',', '.') }}"
             min="1"
             readonly
         />
     </div>
+
     <div class="form-group">
         <label class="required" for="tanggal">{{ trans('cruds.pembayaran.fields.tanggal') }}</label>
         <input class="form-control date {{ $errors->has('tanggal') ? 'is-invalid' : '' }}" type="text" name="tanggal" id="tanggal" value="{{ old('tanggal', $pembayaran->tanggal) }}" required>
@@ -166,6 +175,7 @@
         var form = $('#pembayaranForm');
         var tagihan = form.find('[name="tagihan_id"]');
         var nominal = form.find('[name="nominal"]');
+        var nominalText = form.find('[name="nominal_text"]');
         var diskonTypes = form.find('[name="diskon_type"]');
         var diskonAmount = form.find('[name="diskon_amount"]');
         var diskon = form.find('[name="diskon"]');
@@ -175,43 +185,51 @@
         var tagihanDetail = form.find('.detail-tagihan');
         var tagihanTotal = tagihanDetail.find('.tagihan-total');
         var tagihanSaldo = tagihanDetail.find('.tagihan-saldo');
-        var tagihanSelisih = tagihanDetail.find('.tagihan-selisih');
+        var tagihanSisa = tagihanDetail.find('.tagihan-sisa');
+
+        bayarText.on('change keyup blur paste', function(e) {
+            var value = numeral(e.target.value);
+
+            bayarText.val(value.format('0,0'));
+            bayar.val(value.value()).trigger('change');
+        }).trigger('change');
 
         tagihan.on('change', function(e) {
             var selected = tagihan.find('option').filter(':selected');
             var total = Math.abs(selected.data('total'));
             var saldo = Math.abs(selected.data('saldo'));
-            var selisih = Math.abs(selected.data('selisih'));
+            var sisa = Math.abs(selected.data('sisa'));
 
-            if (!isNaN(total) && !isNaN(saldo) && !isNaN(selisih)) {
-                nominal.attr('max', selisih);
-                selisih < parseFloat(nominal.val()) && nominal.val(selisih).trigger('change');
+            if (!isNaN(total) && !isNaN(saldo) && !isNaN(sisa)) {
+                if (bayar.data('editable')) {
+                    bayar.attr('max', sisa);
+                    sisa < parseFloat(bayar.val()) && bayar.val(sisa).trigger('change');
+                }
 
                 tagihanDetail.show();
                 tagihanTotal.html(numeral(total).format('$0,0'));
                 tagihanSaldo.html(numeral(saldo).format('$0,0'));
-                tagihanSelisih.html(numeral(selisih).format('$0,0'));
+                tagihanSisa.html(numeral(sisa).format('$0,0'));
             } else {
                 tagihanDetail.hide();
             }
-
-            console.log("ASDASD", total, saldo, selisih);
         }).trigger('change');
 
         diskonTypes.on('change', function(e) {
             var el = $(e.currentTarget);
             var prefix = el.data('prefix');
             var value = el.val();
-            var nominalVal = parseFloat(nominal.val()) || 0;
+            var bayarVal = parseFloat(bayar.val()) || 0;
             var diskonVal = parseFloat(diskonAmount.val()) || 0;
 
             $('.diskon-prefix').html(prefix || '');
             $('.diskon-nominal')[!value ? 'hide' : 'show']();
+            diskonAmount.attr('min', !value ? null : 1);
 
             if ('percent' === value && diskonVal > 100) {
-                diskonAmount.val(Math.round(diskonVal * 100 / nominalVal));
+                diskonAmount.val(Math.round(diskonVal * 100 / bayarVal));
             } else if ('value' === value && diskonVal <= 100) {
-                diskonAmount.val(Math.round(nominalVal * diskonVal / 100));
+                diskonAmount.val(Math.round(bayarVal * diskonVal / 100));
             }
 
             diskonAmount.trigger('change');
@@ -224,18 +242,29 @@
             (isPercent && value) > 100 && diskonAmount.val(100);
         });
 
-        nominal.add(diskonAmount).on('change keyup blur', function(e) {
-            var max = Math.abs(nominal.attr('max'));
-            var nominalVal = parseFloat(nominal.val()) || 0;
+        bayar.add(diskonAmount).on('change keyup blur', function(e) {
+            var max = Math.abs(bayar.attr('max'));
+            var bayarVal = parseFloat(bayar.val()) || 0;
             var diskonVal = parseFloat(diskonAmount.val()) || 0;
-            var diskonRp = diskonTypes.filter(':checked').val() !== 'percent' ? diskonVal : (nominalVal * diskonVal / 100);
-            var value = nominalVal - diskonRp;
+            var diskonType = diskonTypes.filter(':checked').val();
+            var diskonCalc = diskonType !== 'percent' ? (
+                diskonType !== 'value' ? 0 : diskonVal
+            ) : ((diskonVal / 100)  * bayarVal);
 
-            value = (max && max < value) ? max : value;
+            bayarVal = (max && max < bayarVal) ? max : bayarVal;
 
-            bayar.add(nominal).val(value);
-            bayarText.val(numeral(value).format('$0,0'));
+            var diskonRp = diskonCalc <= bayarVal ? diskonCalc : bayarVal;
+            diskonVal = diskonCalc <= bayarVal ? diskonVal : (
+                diskonType === 'percent' ? 100 : bayarVal
+            );
+
+            var value = Math.round(bayarVal + diskonRp);
+
+            bayar.val(bayarVal);
+            nominal.val(value);
+            nominalText.val(numeral(value).format('$0,0'));
             diskon.val(diskonRp);
+            diskonAmount.val(diskonVal);
         });
     });
 })(jQuery);

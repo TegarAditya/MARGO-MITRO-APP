@@ -24,6 +24,9 @@ class CategoryController extends Controller
 
         if ($request->ajax()) {
             $query = Category::with(['parent'])->select(sprintf('%s.*', (new Category())->table));
+            if (!empty($request->type)) {
+                $query->where('type', $request->type);
+            }
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -50,6 +53,9 @@ class CategoryController extends Controller
             $table->editColumn('slug', function ($row) {
                 return $row->slug ? $row->slug : '';
             });
+            $table->editColumn('type', function ($row) {
+                return $row->type ? Category::TYPE_SELECT[$row->type] : '';
+            });
             $table->addColumn('parent_name', function ($row) {
                 return $row->parent ? $row->parent->name : '';
             });
@@ -66,7 +72,7 @@ class CategoryController extends Controller
     {
         abort_if(Gate::denies('category_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $parents = Category::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $parents = Category::whereIn('slug', ['buku', 'bahan'])->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.categories.create', compact('parents'));
     }

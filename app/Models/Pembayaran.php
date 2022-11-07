@@ -31,6 +31,7 @@ class Pembayaran extends Model
         'diskon',
         'bayar',
         'tanggal',
+        'note',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -41,6 +42,11 @@ class Pembayaran extends Model
         'diskon' => 'double',
         'bayar' => 'double',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 
     public function tagihan()
     {

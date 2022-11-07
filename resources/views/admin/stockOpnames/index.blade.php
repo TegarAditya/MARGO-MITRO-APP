@@ -1,9 +1,213 @@
 @extends('layouts.admin')
 @section('content')
-
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.product.title_singular') }} {{ trans('global.list') }}
+        Summary Stock Opname Buku
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Item Product</span>
+                        <span class="info-box-number">{{ $summary_item }} Product</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Stock Product</span>
+                        <span class="info-box-number">{{ number_format($summary_stock, 0, 0) }} Eksemplar</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-dollar-sign"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Purchase Value</span>
+                        <span class="info-box-number">@money($summary_hpp)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-dollar-sign"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Sales Value</span>
+                        <span class="info-box-number">@money($summary_sales)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Perjenjang</h3>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Jenjang</th>
+                                    <th>Stock</th>
+                                    <th>Purchase Value</th>
+                                    <th>Sales Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($summary_jenjang as $item)
+                                <tr>
+                                    <td class="text-center">{{ $item->jenjang->name }}</td>
+                                    <td class="text-center">{{ number_format($item->total_stock, 0, 0) }} Eksemplar</td>
+                                    <td class="text-right">@money($item->total_hpp)</td>
+                                    <td class="text-right">@money($item->total_price)</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="offset-md-4 col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Persemester</h3>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Semester</th>
+                                    <th>Stock</th>
+                                    <th>Purchase Value</th>
+                                    <th>Sales Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($summary_semester as $item)
+                                <tr>
+                                    <td class="text-center">{{ $item->semester->name }}</td>
+                                    <td class="text-center">{{ number_format($item->total_stock, 0, 0) }} Eksemplar</td>
+                                    <td class="text-right">@money($item->total_hpp)</td>
+                                    <td class="text-right">@money($item->total_price)</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">
+        Stock Opname Buku
+    </div>
+    <div class="card-body">
+        <form id="filterform">
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="brand_id">{{ trans('cruds.buku.fields.brand') }}</label>
+                        <select class="form-control select2 {{ $errors->has('brand') ? 'is-invalid' : '' }}" name="brand_id" id="brand_id">
+                            @foreach($brands as $id => $entry)
+                                <option value="{{ $id }}" {{ old('brand_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('brand'))
+                            <span class="text-danger">{{ $errors->first('brand') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.brand_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="isi_id">{{ trans('cruds.buku.fields.isi') }}</label>
+                        <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id" id="isi_id">
+                            @foreach($isi as $id => $entry)
+                                <option value="{{ $id }}" {{ old('isi_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('isi'))
+                            <span class="text-danger">{{ $errors->first('isi') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.isi_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="jenjang_id">{{ trans('cruds.buku.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                            @foreach($jenjang as $id => $entry)
+                                <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="kelas_id">{{ trans('cruds.buku.fields.kelas') }}</label>
+                        <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas_id" id="kelas_id">
+                            @foreach($kelas as $id => $entry)
+                                <option value="{{ $id }}" {{ old('kelas_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('kelas'))
+                            <span class="text-danger">{{ $errors->first('kelas') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.kelas_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="halaman_id">{{ trans('cruds.buku.fields.halaman') }}</label>
+                        <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id">
+                            @foreach($halaman as $id => $entry)
+                                <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('halaman'))
+                            <span class="text-danger">{{ $errors->first('halaman') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.halaman_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="semester_id">{{ trans('cruds.buku.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester_id') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semester as $id => $entry)
+                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester_id'))
+                            <span class="text-danger">{{ $errors->first('semester_id') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button class="btn btn-success" type="submit">
+                    Filter
+                </button>
+            </div>
+        </form>
     </div>
 
     <div class="card-body">
@@ -15,9 +219,6 @@
                     </th>
                     <th>
                         {{ trans('cruds.product.fields.category') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.product.fields.brand') }}
                     </th>
                     <th>
                         {{ trans('cruds.product.fields.name') }}
@@ -34,37 +235,6 @@
                     <th>
                         Stock Value
                     </th>
-                </tr>
-                <tr>
-                    <td>
-                    </td>
-                    <td>
-                        <select class="search">
-                            <option value>{{ trans('global.all') }}</option>
-                            @foreach($categories as $key => $item)
-                                <option value="{{ $item->name }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="search">
-                            <option value>{{ trans('global.all') }}</option>
-                            @foreach($brands as $key => $item)
-                                <option value="{{ $item->name }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <input class="search" type="text" placeholder="{{ trans('global.search') }}">
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                    </td>
                 </tr>
             </thead>
         </table>
@@ -85,16 +255,25 @@ $(function () {
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.stock-opnames.index') }}",
+    ajax: {
+        url: "{{ route('admin.stock-opnames.index') }}",
+        data: function(data) {
+            data.brand = $('#brand_id').val(),
+            data.isi = $('#isi_id').val(),
+            data.jenjang = $('#jenjang_id').val(),
+            data.kelas = $('#kelas_id').val(),
+            data.halaman = $('#halaman_id').val()
+            data.semester = $('#semester_id').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'category_name', name: 'category.name' },
-        { data: 'brand_name', name: 'brand.name' },
+        { data: 'category_name', name: 'category.name', class: 'text-center' },
         { data: 'name', name: 'name' },
-        { data: 'hpp', name: 'hpp' },
-        { data: 'price', name: 'price' },
-        { data: 'stock', name: 'stock' },
-        { data: 'value', name: 'value' },
+        { data: 'hpp', name: 'hpp', class: 'text-right' },
+        { data: 'price', name: 'price', class: 'text-right' },
+        { data: 'stock', name: 'stock', class: 'text-center' },
+        { data: 'value', name: 'value', class: 'text-right' },
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
@@ -106,27 +285,11 @@ $(function () {
           .columns.adjust();
   });
 
-let visibleColumnsIndexes = null;
-$('.datatable thead').on('input', '.search', function () {
-      let strict = $(this).attr('strict') || false
-      let value = strict && this.value ? "^" + this.value + "$" : this.value
+  $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 
-      let index = $(this).parent().index()
-      if (visibleColumnsIndexes !== null) {
-        index = visibleColumnsIndexes[index]
-      }
-
-      table
-        .column(index)
-        .search(value, strict)
-        .draw()
-  });
-table.on('column-visibility.dt', function(e, settings, column, state) {
-      visibleColumnsIndexes = []
-      table.columns(":visible").every(function(colIdx) {
-          visibleColumnsIndexes.push(colIdx);
-      });
-  })
 });
 
 </script>

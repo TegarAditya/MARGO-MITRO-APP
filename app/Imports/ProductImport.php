@@ -21,6 +21,7 @@ class ProductImport implements ToModel, WithHeadingRow
         $this->brands = Brand::select('id', 'name')->get();
         $this->units = Unit::select('id', 'name')->get();
     }
+
     /**
     * @param array $row
     *

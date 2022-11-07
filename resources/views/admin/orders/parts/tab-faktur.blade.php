@@ -16,15 +16,16 @@
                 <th rowspan="2">No. Surat Jalan</th>
                 <th rowspan="2">No. Invoice</th>
                 <th rowspan="2" width="120">Tanggal</th>
-                <th rowspan="2" width="120">Masuk/Keluar</th>
+                {{-- <th rowspan="2" width="120">Masuk/Keluar</th> --}}
                 <th colspan="3" class="text-center py-2">Produk</th>
-                <th rowspan="2" class="text-center" width="1%">Total</th>
+                <th rowspan="2" class="text-center" width="10%">Total</th>
+                <th rowspan="2" class="text-center" width="1%"></th>
             </tr>
 
             <tr>
                 <th class="pt-2">Nama</th>
                 <th class="text-center pt-2" width="1%">Qty</th>
-                <th class="text-center pt-2" width="1%">Subtotal</th>
+                <th class="text-center pt-2" width="10%">Subtotal</th>
             </tr>
         </thead>
 
@@ -38,13 +39,15 @@
                         return route('admin.invoices.show', ['invoice' => $row->id, 'print' => $type]);
                     };
                     $is_out = 0 < $row->nominal;
+
+                    $no = $loop->iteration;
                     @endphp
 
                     @foreach ($row->invoice_details as $detail)
                         <tr>
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}">{{ $loop->iteration }}</td>
-                                <td rowspan="{{ $rowspan }}">
+                                <td rowspan="{{ $rowspan }}" class="text-center align-middle">{{ $no }}</td>
+                                <td rowspan="{{ $rowspan }}" class="align-middle">
                                     <div class="d-flex">
                                         <div class="flex-grow-1 pr-2">
                                             <a href="{{ $link }}">{{ $row->no_suratjalan }}</a>
@@ -57,7 +60,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td rowspan="{{ $rowspan }}">
+                                <td rowspan="{{ $rowspan }}" class="align-middle">
                                     <div class="d-flex">
                                         <div class="flex-grow-1 pr-2">
                                             <a href="{{ $link }}">{{ $row->no_invoice }}</a>
@@ -70,16 +73,27 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td rowspan="{{ $rowspan }}">{{ $row->date }}</td>
-                                <td rowspan="{{ $rowspan }}" class="{{ $is_out ? 'text-warning' : 'text-info' }}">
-                                    {{ $is_out ? 'Keluar' : 'Masuk' }}
+                                <td rowspan="{{ $rowspan }}" class="text-center align-middle">
+                                    {{ $row->date }}
+                                    <span class="text-center ml-1 {{ $is_out ? 'text-success' : 'text-danger' }}">
+                                        <strong class="text-xs">
+                                            @if ($is_out)
+                                                <i class="fa fa-arrow-up"></i>
+                                            @else
+                                                <i class="fa fa-arrow-down"></i>
+                                            @endif
+                                        </strong>
+                                    </span>
                                 </td>
+                                {{-- <td rowspan="{{ $rowspan }}" class="{{ $is_out ? 'text-warning' : 'text-info' }}">
+                                    {{ $is_out ? 'Keluar' : 'Masuk' }}
+                                </td> --}}
                             @endif
 
                             <td>
                                 @if ($product = $detail->product)
                                     <p class="m-0">
-                                        <span>{{ $product->name }}</span>
+                                        <span>{{ $product->nama_buku }}</span>
                                         <br />
                                         <span class="text-xs text-muted">
                                             @money($detail->price)
@@ -91,9 +105,15 @@
                             </td>
                             <td class="text-center">{{ abs($detail->quantity) }}</td>
                             <td class="text-right">@money(abs($detail->total))</td>
-                            
+
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-right">@money(abs($row->nominal))</td>
+                                <td rowspan="{{ $rowspan }}" class="text-right align-middle">@money(abs($row->nominal))</td>
+
+                                <td rowspan="{{ $rowspan }}" class="text-center align-middle">
+                                    <a href="{{ route('admin.invoices.destroy', $row->id) }}" class="invoice-delete-btn">
+                                        <i class="fa fa-trash text-danger"></i>
+                                    </a>
+                                </td>
                             @endif
                         </tr>
                     @endforeach
@@ -131,6 +151,20 @@
     $(function() {
         var form = $('#invoiceForm');
 
+        $('.invoice-delete-btn').on('click', function(e) {
+            e.preventDefault();
+
+            var url = $(e.currentTarget).attr('href');
+
+            if (url && confirm('{{ trans('global.areYouSure') }}')) {
+                $.ajax({
+                    headers: {'x-csrf-token': _token},
+                    method: 'POST',
+                    url: url,
+                    data: { _method: 'DELETE' }
+                }).done(function () { location.reload() })
+            }
+        });
     });
 })(jQuery, window.numeral);
 </script>

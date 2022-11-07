@@ -20,10 +20,19 @@ class Product extends Model implements HasMedia
     use HasFactory;
     use Sluggable;
 
+    public const TIPE_PG_SELECT = [
+        'pg'     => 'PG',
+        'kunci'  => 'KUNCI',
+        'non_pg' => 'NON PG',
+    ];
+
     public $table = 'products';
 
     protected $appends = [
         'foto',
+        'nama_buku',
+        'nama_isi_buku',
+        'tiga_nama'
     ];
 
     protected $dates = [
@@ -39,12 +48,20 @@ class Product extends Model implements HasMedia
         'category_id',
         'brand_id',
         'unit_id',
+        'jenjang_id',
+        'kelas_id',
+        'halaman_id',
+        'isi_id',
+        'tipe_pg',
+        'pg_id',
+        'kunci_id',
         'hpp',
         'price',
         'stock',
         'finishing_cost',
         'min_stock',
         'status',
+        'semester_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -86,6 +103,51 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Unit::class, 'unit_id');
     }
 
+    public function jenjang()
+    {
+        return $this->belongsTo(Category::class, 'jenjang_id');
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(Category::class, 'kelas_id');
+    }
+
+    public function halaman()
+    {
+        return $this->belongsTo(Category::class, 'halaman_id');
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
+    public function isi()
+    {
+        return $this->belongsTo(Category::class, 'isi_id');
+    }
+
+    public function pg()
+    {
+        return $this->belongsTo(Product::class, 'pg_id');
+    }
+
+    public function jadi_pg()
+    {
+        return $this->hasOne(Product::class, 'pg_id');
+    }
+
+    public function kunci()
+    {
+        return $this->belongsTo(Product::class, 'kunci_id');
+    }
+
+    public function jadi_kunci()
+    {
+        return $this->hasOne(Product::class, 'kunci_id');
+    }
+
     public function stock_movements()
     {
         return $this->hasMany(StockMovement::class);
@@ -101,6 +163,58 @@ class Product extends Model implements HasMedia
         });
 
         return $files;
+    }
+
+    public function getNamaBukuAttribute()
+    {
+        $nama = $this->name;
+        if ($this->kelas) {
+            $nama .= ' -  KELAS '. $this->kelas->name;
+        }
+        if ($this->halaman) {
+            $nama .= ' -  HAL '. $this->halaman->name;
+        }
+        if ($this->semester) {
+            $nama .= ' - '. $this->semester->name;
+        }
+
+        return $nama;
+    }
+
+    public function getNamaIsiBukuAttribute()
+    {
+        $nama = '';
+        if ($this->brand) {
+            $nama .= '('. $this->brand->name.' | '.$this->isi->name.')';
+        }
+        $nama .= ' - '. $this->name;
+        if ($this->kelas) {
+            $nama .= ' -  KELAS '. $this->kelas->name;
+        }
+        if ($this->halaman) {
+            $nama .= ' -  HAL '. $this->halaman->name;
+        }
+        if ($this->semester) {
+            $nama .= ' - '. $this->semester->name;
+        }
+
+        return $nama;
+    }
+
+    public function getTigaNamaAttribute()
+    {
+        $name = $this->name;
+        if ($this->tipe_pg === 'pg') {
+            $name = str_replace('PG - ', '', $name);
+        } else if ($this->tipe_pg === 'kunci') {
+            $name = str_replace('KUNCI - ', '', $name);
+        }
+
+        if (str_contains($name, 'TEMA ') ) {
+            $name = 'KELAS '. $this->kelas->name . ' '. $name;
+        }
+        // return implode(' ', array_slice(explode(' ', $name), 0, 1));
+        return $name;
     }
 
     protected function serializeDate(DateTimeInterface $date)

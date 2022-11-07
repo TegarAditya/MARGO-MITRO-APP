@@ -33,6 +33,14 @@
                     </tr>
                     <tr>
                         <th>
+                            {{ trans('cruds.category.fields.type') }}
+                        </th>
+                        <td>
+                            {{ App\Models\Category::TYPE_SELECT[$category->type] ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             {{ trans('cruds.category.fields.parent') }}
                         </th>
                         <td>

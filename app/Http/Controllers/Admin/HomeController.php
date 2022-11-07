@@ -2,7 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Salesperson;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\Invoice;
+use App\Models\InvoiceDetail;
+use App\Models\StockMovement;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
+use NumberFormatter;
+use DB;
 
 class HomeController
 {
@@ -187,5 +197,96 @@ class HomeController
         }
 
         return view('home', compact('chart3', 'chart4', 'settings1', 'settings2', 'settings5', 'settings6'));
+    }
+
+    public function dashboard(Request $request)
+    {
+        if ($request->input('date')) {
+            $dates = explode(' - ', $request->input('date', ' - '));
+            $start_at = Date::parse($dates[0] ?: 'first day of this month')->startOf('day');
+            $end_at = Date::parse($dates[1] ?: 'last day of this month')->endOf('day');
+        } else {
+            $start_at = Date::parse('first day of this month')->startOf('day');
+            $end_at = Date::parse('last day of this month')->endOf('day');
+        }
+
+        $salespeople = Salesperson::get()->pluck('nama_sales', 'id')->prepend("Pilih Sales", '');
+        $querySalesOrders = Order::query()
+            ->with([
+                'salesperson', 'order_details',
+                'tagihan', 'pembayarans',
+                'invoices', 'invoices.invoice_details',
+            ])
+            ->whereBetween('date', [$start_at, $end_at]);
+
+        if ($salesperson_id = $request->input('salesperson_id')) {
+            $querySalesOrders->where('salesperson_id', $salesperson_id);
+        }
+
+        $orders = $querySalesOrders->get();
+
+        // dd(
+        //     $orders->map(fn($item) => $item->invoices->sum('nominal'))->sum(),
+        //     $orders->sum('invoices.nominal')
+        // );
+
+        return view('admin.dashboard', compact('salespeople', 'start_at', 'end_at', 'orders'));
+    }
+
+    //update price
+    // $invoices = Invoice::with('invoice_details')->whereIn('id', [14, 4, 7])->get();
+
+    // foreach($invoices as $invoice) {
+    //     $order = Order::with('order_details')->where('id', $invoice->order_id)->first();
+    //     $order_details = $order->order_details;
+    //     foreach($invoice->invoice_details as $detail) {
+    //         $price = $order_details->where('product_id', $detail->product_id)->first()->price;
+    //         $qty = $detail->quantity;
+
+    //         $detail->update([
+    //             'price' => $price,
+    //             'total' => $qty * $price,
+    //         ]);
+    //     }
+    // }
+
+    //update movement
+    // $stocks = StockMovement::where('type', 'kelengkapan')->where('reference', 4)->get();
+
+    // foreach($stocks as $stock) {
+    //     $product = $stock->product;
+    //     $product->update([
+    //         'stock' => DB::raw($product->stock + $stock->quantity),
+    //     ]);
+    // }
+
+    // StockMovement::where('type', 'kelengkapan')->where('reference', 4)->delete();
+
+    //update move dan quantity bonus
+    // $invoice_detail = InvoiceDetail::with('bonus')->whereHas('bonus')->where('invoice_id', 4)->get();
+    //         foreach($invoice_detail as $detail) {
+    //             $order_detail = OrderDetail::with('bonus')->whereHas('bonus')->where('order_id', 33)->where('product_id', $detail->product_id)->first();
+
+    //             $detail->bonus->update([
+    //                 'quantity' => 0
+    //             ]);
+
+    //             $order_detail->bonus->update([
+    //                 'moved' => 0
+    //             ]);
+    //         }
+
+    public function god(){
+        DB::beginTransaction();
+        try {
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e->getMessage());
+        }
+
+        dd('done');
     }
 }

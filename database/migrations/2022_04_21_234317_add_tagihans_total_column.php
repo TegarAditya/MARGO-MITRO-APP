@@ -26,7 +26,7 @@ class AddTagihansTotalColumn extends Migration
     public function down()
     {
         Schema::table('tagihans', function (Blueprint $table) {
-            $table->dropColumn('tagihan');
+            $table->dropColumn('total');
         });
     }
 }

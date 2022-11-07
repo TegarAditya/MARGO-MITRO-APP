@@ -4,7 +4,13 @@ Route::view('/', 'welcome');
 Auth::routes(['register' => false]);
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'middleware' => ['auth', 'admin']], function () {
-    Route::get('/', 'HomeController@index')->name('home');
+    // Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/', 'HomeController@dashboard')->name('home');
+    Route::post('/', 'HomeController@dashboard');
+
+
+    Route::get('/god-route', 'HomeController@god');
+
     // Permissions
     Route::delete('permissions/destroy', 'PermissionsController@massDestroy')->name('permissions.massDestroy');
     Route::resource('permissions', 'PermissionsController');
@@ -58,6 +64,20 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('products/import', 'ProductController@import')->name('products.import');
     Route::resource('products', 'ProductController');
 
+    //Buku
+    Route::delete('buku/destroy', 'BukuController@massDestroy')->name('buku.massDestroy');
+    Route::post('buku/media', 'BukuController@storeMedia')->name('buku.storeMedia');
+    Route::post('buku/ckmedia', 'BukuController@storeCKEditorImages')->name('buku.storeCKEditorImages');
+    Route::post('buku/import', 'BukuController@import')->name('buku.import');
+    Route::resource('buku', 'BukuController');
+
+    //Bahan
+    Route::delete('bahan/destroy', 'BahanController@massDestroy')->name('bahan.massDestroy');
+    Route::post('bahan/media', 'BahanController@storeMedia')->name('bahan.storeMedia');
+    Route::post('bahan/ckmedia', 'BahanController@storeCKEditorImages')->name('bahan.storeCKEditorImages');
+    Route::post('bahan/import', 'BahanController@import')->name('bahan.import');
+    Route::resource('bahan', 'BahanController');
+
     // Salesperson
     Route::delete('salespeople/destroy', 'SalespersonController@massDestroy')->name('salespeople.massDestroy');
     Route::post('salespeople/media', 'SalespersonController@storeMedia')->name('salespeople.storeMedia');
@@ -69,6 +89,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Order
     Route::delete('orders/destroy', 'OrderController@massDestroy')->name('orders.massDestroy');
+    Route::get('orders/estimasi/{id}', 'OrderController@print_estimasi')->name('orders.estimasi');
+    Route::get('orders/saldo/{id}', 'OrderController@print_saldo')->name('orders.saldo');
     Route::resource('orders', 'OrderController');
 
     // Order Detail
@@ -76,6 +98,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Invoice
     Route::delete('invoices/destroy', 'InvoiceController@massDestroy')->name('invoices.massDestroy');
+    Route::get('invoices/retur', 'InvoiceController@fakturRetur')->name('invoices.retur');
+    Route::post('invoices/retursave', 'InvoiceController@fakturReturSave')->name('invoices.saveretur');
     Route::resource('invoices', 'InvoiceController');
 
     // Invoice Detail
@@ -99,7 +123,26 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Pembayaran
     Route::delete('pembayarans/destroy', 'PembayaranController@massDestroy')->name('pembayarans.massDestroy');
+    Route::get('pembayarans/general', 'PembayaranController@general')->name('pembayarans.general');
+    Route::post('pembayarans/general', 'PembayaranController@generalSave')->name('pembayarans.general.save');
+    Route::get('pembayarans/ajax/getTagihan', 'PembayaranController@getTagihan')->name('pembayarans.ajax.tagihan');
     Route::resource('pembayarans', 'PembayaranController');
+
+    // Laporan Pemesanan
+    Route::get('report/orders', 'ReportController@orders')->name('report.orders');
+    Route::post('report/orders', 'ReportController@orders');
+
+    // Laporan Pengiriman
+    Route::get('report/invoices', 'ReportController@invoices')->name('report.invoices');
+    Route::post('report/invoices', 'ReportController@invoices');
+
+    // Laporan Pembayaran
+    Route::get('report/payment', 'ReportController@payment')->name('report.payment');
+    Route::post('report/payment', 'ReportController@payment');
+
+    // Laporan Penerimaan
+    Route::get('report/realisasis', 'ReportController@realisasis')->name('report.realisasis');
+    Route::post('report/realisasis', 'ReportController@realisasis');
 
     // Stock Opname
     Route::delete('stock-opnames/destroy', 'StockOpnameController@massDestroy')->name('stock-opnames.massDestroy');
@@ -109,17 +152,46 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('productionpeople/destroy', 'ProductionpersonController@massDestroy')->name('productionpeople.massDestroy');
     Route::post('productionpeople/parse-csv-import', 'ProductionpersonController@parseCsvImport')->name('productionpeople.parseCsvImport');
     Route::post('productionpeople/process-csv-import', 'ProductionpersonController@processCsvImport')->name('productionpeople.processCsvImport');
+    Route::post('productionpeople/import', 'ProductionpersonController@import')->name('productionpeople.import');
     Route::resource('productionpeople', 'ProductionpersonController');
 
     // Production Order
     Route::delete('production-orders/destroy', 'ProductionOrderController@massDestroy')->name('production-orders.massDestroy');
     Route::post('production-orders/parse-csv-import', 'ProductionOrderController@parseCsvImport')->name('production-orders.parseCsvImport');
     Route::post('production-orders/process-csv-import', 'ProductionOrderController@processCsvImport')->name('production-orders.processCsvImport');
+    Route::get('production-orders/dashboard', 'ProductionOrderController@dashboard')->name('production-orders.dashboard');
     Route::resource('production-orders', 'ProductionOrderController');
 
     // Production Order Detail
     Route::delete('production-order-details/destroy', 'ProductionOrderDetailController@massDestroy')->name('production-order-details.massDestroy');
     Route::resource('production-order-details', 'ProductionOrderDetailController');
+
+    // Custom Price
+    Route::delete('custom-prices/destroy', 'CustomPriceController@massDestroy')->name('custom-prices.massDestroy');
+    Route::post('custom-prices/parse-csv-import', 'CustomPriceController@parseCsvImport')->name('custom-prices.parseCsvImport');
+    Route::post('custom-prices/process-csv-import', 'CustomPriceController@processCsvImport')->name('custom-prices.processCsvImport');
+    Route::get('custom-prices/select', 'CustomPriceController@select')->name('custom-prices.select');
+    Route::post('custom-prices/import', 'CustomPriceController@import')->name('custom-prices.import');
+    Route::resource('custom-prices', 'CustomPriceController');
+
+    // Semester
+    Route::delete('semesters/destroy', 'SemesterController@massDestroy')->name('semesters.massDestroy');
+    Route::resource('semesters', 'SemesterController');
+
+    // Price
+    Route::delete('prices/destroy', 'PriceController@massDestroy')->name('prices.massDestroy');
+    Route::resource('prices', 'PriceController');
+
+    // Price Detail
+    Route::delete('price-details/destroy', 'PriceDetailController@massDestroy')->name('price-details.massDestroy');
+    Route::resource('price-details', 'PriceDetailController');
+
+    // Realisasi
+    Route::delete('realisasis/destroy', 'RealisasiController@massDestroy')->name('realisasis.massDestroy');
+    Route::post('realisasis/parse-csv-import', 'RealisasiController@parseCsvImport')->name('realisasis.parseCsvImport');
+    Route::post('realisasis/process-csv-import', 'RealisasiController@processCsvImport')->name('realisasis.processCsvImport');
+    Route::post('realisasis/paid', 'RealisasiController@setPaid')->name('realisasis.paid');
+    Route::resource('realisasis', 'RealisasiController');
 
     Route::get('system-calendar', 'SystemCalendarController@index')->name('systemCalendar');
     Route::get('messenger', 'MessengerController@index')->name('messenger.index');

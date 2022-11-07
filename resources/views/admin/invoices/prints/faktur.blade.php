@@ -1,9 +1,11 @@
 @extends('layouts.print')
 
-@section('header.right')
-<h6>FAKTUR</h6>
+@section('header.center')
+<h6>FAKTUR {{ $invoice->type === 'Masuk' ? 'RETURN' : '' }}</h6>
+@endsection
 
-<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 9cm">
+@section('header.left')
+<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
     <tbody>
         <tr>
             <td width="136"><strong>No. Invoice</strong></td>
@@ -20,14 +22,37 @@
         <tr>
             <td><strong>Tanggal</strong></td>
             <td>:</td>
-            <td>{{ $invoice->date }}</td>
+            <td>{{ Carbon\Carbon::parse($invoice->date)->format('d-m-Y') }}</td>
+        </tr>
+    </tbody>
+</table>
+@stop
+
+@section('header.right')
+<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
+    <tbody>
+        <tr>
+            <td><strong>Nama Freelance</strong></td>
+            <td>:</td>
+            <td>{{ $invoice->order->salesperson->name }}</td>
         </tr>
 
         <tr>
+            <td><strong>Area Pemasaran</strong></td>
+            <td>:</td>
+            <td>
+                @foreach ($invoice->order->salesperson->area_pemasarans as $area)
+                    {{ $area->name }};
+                @endforeach
+            </td>
+        </tr>
+
+        {{-- <tr>
             <td><strong>{{ $invoice->type === 'Masuk' ? 'Dari' : 'Kepada' }}</strong></td>
             <td>:</td>
             <td style="border-bottom: 1px dotted #000"></td>
-        </tr>
+        </tr> --}}
+
     </tbody>
 </table>
 @stop
@@ -35,32 +60,57 @@
 @section('content')
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
-        <th width="1%">No.</th>
-        <th>Nama Produk</th>
-        <th width="1%">Harga</th>
-        <th width="1%">Qty</th>
-        <th width="1%">Subtotal</th>
+        <th width="1%" class="text-center">No.</th>
+        <th>Jenjang - Kelas</th>
+        <th>Tema/Mapel</th>
+        <th width="1%" class="text-center">Hal</th>
+        <th width="15%" class="text-right">Harga</th>
+        <th width="1%" class="text-center">Qty</th>
+        <th width="20%" class="text-right">Subtotal</th>
     </thead>
 
     <tbody>
-        @foreach ($invoice->invoice_details as $invoice_detail)
+        @foreach ($buku as $item)
             @php
-            $product = $invoice_detail->product;
+            $product = $item->product;
             @endphp
             <tr>
-                <td>{{ $loop->iteration }}</td>
+                <td class="text-center">{{ $loop->iteration }}</td>
+                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
-                <td class="text-right">@money($invoice_detail->price)</td>
-                <td class="text-center">{{ abs($invoice_detail->quantity) }}</td>
-                <td class="text-right">@money(abs($invoice_detail->total))</td>
+                <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
+                <td class="text-right">@money($item->price)</td>
+                <td class="text-center">{{ abs($item->quantity) }}</td>
+                <td class="text-right">@money(abs($item->total))</td>
+            </tr>
+        @endforeach
+    </tbody>
+
+    <thead>
+        <th colspan="7">Kelengkapan</th>
+    </thead>
+
+    <tbody>
+        @foreach ($kelengkapan as $item)
+            @php
+            $product = $item->product;
+            @endphp
+            <tr>
+                <td class="text-center">{{ $loop->iteration }}</td>
+                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
+                <td>{{ $product->name }}</td>
+                <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
+                <td class="text-center">-</td>
+                <td class="text-center">{{ abs($item->quantity) }}</td>
+                <td class="text-right">@money(abs($item->total))</td>
             </tr>
         @endforeach
     </tbody>
 
     <tfoot>
         <tr>
-            <td colspan="4" class="text-right px-3"><strong>Total</strong></td>
-            <td>@money(abs($invoice->nominal))</td>
+            <td colspan="6" class="text-center px-3"><strong>Total</strong></td>
+            <td class="text-right">@money(abs($invoice->nominal))</td>
         </tr>
     </tfoot>
 </table>
@@ -70,7 +120,7 @@
 <div class="row">
     <div class="col align-self-end">
         <p class="mb-2">Dikeluarkan oleh,</p>
-        <p class="mb-0">Gudang</p>
+        <p class="mb-0">Margo Mitro Joyo</p>
     </div>
 
     <div class="col-auto text-center">
@@ -88,7 +138,7 @@
 @push('styles')
 <style type="text/css" media="print">
 @page {
-    size: landscape;
+    size: portrait;
 }
 </style>
 @endpush

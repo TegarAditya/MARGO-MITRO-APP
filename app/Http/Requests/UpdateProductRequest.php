@@ -22,7 +22,7 @@ class UpdateProductRequest extends FormRequest
                 'required',
             ],
             'category_id' => [
-                'required',
+                'nullable',
                 'integer',
             ],
             'unit_id' => [

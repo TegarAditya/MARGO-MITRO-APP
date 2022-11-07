@@ -10,6 +10,8 @@ use App\Http\Requests\StoreSalespersonRequest;
 use App\Http\Requests\UpdateSalespersonRequest;
 use App\Models\City;
 use App\Models\Salesperson;
+use App\Models\KotaSale;
+use App\Models\AlamatSale;
 use Gate;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -18,6 +20,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Excel;
 use App\Imports\SalespersonImport;
 use Alert;
+use DB;
 
 class SalespersonController extends Controller
 {
@@ -59,7 +62,11 @@ class SalespersonController extends Controller
             $table->editColumn('area_pemasaran', function ($row) {
                 $labels = [];
                 foreach ($row->area_pemasarans as $area_pemasaran) {
-                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
+                    if ($area_pemasaran === $row->area_pemasarans->last()) {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
+                    } else {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->name);
+                    }
                 }
 
                 return implode(' ', $labels);
@@ -77,50 +84,124 @@ class SalespersonController extends Controller
     {
         abort_if(Gate::denies('salesperson_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $area_pemasarans = City::pluck('name', 'id');
+        $cities = City::all();
 
-        return view('admin.salespeople.create', compact('area_pemasarans'));
+        return view('admin.salespeople.create', compact('cities'));
     }
 
-    public function store(StoreSalespersonRequest $request)
+    public function store(Request $request)
     {
-        $salesperson = Salesperson::create($request->all());
-        $salesperson->area_pemasarans()->sync($request->input('area_pemasarans', []));
-        if ($request->input('foto', false)) {
-            $salesperson->addMedia(storage_path('tmp/uploads/' . basename($request->input('foto'))))->toMediaCollection('foto');
-        }
+        $request->validate([
+            'name' => 'required|string',
+            'alamat' => 'required|array|min:1',
+        ]);
 
-        if ($media = $request->input('ck-media', false)) {
-            Media::whereIn('id', $media)->update(['model_id' => $salesperson->id]);
-        }
+        DB::beginTransaction();
+        try {
+            $salesperson = Salesperson::create([
+                'name' => $request->name,
+                'telephone' => $request->telephone,
+                'company' => $request->company,
+            ]);
 
-        return redirect()->route('admin.salespeople.index');
+            City::whereIn('id', array_keys($request->alamat))->get()->each(function($item) use ($salesperson, $request) {
+                $city = $item->id;
+                $alamats = $request->alamat[$item->id]['alamat'];
+
+                $kota_sale = KotaSale::create([
+                    'sales_id' => $salesperson->id,
+                    'kota_id' => $city,
+                    'name' => $salesperson->name .' - '. $item->name
+                ]);
+
+                foreach($alamats as $alamat) {
+                    AlamatSale::create([
+                        'kota_sales_id' => $kota_sale->id,
+                        'alamat' => $alamat,
+                    ]);
+                }
+            });
+
+            DB::commit();
+
+            Alert::success('Success', 'Sales berhasil di simpan');
+
+            return redirect()->route('admin.salespeople.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function edit(Salesperson $salesperson)
     {
         abort_if(Gate::denies('salesperson_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $area_pemasarans = City::pluck('name', 'id');
+        $salesperson->load('kota');
+        $cities = City::all();
 
-        $salesperson->load('area_pemasarans');
-
-        return view('admin.salespeople.edit', compact('area_pemasarans', 'salesperson'));
+        return view('admin.salespeople.edit', compact('cities', 'salesperson'));
     }
 
-    public function update(UpdateSalespersonRequest $request, Salesperson $salesperson)
+    public function update(Request $request, Salesperson $salesperson)
     {
-        $salesperson->update($request->all());
-        $salesperson->area_pemasarans()->sync($request->input('area_pemasarans', []));
-        if ($request->input('foto', false)) {
-            if (!$salesperson->foto || $request->input('foto') !== $salesperson->foto->file_name) {
-                if ($salesperson->foto) {
-                    $salesperson->foto->delete();
+        $request->validate([
+            'name' => 'required|string',
+            'alamat' => 'required|array|min:1',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $salesperson->forceFill([
+                'name' => $request->name,
+                'telephone' => $request->telephone,
+                'company' => $request->company,
+            ])->save();
+
+            $kota = City::whereIn('id', array_keys($request->alamat))->get()->map(function($item) use ($salesperson, $request) {
+                $city = $item->id;
+                $old = $request->alamat[$item->id]['id'] ?? null;
+                $alamats = $request->alamat[$item->id]['alamat'];
+
+                $kota_sale = KotaSale::firstOrCreate(
+                    ['sales_id' => $salesperson->id, 'kota_id' => $city],
+                    ['name' => $salesperson->name .' - '. $item->name]
+                );
+
+                foreach($alamats as $key => $item) {
+                    if (isset($old[$key])) {
+                        AlamatSale::updateOrCreate(
+                            ['id' => $old[$key], 'kota_sales_id' => $kota_sale->id],
+                            ['alamat' => $item]
+                        );
+                    } else {
+                        AlamatSale::create(['kota_sales_id' => $kota_sale->id, 'alamat' => $item]);
+                    }
                 }
-                $salesperson->addMedia(storage_path('tmp/uploads/' . basename($request->input('foto'))))->toMediaCollection('foto');
+
+                return [
+                    'kota_id' => $city,
+                ];
+            });
+
+            $kota_deleted = KotaSale::where('sales_id', $salesperson->id)
+                ->whereNotIn('kota_id', $kota->pluck('kota_id'))->get();
+
+            foreach($kota_deleted as $item) {
+                $item->alamats()->delete();
+                $item->delete();
             }
-        } elseif ($salesperson->foto) {
-            $salesperson->foto->delete();
+
+            DB::commit();
+
+            Alert::success('Success', 'Sales berhasil di simpan');
+
+            return redirect()->route('admin.salespeople.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         }
 
         return redirect()->route('admin.salespeople.index');
@@ -139,7 +220,16 @@ class SalespersonController extends Controller
     {
         abort_if(Gate::denies('salesperson_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $kota_deleted = KotaSale::where('sales_id', $salesperson->id)->get();
+
+        foreach($kota_deleted as $item) {
+            $item->alamats()->delete();
+            $item->delete();
+        }
+
         $salesperson->delete();
+
+        Alert::success('Success', 'Sales Person berhasil di hapus');
 
         return back();
     }

@@ -16,18 +16,19 @@
     <div class="print-header">
         @section('header')
             <div class="row align-items-center">
+                <div class="col-12 text-center">
+                    <img src="{{ asset('images/amplop.png') }}" class="print-logo" style="max-width: 100%; height: auto"/>
+                </div>
+            </div>
+            <div class="row  mt-3">
+                <div class="col-12">
+                    @yield('header.center')
+                </div>
+            </div>
+            <div class="row align-items-center">
                 <div class="col-auto">
-                    <img src="{{ asset('images/app-logo.png') }}" class="print-logo" /> 
+                    @yield('header.left')
                 </div>
-
-                <div class="col">
-                    @section('header.content')
-                        <h3 class="mb-1">{{ config('app.name') }}</h3>
-
-                        <p class="mb-0">Jl. Wijaya II No. 3, Jebres, Surakarta 57126</p>
-                    @show
-                </div>
-
                 <div class="col-auto align-self-start">
                     @yield('header.right')
                 </div>

@@ -4,19 +4,19 @@
 }
 
 .sidebar::-webkit-scrollbar-track {
-  background: #ccc; 
+  background: #ccc;
 }
- 
+
 .sidebar::-webkit-scrollbar-thumb {
   background: #888;
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-  background: #909090; 
+  background: #909090;
 }
 
 .sidebar::-webkit-scrollbar-thumb:active {
-  background: #767676; 
+  background: #767676;
 }
 
 /** Forms **/
@@ -99,4 +99,21 @@ input.hide-arrows::-webkit-outer-spin-button, input.hide-arrows::-webkit-inner-s
   appearance: none;
   -webkit-appearance: none;
   margin: 0;
+}
+
+@media only screen and (min-width: 760px) {
+    .usetwentyfour {
+        width: 380px !important;
+    }
+
+    .datepicker, .table-condensed {
+        width: 365px;
+        font-size: x-small;
+    }
+
+    .datepicker td,th{
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
 }

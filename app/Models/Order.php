@@ -17,6 +17,7 @@ class Order extends Model
     use HasFactory;
 
     public $table = 'orders';
+    public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
     protected $dates = [
         'date',
@@ -29,9 +30,15 @@ class Order extends Model
         'no_order',
         'date',
         'salesperson_id',
+        'semester_id',
         'created_at',
         'updated_at',
         'deleted_at',
+    ];
+
+    protected $appended = [
+        'lunas',
+        'selesai'
     ];
 
     public function getDateAttribute($value)
@@ -47,6 +54,11 @@ class Order extends Model
     public function salesperson()
     {
         return $this->belongsTo(Salesperson::class, 'salesperson_id');
+    }
+
+    public function kotasale()
+    {
+        return $this->belongsTo(KotaSale::class, 'kota_sales_id');
     }
 
     public function order_details()
@@ -69,20 +81,49 @@ class Order extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
     }
 
-    public static function generateNoOrder()
+    public static function generateNoOrder($semester)
     {
-        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
 
         $order_number = !$data ? 1 : ($data + 1);
 
-        $prefix = 'ORD'.Date::now()->format('dm');
-        $code = $prefix.sprintf("%04d", $order_number);
+        $prefix = 'ORD/'.$semester->tipe. '/MMJ/'.ORDER::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
+        $code = $prefix.sprintf("%03d", $order_number);
 
         return $code;
+    }
+
+    public function getSisaTagihanAttribute()
+    {
+        if ($this->relationLoaded('pembayarans') && $this->relationLoaded('invoices')) {
+            return $this->invoices->sum('nominal') - $this->pembayarans->sum('nominal');
+        }
+
+        return $this->invoices()->sum('nominal') - $this->pembayarans()->sum('nominal');
+    }
+
+    public function getLunasAttribute() {
+        if ((float) $this->tagihan->tagihan <= (float) $this->tagihan->saldo) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getSelesaiAttribute() {
+        if ((float) $this->tagihan->total <= (float) $this->tagihan->tagihan) {
+            return true;
+        }
+        return false;
     }
 }
