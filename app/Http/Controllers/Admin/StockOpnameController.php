@@ -146,4 +146,9 @@ class StockOpnameController extends Controller
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+    public function stockDetail(Request $request)
+    {
+        return view('admin.stockOpnames.detail');
+    }
 }

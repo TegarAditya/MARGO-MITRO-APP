@@ -146,6 +146,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Stock Opname
     Route::delete('stock-opnames/destroy', 'StockOpnameController@massDestroy')->name('stock-opnames.massDestroy');
+    Route::get('stock-opnames/detail', 'StockOpnameController@stockDetail')->name('stock-opnames.detail');
     Route::resource('stock-opnames', 'StockOpnameController');
 
     // Productionperson
