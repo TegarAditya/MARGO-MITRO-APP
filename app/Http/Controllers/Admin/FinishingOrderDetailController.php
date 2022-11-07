@@ -3,25 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MassDestroyProductionOrderDetailRequest;
-use App\Http\Requests\StoreProductionOrderDetailRequest;
-use App\Http\Requests\UpdateProductionOrderDetailRequest;
+use App\Http\Requests\MassDestroyFinishingOrderDetailRequest;
+use App\Http\Requests\StoreFinishingOrderDetailRequest;
+use App\Http\Requests\UpdateFinishingOrderDetailRequest;
 use App\Models\Product;
-use App\Models\ProductionOrder;
-use App\Models\ProductionOrderDetail;
+use App\Models\FinishingOrder;
+use App\Models\FinishingOrderDetail;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 
-class ProductionOrderDetailController extends Controller
+class FinishingOrderDetailController extends Controller
 {
     public function index(Request $request)
     {
         abort_if(Gate::denies('production_order_detail_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = ProductionOrderDetail::with(['production_order', 'product'])->select(sprintf('%s.*', (new ProductionOrderDetail())->table));
+            $query = FinishingOrderDetail::with(['finishing_order', 'product'])->select(sprintf('%s.*', (new FinishingOrderDetail())->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -31,7 +31,7 @@ class ProductionOrderDetailController extends Controller
                 $viewGate = 'production_order_detail_show';
                 $editGate = 'production_order_detail_edit';
                 $deleteGate = 'production_order_detail_delete';
-                $crudRoutePart = 'production-order-details';
+                $crudRoutePart = 'finishing-order-details';
 
                 return view('partials.datatablesActions', compact(
                 'viewGate',
@@ -42,8 +42,8 @@ class ProductionOrderDetailController extends Controller
             ));
             });
 
-            $table->addColumn('production_order_po_number', function ($row) {
-                return $row->production_order ? $row->production_order->po_number : '';
+            $table->addColumn('finishing_order_po_number', function ($row) {
+                return $row->finishing_order ? $row->finishing_order->po_number : '';
             });
 
             $table->addColumn('product_name', function ($row) {
@@ -63,73 +63,73 @@ class ProductionOrderDetailController extends Controller
                 return $row->ongkos_total ? $row->ongkos_total : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'production_order', 'product']);
+            $table->rawColumns(['actions', 'placeholder', 'finishing_order', 'product']);
 
             return $table->make(true);
         }
 
-        return view('admin.productionOrderDetails.index');
+        return view('admin.finishingOrderDetails.index');
     }
 
     public function create()
     {
         abort_if(Gate::denies('production_order_detail_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $production_orders = ProductionOrder::pluck('po_number', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $finishing_orders = FinishingOrder::pluck('po_number', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.productionOrderDetails.create', compact('production_orders', 'products'));
+        return view('admin.finishingOrderDetails.create', compact('finishing_orders', 'products'));
     }
 
-    public function store(StoreProductionOrderDetailRequest $request)
+    public function store(StoreFinishingOrderDetailRequest $request)
     {
-        $productionOrderDetail = ProductionOrderDetail::create($request->all());
+        $finishingOrderDetail = FinishingOrderDetail::create($request->all());
 
-        return redirect()->route('admin.production-order-details.index');
+        return redirect()->route('admin.finishing-order-details.index');
     }
 
-    public function edit(ProductionOrderDetail $productionOrderDetail)
+    public function edit(FinishingOrderDetail $finishingOrderDetail)
     {
         abort_if(Gate::denies('production_order_detail_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $production_orders = ProductionOrder::pluck('po_number', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $finishing_orders = FinishingOrder::pluck('po_number', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $productionOrderDetail->load('production_order', 'product');
+        $finishingOrderDetail->load('finishing_order', 'product');
 
-        return view('admin.productionOrderDetails.edit', compact('productionOrderDetail', 'production_orders', 'products'));
+        return view('admin.finishingOrderDetails.edit', compact('finishingOrderDetail', 'finishing_orders', 'products'));
     }
 
-    public function update(UpdateProductionOrderDetailRequest $request, ProductionOrderDetail $productionOrderDetail)
+    public function update(UpdateFinishingOrderDetailRequest $request, FinishingOrderDetail $finishingOrderDetail)
     {
-        $productionOrderDetail->update($request->all());
+        $finishingOrderDetail->update($request->all());
 
-        return redirect()->route('admin.production-order-details.index');
+        return redirect()->route('admin.finishing-order-details.index');
     }
 
-    public function show(ProductionOrderDetail $productionOrderDetail)
+    public function show(FinishingOrderDetail $finishingOrderDetail)
     {
         abort_if(Gate::denies('production_order_detail_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $productionOrderDetail->load('production_order', 'product');
+        $finishingOrderDetail->load('finishing_order', 'product');
 
-        return view('admin.productionOrderDetails.show', compact('productionOrderDetail'));
+        return view('admin.finishingOrderDetails.show', compact('finishingOrderDetail'));
     }
 
-    public function destroy(ProductionOrderDetail $productionOrderDetail)
+    public function destroy(FinishingOrderDetail $finishingOrderDetail)
     {
         abort_if(Gate::denies('production_order_detail_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $productionOrderDetail->delete();
+        $finishingOrderDetail->delete();
 
         return back();
     }
 
-    public function massDestroy(MassDestroyProductionOrderDetailRequest $request)
+    public function massDestroy(MassDestroyFinishingOrderDetailRequest $request)
     {
-        ProductionOrderDetail::whereIn('id', request('ids'))->delete();
+        FinishingOrderDetail::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
     }

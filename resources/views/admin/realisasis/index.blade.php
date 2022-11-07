@@ -113,7 +113,7 @@
     columns: [
       { data: 'placeholder', name: 'placeholder' },
 // { data: 'id', name: 'id' },
-{ data: 'production_order', name: 'production_order' },
+{ data: 'finishing_order', name: 'finishing_order' },
 { data: 'no_realisasi', name: 'no_realisasi' },
 { data: 'date', name: 'date' },
 { data: 'nominal', name: 'nominal', render: function(value) { return numeral(value).format('$0,0'); } },

@@ -17,16 +17,16 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         @endif
     </div>
     <div class="form-group">
-        <label class="required" for="production_order_id">Production Order</label>
-        <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="production_order_id" id="production_order_id" required>
-            @foreach($productionOrders as $id => $entry)
-                <option value="{{ $id }}" {{ (old('production_order_id') ? old('production_order_id') : $realisasi->production_order->id ?? '') == $id ? 'selected' : (
-                    request('production_order_id') == $id ? 'selected' : ''
+        <label class="required" for="finishing_order_id">Finishing Order</label>
+        <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="finishing_order_id" id="finishing_order_id" required>
+            @foreach($finishingOrders as $id => $entry)
+                <option value="{{ $id }}" {{ (old('finishing_order_id') ? old('finishing_order_id') : $realisasi->finishing_order->id ?? '') == $id ? 'selected' : (
+                    request('finishing_order_id') == $id ? 'selected' : ''
                 ) }}>{{ $entry }}</option>
             @endforeach
         </select>
-        @if($errors->has('production_order_id'))
-            <span class="text-danger">{{ $errors->first('production_order_id') }}</span>
+        @if($errors->has('finishing_order_id'))
+            <span class="text-danger">{{ $errors->first('finishing_order_id') }}</span>
         @endif
     </div>
     <div class="form-group">
@@ -51,7 +51,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         ],
     ] as $item)
         @php
-        $details = $po_details->whereIn('product_id', $item['product_ids']);
+        $details = $fo_details->whereIn('product_id', $item['product_ids']);
         @endphp
         <hr style="margin: .5em -15px;border-color:#ccc" />
 
@@ -64,7 +64,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                 @endif
 
                 @include('admin.realisasis.parts.item-realisasi-detail', [
-                    'detail' => new App\Models\ProductionOrderDetail,
+                    'detail' => new App\Models\FinishingOrderDetail,
                     'modal' => $item['modal'],
                     'name' => $item['name'],
                 ])
@@ -88,7 +88,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
             <div class="product-faker d-none">
                 @include('admin.realisasis.parts.item-realisasi-detail', [
-                    'detail' => new App\Models\ProductionOrderDetail,
+                    'detail' => new App\Models\FinishingOrderDetail,
                     'modal' => $item['modal'],
                     'name' => $item['name'],
                 ])
@@ -100,17 +100,17 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         </div>
     @endforeach
 
-    <div class="product-summary" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+    <div class="product-summary" style="display: {{ !$finishingOrder->finishing_order_details->count() ? 'none' : 'block' }}">
         <div class="row border-top pt-2">
             <div class="col text-right">
                 <p class="mb-0">
                     <span class="text-sm">Grand Total</span>
                     <br />
-                    <strong class="product-total">@money(data_get($productionOrder, 'total', 0))</strong>
+                    <strong class="product-total">@money(data_get($finishingOrder, 'total', 0))</strong>
                 </p>
             </div>
 
-            @if (!$productionOrder->id)
+            @if (!$finishingOrder->id)
                 <div class="col-auto opacity-0 pl-5 order-action-placeholder" style="pointer-events: none">
                     <button type="button" class="btn py-1"></button>
                 </div>
@@ -122,7 +122,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
         <div class="col"></div>
 
         <div class="col-auto">
-            {{-- {{ !$productionOrder->id ? 'btn-primary' : 'btn-secondary' }} --}}
+            {{-- {{ !$finishingOrder->id ? 'btn-primary' : 'btn-secondary' }} --}}
             <button type="submit" class="btn btn-primary">Simpan Realisasi</a>
         </div>
     </div>
@@ -134,14 +134,14 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
     [
         'id' => 'bahanModal',
         'label' => 'Semua Bahan',
-        'items' => $bahan_products->filter(function($item) use ($po_details, $productionOrder) {
-            return !$productionOrder->id ? true : $po_details->where('product_id', $item->id)->count();
+        'items' => $bahan_products->filter(function($item) use ($fo_details, $finishingOrder) {
+            return !$finishingOrder->id ? true : $fo_details->where('product_id', $item->id)->count();
         }),
     ], [
         'id' => 'productModal',
         'label' => 'Semua Produk',
-        'items' => $buku_products->filter(function($item) use ($po_details, $productionOrder) {
-            return !$productionOrder->id ? true : $po_details->where('product_id', $item->id)->count();
+        'items' => $buku_products->filter(function($item) use ($fo_details, $finishingOrder) {
+            return !$finishingOrder->id ? true : $fo_details->where('product_id', $item->id)->count();
         }),
     ],
 ] as $modal)
@@ -189,11 +189,11 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
                     <hr class="mt-0 mb-2" />
 
-                    <div class="product-select" style="display: {{ !$po_details->count() ? 'none' : 'block' }}">
+                    <div class="product-select" style="display: {{ !$fo_details->count() ? 'none' : 'block' }}">
                         @foreach ($modal['items'] as $product)
                             @php
                             $category = $product->category;
-                            $po_detail = $po_details->where('product_id', $product->id)->first();
+                            $fo_detail = $fo_details->where('product_id', $product->id)->first();
                             $search = implode(' ', [
                                 $product->name,
                                 !$category ? '' : $category->name,
@@ -208,8 +208,8 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
                                 data-price="{{ $product->price }}"
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
-                                @if ($po_detail)
-                                    data-qty="{{ $po_detail->order_qty }}"
+                                @if ($fo_detail)
+                                    data-qty="{{ $fo_detail->order_qty }}"
                                     data-prod="0"
                                 @endif
                                 @if ($foto = $product->foto->first())

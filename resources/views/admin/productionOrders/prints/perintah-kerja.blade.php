@@ -8,13 +8,7 @@
         <tr>
             <td width="136"><strong>No. PO</strong></td>
             <td width="12">:</td>
-            <td>{{ $productionOrder->po_number }}</td>
-        </tr>
-
-        <tr>
-            <td width="120"><strong>No. SPK</strong></td>
-            <td width="8">:</td>
-            <td>{{ $productionOrder->no_spk }}</td>
+            <td>{{ $productionOrder->no_order }}</td>
         </tr>
 
         <tr>

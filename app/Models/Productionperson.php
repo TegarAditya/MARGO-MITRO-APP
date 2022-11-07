@@ -28,6 +28,7 @@ class Productionperson extends Model
     ];
 
     protected $fillable = [
+        'user_id',
         'code',
         'name',
         'type',
@@ -38,6 +39,31 @@ class Productionperson extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function attachUser(User $user)
+    {
+        $this->update([ 'user_id' => $user->id ]);
+
+        $roleTitle = ucfirst($this->type); // Percetakan / Finishing
+        $role = Role::where('title', $roleTitle)->firstOrCreate([
+            'title' => $roleTitle,
+        ]);
+
+        if (!$role->permissions()->count()) {
+            $permissions = Permission::get()->filter(function($item) {
+                return substr($item->title, 0, strlen('production_')) === 'production_';
+            });
+    
+            $role->permissions()->sync($permissions->pluck('id'));
+        }
+
+        $user->roles()->sync($role->id);
+    }
 
     protected function serializeDate(DateTimeInterface $date)
     {

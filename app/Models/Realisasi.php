@@ -24,16 +24,16 @@ class Realisasi extends Model
     ];
 
     protected $fillable = [
-        'production_order_id',
+        'finishing_order_id',
         'no_realisasi',
         'date',
         'nominal',
         'lunas'
     ];
 
-    public function production_order()
+    public function finishing_order()
     {
-        return $this->belongsTo(ProductionOrder::class);
+        return $this->belongsTo(FinishingOrder::class);
     }
 
     public function realisasi_details()

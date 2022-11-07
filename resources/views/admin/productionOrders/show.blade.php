@@ -10,7 +10,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.show') }} {{ trans('cruds.order.title') }}
+        {{ trans('global.show') }} Order Cetak
     </div>
 
     <div class="card-body">
@@ -29,7 +29,7 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
 
             <div class="col-auto">
                 <a class="btn btn-info" href="{{ route('admin.production-orders.edit', $productionOrder->id) }}">
-                    Edit Production Order
+                    Edit Finishing Order
                 </a>
             </div>
         </div>
