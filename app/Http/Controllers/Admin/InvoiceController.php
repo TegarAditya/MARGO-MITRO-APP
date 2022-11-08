@@ -539,64 +539,55 @@ class InvoiceController extends Controller
 
     public function delete(Request $request)
     {
-        $order_detail = OrderDetail::find($request->id);
+        $invoice_detail = InvoiceDetail::find($request->invoice);
+        $order_detail = OrderDetail::find($request->order);
 
-        // // Delete items if removed
-            // $invoice->invoice_details()
-            //     ->whereNotIn('product_id', $products->pluck('product_id'))
-            //     ->forceDelete();
-            // StockMovement::where('reference', $invoice->id)
-            //     ->where('type', 'invoice')
-            //     ->whereNotIn('product_id', $invoice_details->pluck('product_id'))
-            //     ->delete();
+        $invoice = Invoice::find($invoice_detail->invoice_id);
+        $order = Order::find($order_detail->order_id);
 
         DB::beginTransaction();
         try {
-            $invoice->load([
-                'invoice_details', 'invoice_details.product',
+            // Kembalikan Stock
+            if ($product = $invoice_detail->product) {
+                $product->update([
+                    'stock' => $product->stock + $invoice_detail->quantity
+                ]);
+            }
+            $order_detail->update([
+                'moved' => $order_detail->moved - $invoice_detail->quantity,
             ]);
 
-            // Restore to previous data
-            foreach ($invoice->invoice_details as $invoice_detail) {
-                if ($product = $invoice_detail->product) {
-                    $product->update([
-                        'stock' => $product->stock + $invoice_detail->quantity
-                    ]);
-                }
-
-                $order->order_details()->where('product_id', $invoice_detail->product_id)->update([
-                    'moved' => DB::raw("order_details.moved - $invoice_detail->quantity"),
+            if ($bonus = $invoice_detail->bonus) {
+                //Kembalikan Stock Bonus
+                $bonus_product = $bonus->product;
+                $bonus_product->update([
+                    'stock' => $bonus_product->stock + $bonus->quantity
+                ]);
+                $order_detail->bonus->update([
+                    'moved' => DB::raw("order_packages.moved - $bonus->quantity"),
                 ]);
 
-                if ($bonus = $invoice_detail->bonus) {
-                    $bonus_product = $bonus->product;
+                //delete bonus dan movementnya
+                StockMovement::where('reference', $invoice_detail->invoice_id)
+                    ->where('type', 'kelengkapan')
+                    ->where('product_id', $bonus->product_id)
+                    ->forceDelete();
 
-                    $bonus_product->update([
-                        'stock' => $bonus_product->stock + $bonus->quantity
-                    ]);
-
-                    $bonus->update([
-                        'moved' => DB::raw("order_packages.moved - $bonus->quantity"),
-                    ]);
-
-                    StockMovement::where('reference', $invoice->id)
-                        ->where('type', 'kelengkapan')
-                        ->where('product_id', $bonus->product_id)
-                        ->forceDelete();
-                }
+                $bonus->delete();
             }
 
-            // Delete items if removed
-            $invoice->invoice_details()
-                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
-                ->forceDelete();
-            StockMovement::where('reference', $invoice->id)
+            //Delete Invoice detail
+            StockMovement::where('reference', $invoice_detail->invoice_id)
                 ->where('type', 'invoice')
-                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->where('product_id', $invoice_detail->product_id)
                 ->forceDelete();
 
-            $invoice->delete();
+            $invoice_detail->forceDelete();
 
+            //update nominal & tagihan
+            $invoice->update([
+                'nominal' => InvoiceDetail::where('invoice_id', $invoice->id)->sum('total')
+            ]);
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0
             ]);
