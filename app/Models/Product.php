@@ -165,6 +165,11 @@ class Product extends Model implements HasMedia
         return $files;
     }
 
+    public function getHargaStockAttribute()
+    {
+        return $this->stock * $this->hpp;
+    }
+
     public function getNamaBukuAttribute()
     {
         $nama = $this->name;

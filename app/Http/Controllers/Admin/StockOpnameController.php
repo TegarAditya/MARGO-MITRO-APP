@@ -3,9 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MassDestroyStockOpnameRequest;
-use App\Http\Requests\StoreStockOpnameRequest;
-use App\Http\Requests\UpdateStockOpnameRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -96,59 +93,61 @@ class StockOpnameController extends Controller
         return view('admin.stockOpnames.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi', 'semester', 'summary_item', 'summary_stock', 'summary_hpp', 'summary_sales', 'summary_jenjang', 'summary_semester'));
     }
 
-    public function create()
+    public function stockDetail($jenjang)
     {
-        abort_if(Gate::denies('stock_opname_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $covers = Brand::all();
+        $title = Product::select(['name', 'isi_id', 'kelas_id', 'halaman_id', 'semester_id', 'tipe_pg'])
+            ->where(function($q) {
+                $q->where('stock', '!=', 0)
+                ->orWhereHas('stock_movements');
+            })
+            ->where('jenjang_id', 3)
+            ->orderBy('tipe_pg')
+            ->orderBy('halaman_id')
+            ->orderBy('kelas_id')
+            ->distinct()
+            ->get()
+            ->sortBy('tiga_nama')
+            ->sortByDesc('semester_id');
 
-        return view('admin.stockOpnames.create');
+        $products = Product::withCount([
+            'stock_movements as masuk' => function($query) {
+                $query->where('quantity', '>', 0)->select(DB::raw('SUM(quantity)'));
+            }, 'stock_movements as keluar' => function($query) {
+                $query->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
+            }])->where('jenjang_id', 3)->get();
+
+        $jenjang = Category::find($jenjang);
+
+        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang'));
     }
 
-    public function store(StoreStockOpnameRequest $request)
+    public function stockExport($jenjang)
     {
-        $stockOpname = StockOpname::create($request->all());
+        $covers = Brand::all();
+        $title = Product::select(['name', 'isi_id', 'kelas_id', 'halaman_id', 'semester_id', 'tipe_pg'])
+            ->where(function($q) {
+                $q->where('stock', '!=', 0)
+                ->orWhereHas('stock_movements');
+            })
+            ->where('jenjang_id', 3)
+            ->orderBy('tipe_pg')
+            ->orderBy('halaman_id')
+            ->orderBy('kelas_id')
+            ->distinct()
+            ->get()
+            ->sortBy('tiga_nama')
+            ->sortByDesc('semester_id');
 
-        return redirect()->route('admin.stock-opnames.index');
-    }
+        $products = Product::withCount([
+            'stock_movements as masuk' => function($query) {
+                $query->where('quantity', '>', 0)->select(DB::raw('SUM(quantity)'));
+            }, 'stock_movements as keluar' => function($query) {
+                $query->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
+            }])->where('jenjang_id', 3)->get();
 
-    public function edit(StockOpname $stockOpname)
-    {
-        abort_if(Gate::denies('stock_opname_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $jenjang = Category::find($jenjang);
 
-        return view('admin.stockOpnames.edit', compact('stockOpname'));
-    }
-
-    public function update(UpdateStockOpnameRequest $request, StockOpname $stockOpname)
-    {
-        $stockOpname->update($request->all());
-
-        return redirect()->route('admin.stock-opnames.index');
-    }
-
-    public function show(StockOpname $stockOpname)
-    {
-        abort_if(Gate::denies('stock_opname_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return view('admin.stockOpnames.show', compact('stockOpname'));
-    }
-
-    public function destroy(StockOpname $stockOpname)
-    {
-        abort_if(Gate::denies('stock_opname_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $stockOpname->delete();
-
-        return back();
-    }
-
-    public function massDestroy(MassDestroyStockOpnameRequest $request)
-    {
-        StockOpname::whereIn('id', request('ids'))->delete();
-
-        return response(null, Response::HTTP_NO_CONTENT);
-    }
-
-    public function stockDetail(Request $request)
-    {
-        return view('admin.stockOpnames.detail');
+        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang'));
     }
 }
