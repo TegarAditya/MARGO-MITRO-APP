@@ -54,7 +54,8 @@
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th></th>
+                                    <th>Buku</th>
+                                    <th>PG</th>
                                     <th>Jenjang</th>
                                     <th>Stock</th>
                                     <th>Purchase Value</th>
@@ -64,7 +65,14 @@
                             <tbody>
                                 @foreach ($summary_jenjang as $item)
                                 <tr>
-                                    <td><a href="{{ route('admin.stock-opnames.detail', $item->jenjang_id) }}/{{ $item->id }}"><i class="fas fa-eye text-success  fa-lg"></i></a></td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.stock-opnames.detail', ['jenjang' => $item->jenjang_id, 'pg' => 'buku']) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
+                                        <a href="{{ route('admin.stock-opnames.export', ['jenjang' => $item->jenjang_id, 'pg' => 'buku']) }}"><i class="fas fa-file-export text-warning fa-lg"></i></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.stock-opnames.detail', ['jenjang' => $item->jenjang_id, 'pg' => 'pg']) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
+                                        <a href="{{ route('admin.stock-opnames.export', ['jenjang' => $item->jenjang_id, 'pg' => 'pg']) }}"><i class="fas fa-file-export text-warning fa-lg"></i></a>
+                                    </td>
                                     <td class="text-center">{{ $item->jenjang->name }}</td>
                                     <td class="text-center">{{ number_format($item->total_stock, 0, 0) }} Eksemplar</td>
                                     <td class="text-right">@money($item->total_hpp)</td>

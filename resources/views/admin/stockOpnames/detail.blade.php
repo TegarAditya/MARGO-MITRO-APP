@@ -2,7 +2,7 @@
 @section('content')
 <div style="margin-bottom: 10px;" class="row">
     <div class="col-lg-12">
-        <a class="btn btn-warning" href="{{ route('admin.units.create') }}">
+        <a class="btn btn-warning" href="{{ route('admin.stock-opnames.export', ['jenjang' => $jenjang->id, 'pg' => $pg]) }}">
             Export Stock
         </a>
     </div>
@@ -12,7 +12,7 @@
 @endphp
 <div class="card">
     <div class="card-header">
-        Laporan Stock Jenjang {{ $jenjang->name }}
+        Laporan Stock {{ ucwords($pg) }} Jenjang {{ $jenjang->name }}
     </div>
 
     <div class="card-body">

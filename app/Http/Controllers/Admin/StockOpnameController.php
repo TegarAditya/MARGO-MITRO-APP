@@ -13,6 +13,7 @@ use DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Exports\Admin\StockDetailExport;
 
 class StockOpnameController extends Controller
 {
@@ -93,7 +94,7 @@ class StockOpnameController extends Controller
         return view('admin.stockOpnames.index', compact('brands', 'jenjang', 'kelas', 'halaman', 'isi', 'semester', 'summary_item', 'summary_stock', 'summary_hpp', 'summary_sales', 'summary_jenjang', 'summary_semester'));
     }
 
-    public function stockDetail($jenjang)
+    public function stockDetail(Request $request)
     {
         $covers = Brand::all();
         $title = Product::select(['name', 'isi_id', 'kelas_id', 'halaman_id', 'semester_id', 'tipe_pg'])
@@ -101,7 +102,8 @@ class StockOpnameController extends Controller
                 $q->where('stock', '!=', 0)
                 ->orWhereHas('stock_movements');
             })
-            ->where('jenjang_id', 3)
+            ->where('jenjang_id', $request->jenjang)
+            ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
             ->orderBy('tipe_pg')
             ->orderBy('halaman_id')
             ->orderBy('kelas_id')
@@ -115,14 +117,18 @@ class StockOpnameController extends Controller
                 $query->where('quantity', '>', 0)->select(DB::raw('SUM(quantity)'));
             }, 'stock_movements as keluar' => function($query) {
                 $query->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
-            }])->where('jenjang_id', 3)->get();
+            }])
+            ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
+            ->where('jenjang_id', $request->jenjang)
+            ->get();
 
-        $jenjang = Category::find($jenjang);
+        $jenjang = Category::find($request->jenjang);
+        $pg = $request->pg;
 
-        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang'));
+        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang', 'pg'));
     }
 
-    public function stockExport($jenjang)
+    public function stockExport(Request $request)
     {
         $covers = Brand::all();
         $title = Product::select(['name', 'isi_id', 'kelas_id', 'halaman_id', 'semester_id', 'tipe_pg'])
@@ -130,7 +136,8 @@ class StockOpnameController extends Controller
                 $q->where('stock', '!=', 0)
                 ->orWhereHas('stock_movements');
             })
-            ->where('jenjang_id', 3)
+            ->where('jenjang_id', $request->jenjang)
+            ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
             ->orderBy('tipe_pg')
             ->orderBy('halaman_id')
             ->orderBy('kelas_id')
@@ -144,10 +151,14 @@ class StockOpnameController extends Controller
                 $query->where('quantity', '>', 0)->select(DB::raw('SUM(quantity)'));
             }, 'stock_movements as keluar' => function($query) {
                 $query->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
-            }])->where('jenjang_id', 3)->get();
+            }])
+            ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
+            ->where('jenjang_id', $request->jenjang)
+            ->get();
 
-        $jenjang = Category::find($jenjang);
+        $jenjang = Category::find($request->jenjang);
+        $pg = $request->pg;
 
-        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang'));
+        return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.'.xlsx');
     }
 }
