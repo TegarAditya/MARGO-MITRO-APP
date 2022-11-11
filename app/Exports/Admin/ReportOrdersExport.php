@@ -59,7 +59,7 @@ class ReportOrdersExport implements FromCollection, ShouldAutoSize
                     'no_order' => $order->no_order,
                     'salesperson' => $salesperson->name,
                     'date' => $order->date,
-                    'product_jenjang' => $product->jenjang->name,
+                    'product_jenjang' => $product->jenjang->name ?? '-',
                     'product_kelas' => (string) $product->kelas->name,
                     'product_judul' => $product->name,
                     'product_hal' => $product->halaman->name,
