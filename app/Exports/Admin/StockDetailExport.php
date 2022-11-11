@@ -65,11 +65,11 @@ class StockDetailExport implements FromCollection, ShouldAutoSize
                         ->where('halaman_id', $title->halaman_id)->where('semester_id', $title->semester_id)->where('brand_id', $cover->id)->first();
 
                 if($result) {
-                    $row[$cover->slug. 'masuk'] = $result->masuk ?? 0 ;
-                    $row[$cover->slug. 'keluar'] = $result->keluar ? abs($result->keluar) : 0;
-                    $row[$cover->slug. 'sisa'] = $result->stock;
-                    $row[$cover->slug. 'hpp'] = $result->hpp;
-                    $row[$cover->slug. 'total'] = $result->harga_stock;
+                    $row[$cover->slug. 'masuk'] = (string) $result->masuk ?? 0 ;
+                    $row[$cover->slug. 'keluar'] = (string) $result->keluar ? abs($result->keluar) : 0;
+                    $row[$cover->slug. 'sisa'] = (string) $result->stock;
+                    $row[$cover->slug. 'hpp'] = (string) $result->hpp;
+                    $row[$cover->slug. 'total'] = (string) $result->harga_stock;
                 } else {
                     $row[$cover->slug. 'masuk'] = '-';
                     $row[$cover->slug. 'keluar'] = '-';
