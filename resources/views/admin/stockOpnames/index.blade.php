@@ -44,6 +44,67 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Detail dan Export Stock Perjenjang</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <form action="{{ route('admin.stock-opnames.detail') }}">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="jenjang">{{ trans('cruds.buku.fields.jenjang') }}</label>
+                                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang" id="jenjang">
+                                            @foreach($jenjang as $id => $entry)
+                                                <option value="{{ $id }}" {{ old('jenjang') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                            @endforeach
+                                        </select>
+                                        @if($errors->has('jenjang'))
+                                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                                        @endif
+                                        <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="semester">{{ trans('cruds.buku.fields.semester') }}</label>
+                                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
+                                            @foreach($semester as $id => $entry)
+                                                <option value="{{ $id }}" {{ old('semester') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                            @endforeach
+                                        </select>
+                                        @if($errors->has('semester'))
+                                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                                        @endif
+                                        <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="pg">Tipe PG</label>
+                                        <select class="form-control select2 {{ $errors->has('pg') ? 'is-invalid' : '' }}" name="pg" id="pg">
+                                            <option value="buku" {{ old('buku') == 'buku' ? 'selected' : '' }}>Buku</option>
+                                            <option value="pg" {{ old('pg') == 'pg' ? 'selected' : '' }}>PG</option>
+                                        </select>
+                                        @if($errors->has('pg'))
+                                            <span class="text-danger">{{ $errors->first('pg') }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <button class="btn btn-primary" type="submit">Detail</button>
+                                <button class="btn btn-warning" type="submit" name="export" value="export">Export</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
@@ -54,8 +115,6 @@
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Buku</th>
-                                    <th>PG</th>
                                     <th>Jenjang</th>
                                     <th>Stock</th>
                                     <th>Purchase Value</th>
@@ -65,14 +124,6 @@
                             <tbody>
                                 @foreach ($summary_jenjang as $item)
                                 <tr>
-                                    <td class="text-center">
-                                        <a href="{{ route('admin.stock-opnames.detail', ['jenjang' => $item->jenjang_id, 'pg' => 'buku']) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
-                                        <a href="{{ route('admin.stock-opnames.export', ['jenjang' => $item->jenjang_id, 'pg' => 'buku']) }}"><i class="fas fa-file-export text-warning fa-lg"></i></a>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="{{ route('admin.stock-opnames.detail', ['jenjang' => $item->jenjang_id, 'pg' => 'pg']) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
-                                        <a href="{{ route('admin.stock-opnames.export', ['jenjang' => $item->jenjang_id, 'pg' => 'pg']) }}"><i class="fas fa-file-export text-warning fa-lg"></i></a>
-                                    </td>
                                     <td class="text-center">{{ $item->jenjang->name }}</td>
                                     <td class="text-center">{{ number_format($item->total_stock, 0, 0) }} Eksemplar</td>
                                     <td class="text-right">@money($item->total_hpp)</td>
@@ -82,7 +133,6 @@
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
             <div class="offset-md-4 col-md-8">

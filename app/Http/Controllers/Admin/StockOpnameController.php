@@ -103,6 +103,7 @@ class StockOpnameController extends Controller
                 ->orWhereHas('stock_movements');
             })
             ->where('jenjang_id', $request->jenjang)
+            ->where('semester_id', $request->semester)
             ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
             ->orderBy('tipe_pg')
             ->orderBy('halaman_id')
@@ -118,14 +119,20 @@ class StockOpnameController extends Controller
             }, 'stock_movements as keluar' => function($query) {
                 $query->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
             }])
-            ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
+            ->where('semester_id', $request->semester)
             ->where('jenjang_id', $request->jenjang)
+            ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
             ->get();
 
         $jenjang = Category::find($request->jenjang);
+        $semester = Semester::find($request->semester);
         $pg = $request->pg;
 
-        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang', 'pg'));
+        if ($request->export === 'export') {
+            return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.'.xlsx');
+        }
+
+        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang', 'pg', 'semester'));
     }
 
     public function stockExport(Request $request)
@@ -137,6 +144,7 @@ class StockOpnameController extends Controller
                 ->orWhereHas('stock_movements');
             })
             ->where('jenjang_id', $request->jenjang)
+            ->where('semester_id', $request->semester)
             ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
             ->orderBy('tipe_pg')
             ->orderBy('halaman_id')
@@ -154,6 +162,7 @@ class StockOpnameController extends Controller
             }])
             ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
             ->where('jenjang_id', $request->jenjang)
+            ->where('semester_id', $request->semester)
             ->get();
 
         $jenjang = Category::find($request->jenjang);
