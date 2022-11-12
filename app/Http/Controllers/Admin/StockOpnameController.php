@@ -129,7 +129,7 @@ class StockOpnameController extends Controller
         $pg = $request->pg;
 
         if ($request->export === 'export') {
-            return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.' '.$semester->name. '.xlsx');
+            return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.'.xlsx');
         }
 
         return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang', 'pg', 'semester'));
@@ -166,9 +166,8 @@ class StockOpnameController extends Controller
             ->get();
 
         $jenjang = Category::find($request->jenjang);
-        $semester = Semester::find($request->semester);
         $pg = $request->pg;
 
-        return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.' '.$semester->name. '.xlsx');
+        return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.'.xlsx');
     }
 }
