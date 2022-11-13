@@ -385,16 +385,6 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('production_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.realisasis.index") }}" class="nav-link {{ request()->is("admin/realisasis") || request()->is("admin/realisasis/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-list"></i>
-                                        <p>
-                                            Realisasi Cetak
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
                         </ul>
                     </li>
                 @endcan
