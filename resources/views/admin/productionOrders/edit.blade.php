@@ -65,7 +65,7 @@
             @php
             $tabs = [
                 [ 'label' => 'Detail Order', 'enabled' => true ],
-                [ 'label' => 'Realisasi', 'enabled' => !!$productionOrder->id ],
+                [ 'label' => 'Finishing', 'enabled' => !!$productionOrder->id ],
             ];
             @endphp
             <ul class="nav nav-tabs" id="modelTabs" role="tablist">
@@ -91,7 +91,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="model-tab-2" role="tabpanel">
-                    @include('admin.productionOrders.parts.tab-realisasi')
+                    @include('admin.productionOrders.parts.tab-finishing')
                 </div>
             </div>
         </form>
