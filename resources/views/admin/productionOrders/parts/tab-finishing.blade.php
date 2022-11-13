@@ -27,7 +27,9 @@
             @php
             $groups = $productionOrder->production_order_details->groupBy('group');
             @endphp
-            @foreach ($groups as $group)
+            @foreach ($groups->filter(function($item) {
+                return $item->where('is_check', 1)->count();
+            }) as $group)
                 <tbody>
                     @php
                     $rowspan = $group->count();
