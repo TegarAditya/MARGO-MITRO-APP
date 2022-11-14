@@ -341,6 +341,9 @@ class ProductionOrderController extends Controller
 
     public function toFinishingOrder(Request $request, ProductionOrder $productionOrder)
     {
-        return redirect()->route('admin.finishing-orders.create');
+        return redirect()->route('admin.finishing-orders.create')->withInput([
+            'finishing_group_ids' => $request->finishing_group_ids,
+            'production_order_id' => $productionOrder->id,
+        ]);
     }
 }

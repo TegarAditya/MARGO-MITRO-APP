@@ -72,9 +72,15 @@
                                 </td>
 
                                 <td rowspan="{{ $rowspan }}" class="text-center">
-                                    <span class="btn text-success btn-sm border-success finish-detail-check" data-id="{{ $detail->id }}" title="Lanjutkan ke Finishing">
-                                        <i class="fa fa-check"></i>
-                                    </span>
+                                    @if ($detail->is_ready)
+                                        <span class="btn text-muted btn-sm" style="pointer-events: none" data-id="{{ $detail->group }}" title="Lanjutkan ke Finishing">
+                                            <i class="fa fa-check"></i>
+                                        </span>
+                                    @else
+                                        <span class="btn text-success btn-sm border-success finish-detail-check" data-id="{{ $detail->group }}" title="Lanjutkan ke Finishing">
+                                            <i class="fa fa-check"></i>
+                                        </span>
+                                    @endif
                                 </td>
                             @endif
                         </tr>
