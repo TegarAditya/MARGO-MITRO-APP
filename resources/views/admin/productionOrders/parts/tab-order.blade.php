@@ -235,111 +235,106 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         'items' => $buku_products,
     ],
 ] as $modal)
-    <div class="modal fade product-modal" id="{{ $modal['id'] }}" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4">
-                <div class="modal-body">
-                    <div class="row position-sticky top-0 py-2 bg-white" style="z-index: 10">
+    <div class="modal fade product-modal ajax-product-modal" id="{{ $modal['id'] }}" tabindex="-1" role="dialog">
+        <form action="{{ route("api.products.paginate") }}" id="form{{ $modal['id'] }}">
+            <input type="hidden" name="page" value="1" />
+            <input type="hidden" name="per_page" value="25" />
+
+            <input type="hidden" name="category_ids" value="{{ implode(',', [$buku_cat->id, ...$buku_cat->child()->pluck('id')]) }}" />
+            <input type="hidden" name="selected_ids" value="{{ implode(',', $productionOrder->production_order_details->pluck('product_id')->toArray()) }}" />
+
+            <input type="hidden" name="component" value="components.admin.ajax-product-item" />
+
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4">
+                    <div class="modal-body">
+                        <div class="row position-sticky top-0 py-2 bg-white" style="z-index: 10">
+                            <div class="col">
+                                <h4 class="mb-0">Semua Produk</h4>
+                            </div>
+
+                            <div class="col-auto align-self-center">
+                                <button type="button" class="btn btn-sm btn-default px-2" data-toggle="modal" data-target="#{{ $modal['id'] }}">
+                                    <span class="text-xs">Tutup</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="mb-0">Pilih produk yang akan ditambahkan:</p>
+
+                        <div class="row align-items-center product-searchbar py-2">
+                            <div class="col-12">
+                                <x-admin.form-group
+                                    type="text"
+                                    name="search"
+                                    containerClass=" m-0"
+                                    boxClass=" p-0"
+                                    class="form-control-sm product-search px-1"
+                                >
+                                    <x-slot name="left">
+                                        <button type="button" class="btn btn-sm border-0 px-2 product-search-act">
+                                            <i class="fa fa-search text-sm"></i>
+                                        </button>
+                                    </x-slot>
+
+                                    <x-slot name="right">
+                                        <button type="button" class="btn btn-sm border-0 px-2 product-search-clear">
+                                            <i class="fa fa-times text-sm"></i>
+                                        </button>
+                                    </x-slot>
+                                </x-admin.form-group>
+                            </div>
+                        </div>
+
+                        <hr class="mt-0 mb-2" />
+
+                        <div class="product-select" style="display: {{ !$products->count() ? 'none' : 'block' }}"></div>
+
+                        <div class="product-select-loading py-4 text-center" style="display: none">
+                            <div class="spinner-border"></div>                        
+                        </div>
+
+                        <div class="product-select-empty" style="display: {{ !$modal['items']->count() ? 'block' : 'none' }}">
+                            <p class="text-center m-0 py-3">Tidak ada produk</p>
+                        </div>
+
+                        <div class="product-select-page-empty" style="display: none">
+                            <p class="text-center m-0 py-3">Tidak ada produk di halaman ini</p>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer row mx-0 px-2 justify-content-start">
                         <div class="col">
-                            <h4 class="mb-0">Semua Produk</h4>
-                        </div>
+                            <div class="product-select-pagination" style="display: none">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item page-prev disabled">
+                                            <a class="page-link" href="#">
+                                                <i class="fa fa-chevron-left"></i>
+                                            </a>
+                                        </li>
 
-                        <div class="col-auto align-self-center">
-                            <button type="button" class="btn btn-sm btn-default px-2" data-toggle="modal" data-target="#{{ $modal['id'] }}">
-                                <span class="text-xs">Tutup</span>
-                            </button>
-                        </div>
-                    </div>
+                                        <li class="page-item page-next">
+                                            <a class="page-link" href="#">
+                                                <i class="fa fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
 
-                    <p class="mb-0">Pilih produk yang akan ditambahkan:</p>
-
-                    <div class="row align-items-center product-searchbar py-2">
-                        <div class="col-12">
-                            <x-admin.form-group
-                                type="text"
-                                name="product-search"
-                                containerClass=" m-0"
-                                boxClass=" p-0"
-                                class="form-control-sm product-search px-1"
-                            >
-                                <x-slot name="left">
-                                    <button type="button" class="btn btn-sm border-0 px-2 product-search-act">
-                                        <i class="fa fa-search text-sm"></i>
-                                    </button>
-                                </x-slot>
-
-                                <x-slot name="right">
-                                    <button type="button" class="btn btn-sm border-0 px-2 product-search-clear">
-                                        <i class="fa fa-times text-sm"></i>
-                                    </button>
-                                </x-slot>
-                            </x-admin.form-group>
-                        </div>
-                    </div>
-
-                    <hr class="mt-0 mb-2" />
-
-                    <div class="product-select" style="display: {{ !$products->count() ? 'none' : 'block' }}">
-                        @foreach ($modal['items'] as $product)
-                            @php
-                            $category = $product->category;
-                            $search = implode(' ', [
-                                $product->name,
-                                !$category ? '' : $category->name,
-                            ]);
-                            $selected = $productionOrder->production_order_details->where('product_id', $product->id)->count();
-                            @endphp
-                            <a
-                                href="{{ route('admin.products.show', $product->id) }}"
-                                class="product-select-item{{ $selected ? ' selected' : '' }}"
-                                data-search="{{ strtolower($search) }}"
-                                data-id="{{ $product->id }}"
-                                data-price="{{ $product->price }}"
-                                data-hpp="{{ $product->hpp }}"
-                                data-stock="{{ $product->stock }}"
-                                @if ($foto = $product->foto->first())
-                                    data-image="{{ $foto->getUrl('thumb') }}"
-                                @endif
-                            >
-                                <div class="row">
-                                    @if ($product->foto && $foto = $product->foto->first())
-                                        <div class="col-auto pr-1">
-                                            <img src="{{ $foto->getUrl('thumb') }}" class="product-img" />
-                                        </div>
-                                    @endif
-                                
-                                    <div class="col">
-                                        <div class="product-content">
-                                            <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
-                            
-                                            <p class="mb-0 text-sm">
-                                                HPP: <span class="product-hpp">@money($product->hpp)</span>
-                                            </p>
-                            
-                                            <p class="mb-0 text-sm">
-                                                Category: <span class="product-category">{{ !$category ? '' : $category->name }}</span>
-                                            </p>
-                            
-                                            <p class="mb-0 text-sm">
-                                                Stock: <span class="product-stock">{{ $product->stock }}</span>
-                                            </p>
-                                        </div>
-                                    </div>
+                                <div class="pagination-fake" style="display: none">
+                                    <li class="page-item"><a class="page-link" href="#"></a></li>
                                 </div>
-                            </a>
-                        @endforeach
-                    </div>
+                            </div>
 
-                    <div class="product-select-empty" style="display: {{ !$modal['items']->count() ? 'block' : 'none' }}">
-                        <p class="text-center m-0 py-3">Tidak ada produk</p>
+                            <div class="text-center mt-3">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 @endforeach
 @endpush
@@ -450,6 +445,15 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 .select2-container--default .select2-results__option[aria-disabled=true] {
     display: none;
 }
+
+.modal-footer {
+    position: sticky;
+    position: -webkit-sticky;
+    bottom: 0;
+    left: 0;
+    border-top: 1px solid #ccc;
+    background-color: #fff;
+}
 </style>
 @endpush
 
@@ -473,8 +477,6 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         var productTotal = form.find('.product-total');
 
         var modals = $('.product-modal');
-        var productSearch = modals.find('.product-search');
-        var productSearchClear = modals.find('.product-search-clear');
         var productSelectItems = modals.find('.product-select-item');
         var productSelectTarget;
 
@@ -539,6 +541,14 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                     e.preventDefault();
 
                     var id = product.attr('data-id');
+                    var form = modals.find('form').each(function(index, item) {
+                        var selectedInput = $(item).find('[name="selected_ids"]');
+                        var selectedIds = (selectedInput.val() || '').split(',').filter(function(item) {
+                            return item && item.toString() !== id.toString();
+                        });
+    
+                        selectedInput.val(selectedIds.join(','));
+                    });
 
                     productSelectItems.filter('[data-id="'+id+'"]').removeClass('selected');
 
@@ -655,82 +665,203 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
             }
         });
 
-        modals.each(function(index, item) {
-            var modal = $(item);
-            var productSearch = modal.find('.product-search');
-            var productSearchClear = modal.find('.product-search-clear');
-            var productSelect = modal.find('.product-select');
-            var productSelectEmpty = modal.find('.product-select-empty');
-            var items = modal.find('.product-select-item');
+        function bindProductSelectItem(item) {
+            item.on('click', function(e) {
+                e.preventDefault();
 
-            productSearch.on('change keyup blur', function(e) {
-                var keyword = $(e.currentTarget).val().toLowerCase();
-                var results = !keyword ? 1 : 0;
+                var product = productSelectTarget || $('');
+                var selected = $(e.currentTarget);
+                var content = selected.find('.product-content').clone();
+                var qty = product.find('.product-qty').val();
+                var price = product.find('.product-price').val();
+                var name = product.data('name');
+                var data = selected.data();
 
-                items.show();
-
-                keyword && items.each(function(i, item) {
-                    var el = $(item);
-                    var search = el.data('search');
-                    
-                    keyword.split(' ').map(function(key) {
-                        search.indexOf(key) < 0 ? el.hide() : (results++);
-                    });
+                var form = selected.closest('form');
+                var selectedInput = form.find('[name="selected_ids"]');
+                var selectedIds = (selectedInput.val() || '').split(',').filter(function(item) {
+                    return !!item;
                 });
 
-                productSelect[!results ? 'hide' : 'show']();
-                productSelectEmpty[!results ? 'show' : 'hide']();
+                if (selectedIds.indexOf(data.id) < 0) {
+                    selectedIds.push(data.id);
+
+                    selectedInput.val(selectedIds.join(','));
+                }
+
+                product.attr('data-id', data.id).data('id', data.id);
+                product.attr('data-price', data.price).data('price', data.price);
+                product.attr('data-stock', data.stock).data('stock', data.stock);
+                product.find('.product-col-main').html(content);
+                product.find('.product-qty1').val(qty || 0)
+                    .attr('id', 'fieldQty-'+data.id)
+                    .attr('name', name+'['+data.id+'][qty]')
+                    .attr('min', 1)
+                    .attr('required', true);
+                product.find('.product-group')
+                    .attr('id', 'fieldGroupProd-'+data.id)
+                    .attr('name', name+'['+data.id+'][group]')
+                    .attr('required', true);
+                product.find('.product-price').val(price != 0 ? price : data.price)
+                    .attr('name', name+'['+data.id+'][price]');
+                product.find('.product-price_text').val(price != 0 ? price : data.price)
+                    .attr('id', 'fieldPrice-'+data.id)
+                    .attr('name', name+'['+data.id+'][price_text]')
+                    .attr('required', true)
+                    .trigger('change');
+                product.find('.product-subtotal').html(numeral(data.price).format('$0,0'));
+                product.find('.product-img').attr('src', data.image).parent()[!data.image ? 'hide' : 'show']();
+
+                modals.modal('hide');
+                selected.addClass('selected');
+                productSummary.show();
+                groupAction.show();
+                calculatePrice();
+
+                product.removeClass('is-removable');
+                product.closest('.product-list-group').find('.product-add').trigger('click');
+            });
+        };
+
+        productSelectItems.each(function(index, item) {
+            var el = $(item);
+
+            bindProductSelectItem(el);
+        });
+
+        modals.each(function(index, item) {
+            var modal = $(item);
+            var form = modal.find('form');
+            var list = modal.find('.product-select');
+            var loading = modal.find('.product-select-loading');
+            var empty = modal.find('.product-select-empty');
+            var pageEmpty = modal.find('.product-select-page-empty');
+
+            var productSearch = modal.find('.product-search');
+            var productSearchClear = modal.find('.product-search-clear');
+
+            var pages = modal.find('.product-select-pagination');
+            var pagesUl = pages.find('ul');
+            var prev = pages.find('.page-prev');
+            var next = pages.find('.page-next');
+            var fake = pages.find('.pagination-fake');
+            var fakeItem = fake.find('.page-item');
+
+            form.on('submit', function(e) {
+                e.preventDefault();
+
+                retrieveProducts();
+            });
+
+            next.find('a').add(prev.find('a')).on('click', function(e) {
+                e.preventDefault();
+
+                var page = $(e.currentTarget).data('page');
+
+                form.find('[name="page"]').val(page);
+                retrieveProducts();
             });
 
             productSearchClear.on('click', function(e) {
                 e.preventDefault();
+
                 productSearch.val('').trigger('change');
+                retrieveProducts();
             });
-        });
 
-        productSelectItems.on('click', function(e) {
-            e.preventDefault();
+            function bindPagination(pagination) {
+                prev.removeClass('disabled');
+                next.removeClass('disabled');
+                pages.show();
 
-            var product = productSelectTarget || $('');
-            var selected = $(e.currentTarget);
-            var content = selected.find('.product-content').clone();
-            var qty = product.find('.product-qty').val();
-            var price = product.find('.product-price').val();
-            var name = product.data('name');
-            var data = selected.data();
+                pagesUl.find('.page-item:not(.page-prev):not(.page-next)').remove();
 
-            product.attr('data-id', data.id).data('id', data.id);
-            product.attr('data-price', data.price).data('price', data.price);
-            product.attr('data-stock', data.stock).data('stock', data.stock);
-            product.find('.product-col-main').html(content);
-            product.find('.product-qty1').val(qty || 0)
-                .attr('id', 'fieldQty-'+data.id)
-                .attr('name', name+'['+data.id+'][qty]')
-                .attr('min', 1)
-                .attr('required', true);
-            product.find('.product-group')
-                .attr('id', 'fieldGroupProd-'+data.id)
-                .attr('name', name+'['+data.id+'][group]')
-                .attr('required', true);
-            product.find('.product-price').val(price != 0 ? price : data.price)
-                .attr('name', name+'['+data.id+'][price]');
-            product.find('.product-price_text').val(price != 0 ? price : data.price)
-                .attr('id', 'fieldPrice-'+data.id)
-                .attr('name', name+'['+data.id+'][price_text]')
-                .attr('required', true)
-                .trigger('change');
-            product.find('.product-subtotal').html(numeral(data.price).format('$0,0'));
-            product.find('.product-img').attr('src', data.image).parent()[!data.image ? 'hide' : 'show']();
+                pagination.links.map(function(item, index) {
+                    var label = item.label;
 
-            productSearchClear.trigger('click');
-            modals.modal('hide');
-            selected.addClass('selected');
-            productSummary.show();
-            groupAction.show();
-            calculatePrice();
+                    console.log("INDEX IS ", index);
 
-            product.removeClass('is-removable');
-            product.closest('.product-list-group').find('.product-add').trigger('click');
+                    if (label.toLowerCase().indexOf('prev') >= 0) {
+                        var page = pagination.current_page - 1;
+
+                        prev.find('a').attr('data-page', page).data('page', page);
+
+                        pagination.current_page === 1 && prev.addClass('disabled');
+
+                        return void(0);
+                    }
+
+                    if (label.toLowerCase().indexOf('next') >= 0) {
+                        var page = pagination.current_page + 1;
+
+                        next.find('a').attr('data-page', page).data('page', page);
+
+                        pagination.current_page === pagination.last_page && next.addClass('disabled');
+
+                        return void(0);
+                    }
+
+                    var el = fakeItem.clone();
+
+                    if (!item.url) {
+                        el.find('a').remove();
+                        el.addClass('disabled').html('<span class="page-link">'+item.label+'</span');
+                    } else if (item.active) {
+                        el.find('a').remove();
+                        el.addClass('active').html('<span class="page-link">'+item.label+'</span');
+                    } else {
+                        el.find('a').attr('href', item.url)
+                            .html(item.label)
+                            .on('click', function(e) {
+                                e.preventDefault();
+    
+                                form.find('[name="page"]').val(item.label);
+                                retrieveProducts();
+                            });
+                    }
+
+                    el.insertAfter(pagesUl.children().eq(index - 1));
+                });
+            }
+
+            function retrieveProducts() {
+                var action = form.attr('action');
+
+                empty.hide();
+                pageEmpty.hide();
+                list.hide();
+
+                loading.show();
+
+                $.ajax(action, {
+                    method: 'GET',
+                    data: form.serialize(),
+                }).done(function(data) {
+                    loading.hide();
+
+                    if (data.pagination?.data?.length) {
+                        list.show().html(data.html);
+
+                        productSelectItems = modals.find('.product-select-item');
+
+                        productSelectItems.each(function(index, item) {
+                            var el = $(item);
+
+                            bindProductSelectItem(el);
+                        });
+
+                        bindPagination(data.pagination);
+                    } else {
+                        pageEmpty.show();
+                    }
+                }).fail(function(xhr) {
+                    loading.hide();
+
+                    empty.show();
+                });
+            }
+
+            retrieveProducts();
         });
     });
 })(jQuery, window.numeral);

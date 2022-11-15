@@ -15,6 +15,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
 
     // Product
     Route::post('products/media', 'ProductApiController@storeMedia')->name('products.storeMedia');
+    Route::get('products/paginate', 'ProductApiController@paginate')->name('products.paginate');
     Route::apiResource('products', 'ProductApiController');
 
     // Salesperson
