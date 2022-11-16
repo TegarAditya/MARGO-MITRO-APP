@@ -41,8 +41,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 <label class="required" for="type">Jenis</label>
                 <select class="form-control select2 {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
                     <option value="">Please select</option>
-                    <option value="finishing" {{ old('type', $productionOrder->type) == 'finishing' ? 'selected' : '' }}>Finishing</option>
-                    <option value="percetakan" {{ old('type', $productionOrder->type) == 'percetakan' ? 'selected' : '' }}>Percetakan</option>
+                    <option value="cover" {{ old('type', $productionOrder->type) == 'cover' ? 'selected' : '' }}>Cover</option>
+                    <option value="isi" {{ old('type', $productionOrder->type) == 'isi' ? 'selected' : '' }}>Percetakan</option>
                 </select>
                 @if($errors->has('type'))
                     <span class="text-danger">{{ $errors->first('type') }}</span>
@@ -52,6 +52,19 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     </div>
 
     <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label class="required" for="type_person">Tipe Order</label>
+                <select class="form-control select2 {{ $errors->has('type_person') ? 'is-invalid' : '' }}" name="type_person" id="type_person" required>
+                    <option value="">Please select</option>
+                    <option value="percetakan" selected>Percetakan</option>
+                </select>
+                @if($errors->has('type_person'))
+                    <span class="text-danger">{{ $errors->first('type_person') }}</span>
+                @endif
+            </div>
+        </div>
+
         <div class="col-6">
             <div class="form-group product-pp{{ !$productionOrder->id ? ' disabled' : ''}}">
                 <label class="required" for="productionperson_id">Production Person</label>
@@ -130,6 +143,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
             <div
                 class="product-list-group{{ $group === 'fake' ? ' d-none' : '' }}"
                 data-group="{{ $group }}"
+                data-max-items="2"
             >
                 {{-- <h6 class="product-group-title font-weight-normal mb-0">{{ $label }}</h6> --}}
 
@@ -263,7 +277,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                         <p class="mb-0">Pilih produk yang akan ditambahkan:</p>
 
                         <div class="row align-items-center product-searchbar py-2">
-                            <div class="col-12">
+                            <div class="col">
                                 <x-admin.form-group
                                     type="text"
                                     name="search"
@@ -283,6 +297,12 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                                         </button>
                                     </x-slot>
                                 </x-admin.form-group>
+                            </div>
+
+                            <div class="col-auto pl-0">
+                                <button type="submit" class="btn btn-sm btn-primary border-0">
+                                    Cari
+                                </button>
                             </div>
                         </div>
 
@@ -464,7 +484,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         var form = $('#modelForm');
 
         var orderProduct = form.find('.model-products');
-        var type = form.find('#type');
+        var type = form.find('#type_person');
         var people = form.find('#productionperson_id');
 
         var groups = form.find('.product-list-group:not([data-group="fake"])');
@@ -502,6 +522,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         var bindGroup = function(item, index) {
             var group = $(item);
             var groupId = group.data('group');
+            var maxItems = parseInt(group.data('max-items') || -1);
             var products = group.find('.product-list');
             var productAdd = group.find('.product-add');
             var productFake = group.find('.product-faker > .item-product');
@@ -567,6 +588,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                         productSummary.hide();
                         groupAction.hide();
                     }
+
+                    maxItems > 0 && products.children('.item-product').show();
                 });
 
                 product.find('.product-pick').on('click', function(e) {
@@ -665,6 +688,10 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
             }
         });
 
+        if (type.val()) {
+            type.trigger('change');
+        }
+
         function bindProductSelectItem(item) {
             item.on('click', function(e) {
                 e.preventDefault();
@@ -676,6 +703,10 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 var price = product.find('.product-price').val();
                 var name = product.data('name');
                 var data = selected.data();
+
+                var group = product.closest('.product-list-group');
+                var maxItems = parseInt(group.data('max-items') || -1);
+                var items = group.children('.product-list').children('.item-product');
 
                 var form = selected.closest('form');
                 var selectedInput = form.find('[name="selected_ids"]');
@@ -720,6 +751,10 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 
                 product.removeClass('is-removable');
                 product.closest('.product-list-group').find('.product-add').trigger('click');
+
+                if (maxItems > 0 && items.length >= maxItems) {
+                    items.last().next().hide();
+                }
             });
         };
 
@@ -749,6 +784,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 
             form.on('submit', function(e) {
                 e.preventDefault();
+
+                form.find('[name="page"]').val(1);
 
                 retrieveProducts();
             });
@@ -830,6 +867,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 empty.hide();
                 pageEmpty.hide();
                 list.hide();
+                pages.hide();
 
                 loading.show();
 
@@ -841,6 +879,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 
                     if (data.pagination?.data?.length) {
                         list.show().html(data.html);
+                        pages.show();
 
                         productSelectItems = modals.find('.product-select-item');
 

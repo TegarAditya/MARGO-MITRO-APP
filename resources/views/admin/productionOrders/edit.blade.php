@@ -65,7 +65,7 @@
             @php
             $tabs = [
                 [ 'label' => 'Detail Order', 'enabled' => true ],
-                [ 'label' => 'Finishing', 'enabled' => !!$productionOrder->id ],
+                // [ 'label' => 'Finishing', 'enabled' => !!$productionOrder->id ],
             ];
             @endphp
             <ul class="nav nav-tabs" id="modelTabs" role="tablist">
