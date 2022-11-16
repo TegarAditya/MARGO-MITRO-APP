@@ -133,17 +133,17 @@ class ProductionpersonController extends Controller
                         'email' => 'Email sudah terdaftar',
                     ]);
             }
+
+            $login = $productionperson->user ?: new User();
+    
+            $login->name = $request->input('name', $login->name);
+            $login->email = $request->input('email', $login->email);
+            $login->password = !$request->password ? $login->password : Hash::make($request->password);
+    
+            $login->save();
+
+            $productionperson->attachUser($login);
         }
-
-        $login = $productionperson->user ?: new User();
-
-        $login->name = $request->input('name', $login->name);
-        $login->email = $request->input('email', $login->email);
-        $login->password = !$request->password ? $login->password : Hash::make($request->password);
-
-        $login->save();
-
-        $productionperson->attachUser($login);
 
         return redirect()->route('admin.productionpeople.index');
     }

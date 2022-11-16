@@ -47,8 +47,6 @@ class Productionperson extends Model
 
     public function attachUser(User $user)
     {
-        $this->update([ 'user_id' => $user->id ]);
-
         $roleTitle = ucfirst($this->type); // Percetakan / Finishing
         $role = Role::where('title', $roleTitle)->firstOrCreate([
             'title' => $roleTitle,
@@ -63,6 +61,10 @@ class Productionperson extends Model
         }
 
         $user->roles()->sync($role->id);
+
+        if ($user->id !== $this->user_id) {
+            $this->update([ 'user_id' => $user->id ]);
+        }
     }
 
     protected function serializeDate(DateTimeInterface $date)
