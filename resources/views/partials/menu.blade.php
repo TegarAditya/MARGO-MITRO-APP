@@ -354,6 +354,31 @@
                     </li>
                 @endcan
                 @can('production_access')
+                    <li class="nav-item has-treeview {{ request()->is("admin/preorders*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle" href="#">
+                            <i class="fa-fw nav-icon fas fa-tags"></i>
+                            <p>
+                                Preorder
+                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('production_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.preorders.index") }}" class="nav-link {{
+                                        (request()->is("admin/preorders") || request()->is("admin/preorders/*"))
+                                        && !request()->is('admin/preorders/dashboard') ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-tags"></i>
+                                        <p>
+                                            Preorder
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
+                @can('production_access')
                     <li class="nav-item has-treeview {{ request()->is("admin/production-orders*") ? "menu-open" : "" }} {{ request()->is("admin/realisasis*") ? "menu-open" : "" }}">
                         <a class="nav-link nav-dropdown-toggle" href="#">
                             <i class="fa-fw nav-icon fas fa-print"></i>
