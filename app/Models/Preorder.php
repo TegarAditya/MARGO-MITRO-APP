@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class Preorder extends Model
 {
@@ -33,6 +34,11 @@ class Preorder extends Model
         'deleted_at',
     ];
 
+    public function preorder_details()
+    {
+        return $this->hasMany(PreorderDetail::class, 'preorder_detail_id');
+    }
+
     public function getDateAttribute($value)
     {
         return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
@@ -46,5 +52,17 @@ class Preorder extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public static function generateNoPO()
+    {
+        $data = self::whereBetween('created_at', [Date::now()->startOf('month'), Date::now()->endOf('month')])->count();
+
+        $order_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'PRE'.Date::now()->format('dm');
+        $code = $prefix.sprintf("%04d", $order_number);
+
+        return $code;
     }
 }

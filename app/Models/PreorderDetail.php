@@ -22,6 +22,7 @@ class PreorderDetail extends Model
         'preorder_detail_id',
         'product_id',
         'quantity',
+        'group',
         'created_at',
         'updated_at',
         'deleted_at',
