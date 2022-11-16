@@ -15,12 +15,13 @@ $foto = !$product->foto ? null : $product->foto->first();
 
 $modal = !isset($modal) ? '#productModal' : $modal;
 $name = !isset($name) ? 'products' : $name;
+$hidden = !isset($hidden) ? false : (bool) $hidden;
 $placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
 
 $po_status = $detail->production_order->status ?? 0;
 $all_check = !isset($all_check) ? false : $all_check;
 @endphp
-<div class="item-product row item-product-status-{{ $po_status }}" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}">
+<div class="item-product row item-product-status-{{ $po_status }}" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}" style="display: {{ $hidden ? 'none' : 'flex' }}">
     <div class="col-5 row">
         <div class="col-auto" style="display: {{ (!$product->id || !$foto) ? 'none' : 'block' }}">
             @if ($foto)

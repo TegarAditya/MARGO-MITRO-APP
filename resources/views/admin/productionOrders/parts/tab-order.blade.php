@@ -42,7 +42,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 <select class="form-control select2 {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
                     <option value="">Please select</option>
                     <option value="cover" {{ old('type', $productionOrder->type) == 'cover' ? 'selected' : '' }}>Cover</option>
-                    <option value="isi" {{ old('type', $productionOrder->type) == 'isi' ? 'selected' : '' }}>Percetakan</option>
+                    <option value="isi" {{ old('type', $productionOrder->type) == 'isi' ? 'selected' : '' }}>Isi</option>
                 </select>
                 @if($errors->has('type'))
                     <span class="text-danger">{{ $errors->first('type') }}</span>
@@ -81,7 +81,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 </select>
 
                 <span class="product-warn-pp text-info text-sm" style="display: {{ !$productionOrder->type ? 'block' : 'none' }}">
-                    Mohon pilih Jenis produksi
+                    Mohon pilih Tipe Order produksi
                 </span>
 
                 @if($errors->has('productionperson'))
@@ -96,6 +96,12 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     <h5 class="mb-2 mt-3">
         {{ !$productionOrder->id ? "Pilih Produk" : "Produk Dipilih" }}
     </h5>
+
+    @if (!$productionOrder->id)
+        <div class="product-notice">
+            <p>Mohon pilih "Jenis" lebih dulu</p>
+        </div>
+    @endif
 
     @if ($status === 0)
         <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
@@ -112,9 +118,16 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     @endif
 
     @foreach ([
+        // [
+        //     'modal' => '#coverModal',
+        //     'name' => 'covers',
+        //     'type' => 'cover',
+        //     'placeholder' => 'Pilih Cover',
+        // ],
         [
             'modal' => '#productModal',
             'name' => 'products',
+            'type' => 'isi',
             'placeholder' => 'Pilih Produk',
         ],
     ] as $item)
@@ -144,6 +157,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 class="product-list-group{{ $group === 'fake' ? ' d-none' : '' }}"
                 data-group="{{ $group }}"
                 data-max-items="2"
+                data-type="{{ $item['type'] }}"
+                {{-- style="display: {{ $item['type'] !== $productionOrder->type ? 'none' : 'block' }}" --}}
             >
                 {{-- <h6 class="product-group-title font-weight-normal mb-0">{{ $label }}</h6> --}}
 
@@ -243,19 +258,38 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 @push('footer')
 <!-- Modal Products -->
 @foreach ([
+    // [
+    //     'id' => 'coverModal',
+    //     'type' => 'cover',
+    //     'label' => 'Semua Cover',
+    //     'items' => $buku_products,
+    //     'url' => route("api.products.paginate"),
+    //     'selected_ids' => implode(',', []),
+    // ],
     [
         'id' => 'productModal',
+        'type' => 'isi',
         'label' => 'Semua Produk',
         'items' => $buku_products,
+        'url' => route("api.products.paginate"),
+        'selected_ids' => implode(',', $productionOrder->production_order_details->pluck('product_id')->toArray()),
     ],
 ] as $modal)
-    <div class="modal fade product-modal ajax-product-modal" id="{{ $modal['id'] }}" tabindex="-1" role="dialog">
-        <form action="{{ route("api.products.paginate") }}" id="form{{ $modal['id'] }}">
+    <div
+        class="modal fade product-modal ajax-product-modal"
+        id="{{ $modal['id'] }}"
+        tabindex="-1"
+        role="dialog"
+        data-type="{{ $modal['type'] }}"
+    >
+        <form action="{{ $modal['url'] }}" id="form{{ $modal['id'] }}">
             <input type="hidden" name="page" value="1" />
             <input type="hidden" name="per_page" value="25" />
 
+            <input type="hidden" name="type" value="" />
+
             <input type="hidden" name="category_ids" value="{{ implode(',', [$buku_cat->id, ...$buku_cat->child()->pluck('id')]) }}" />
-            <input type="hidden" name="selected_ids" value="{{ implode(',', $productionOrder->production_order_details->pluck('product_id')->toArray()) }}" />
+            <input type="hidden" name="selected_ids" value="{{ $modal['selected_ids'] }}" />
 
             <input type="hidden" name="component" value="components.admin.ajax-product-item" />
 
@@ -484,7 +518,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         var form = $('#modelForm');
 
         var orderProduct = form.find('.model-products');
-        var type = form.find('#type_person');
+        var type = form.find('#type');
+        var type_person = form.find('#type_person');
         var people = form.find('#productionperson_id');
 
         var groups = form.find('.product-list-group:not([data-group="fake"])');
@@ -667,8 +702,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         });
 
         $('.field-select2').each((index, item) => {
-            const el = $(item);
-            const placeholder = el.data('placeholder');
+            var el = $(item);
+            var placeholder = el.data('placeholder');
 
             placeholder && el.select2({
                 placeholder,
@@ -676,6 +711,13 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         });
 
         type.on('change', function(e) {
+            var value = e.currentTarget.value;
+            var exists = false;
+
+            $('.product-notice')[exists ? 'hide' : 'show']();
+        });
+
+        type_person.on('change', function(e) {
             var value = e.currentTarget.value;
 
             people.val('').trigger('change').select2();
@@ -688,8 +730,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
             }
         });
 
-        if (type.val()) {
-            type.trigger('change');
+        if (type_person.val()) {
+            type_person.trigger('change');
         }
 
         function bindProductSelectItem(item) {
