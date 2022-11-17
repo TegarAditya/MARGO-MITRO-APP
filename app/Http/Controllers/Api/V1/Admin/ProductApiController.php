@@ -17,6 +17,11 @@ class ProductApiController extends Controller
 {
     use MediaUploadingTrait;
 
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function index()
     {
         abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
