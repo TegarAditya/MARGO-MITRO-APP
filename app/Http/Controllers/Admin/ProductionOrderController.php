@@ -205,6 +205,10 @@ class ProductionOrderController extends Controller
         $user = $request->user();
         $old_status = (int) $request->status;
 
+        if (!empty($request->finishing_group_ids)) {
+            return $this->toFinishingOrder($request, $productionOrder);
+        }
+
         if ($old_status === 0 && $productionOrder->status !== 0) {
             Alert::error('Error', 'Production Order sedang dalam proses dan tidak dapat diubah.');
 
@@ -333,5 +337,13 @@ class ProductionOrderController extends Controller
         ProductionOrder::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function toFinishingOrder(Request $request, ProductionOrder $productionOrder)
+    {
+        return redirect()->route('admin.finishing-orders.create')->withInput([
+            'finishing_group_ids' => $request->finishing_group_ids,
+            'production_order_id' => $productionOrder->id,
+        ]);
     }
 }

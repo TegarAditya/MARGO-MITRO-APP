@@ -4,14 +4,14 @@
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
             <a class="btn btn-success" href="{{ route('admin.preorders.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.preorder.title_singular') }}
+                {{ trans('global.add') }} Preorder
             </a>
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.preorder.title_singular') }} {{ trans('global.list') }}
+        Preorder {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
@@ -22,13 +22,13 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.preorder.fields.no_preorder') }}
+                        No. Preorder
                     </th>
                     <th>
-                        {{ trans('cruds.preorder.fields.date') }}
+                        Tanggal
                     </th>
                     <th>
-                        {{ trans('cruds.preorder.fields.note') }}
+                        Catatan
                     </th>
                     <th>
                         &nbsp;

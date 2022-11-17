@@ -540,6 +540,10 @@ $buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat-
             }
         });
 
+        if (type.val() && !people.val()) {
+            type.trigger('change');
+        }
+
         modals.each(function(index, item) {
             var modal = $(item);
             var productSearch = modal.find('.product-search');

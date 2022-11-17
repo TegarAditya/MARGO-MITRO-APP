@@ -81,7 +81,7 @@
                     </div>
                     <div class="form-group">
                         <label for="name">Password</label>
-                        <input class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" type="text" name="password" id="password" value="{{ old('password') }}">
+                        <input class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" type="password" name="password" id="password" value="{{ old('password') }}" autocomplete="new-password">
                         @if($errors->has('password'))
                             <span class="text-danger">{{ $errors->first('password') }}</span>
                         @endif

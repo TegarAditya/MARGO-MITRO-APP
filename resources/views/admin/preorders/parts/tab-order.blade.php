@@ -1,24 +1,20 @@
 @php
-$bahan_cat = $categories->where('slug', 'bahan')->first();
-$bahan_products = $products->whereIn('category_id', [$bahan_cat->id, ...$bahan_cat->child()->pluck('id')]);
-
 $buku_cat = $categories->where('slug', 'buku')->first();
-$buku_products = $products->whereIn('category_id', [$buku_cat->id, ...$buku_cat->child()->pluck('id')]);
 
-$status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDING;
+$editable = true;
 @endphp
 
 <div class="model-products pt-3">
-    <input type="hidden" name="status" value="{{ $productionOrder->status }}" id="status" />
-    <input type="hidden" name="total" value="{{ $productionOrder->total }}" id="total" />
+    <input type="hidden" name="status" value="{{ $preorder->status }}" id="status" />
+    <input type="hidden" name="total" value="{{ $preorder->total }}" id="total" />
 
     <div class="row">
-        <div class="col-12">
+        <div class="col-6">
             <div class="form-group">
-                <label for="no_order">No. Order Cetak</label>
-                <input class="form-control h-auto py-1 {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $productionOrder->no_order) }}" readonly placeholder="(Otomatis)">
-                @if($errors->has('no_order'))
-                    <span class="text-danger">{{ $errors->first('no_order') }}</span>
+                <label for="no_preorder">No. Preorder</label>
+                <input class="form-control h-auto py-1 {{ $errors->has('no_preorder') ? 'is-invalid' : '' }}" type="text" name="no_preorder" id="no_order" value="{{ old('no_order', $preorder->no_preorder) }}" readonly placeholder="(Otomatis)">
+                @if($errors->has('no_preorder'))
+                    <span class="text-danger">{{ $errors->first('no_preorder') }}</span>
                 @endif
             </div>
         </div>
@@ -28,24 +24,9 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         <div class="col-6">
             <div class="form-group">
                 <label class="required" for="date">Tanggal</label>
-                <input class="form-control date h-auto py-1 {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $productionOrder->date) }}" required>
+                <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $preorder->date) }}" required>
                 @if($errors->has('date'))
                     <span class="text-danger">{{ $errors->first('date') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.productionOrder.fields.date_helper') }}</span>
-            </div>
-        </div>
-
-        <div class="col-6">
-            <div class="form-group">
-                <label class="required" for="type">Jenis</label>
-                <select class="form-control select2 {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
-                    <option value="">Please select</option>
-                    <option value="cover" {{ old('type', $productionOrder->type) == 'cover' ? 'selected' : '' }}>Cover</option>
-                    <option value="isi" {{ old('type', $productionOrder->type) == 'isi' ? 'selected' : '' }}>Isi</option>
-                </select>
-                @if($errors->has('type'))
-                    <span class="text-danger">{{ $errors->first('type') }}</span>
                 @endif
             </div>
         </div>
@@ -54,38 +35,10 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     <div class="row">
         <div class="col-6">
             <div class="form-group">
-                <label class="required" for="type_person">Tipe Order</label>
-                <select class="form-control select2 {{ $errors->has('type_person') ? 'is-invalid' : '' }}" name="type_person" id="type_person" required>
-                    <option value="">Please select</option>
-                    <option value="percetakan" selected>Percetakan</option>
-                </select>
-                @if($errors->has('type_person'))
-                    <span class="text-danger">{{ $errors->first('type_person') }}</span>
-                @endif
-            </div>
-        </div>
-
-        <div class="col-6">
-            <div class="form-group product-pp{{ !$productionOrder->id ? ' disabled' : ''}}">
-                <label class="required" for="productionperson_id">Production Person</label>
-                <select class="form-control select2 {{ $errors->has('productionperson') ? 'is-invalid' : '' }}" name="productionperson_id" id="productionperson_id" required>
-                    <option value="">Please select</option>
-
-                    @foreach($productionpeople as $person)
-                        <option
-                            value="{{ $person->id }}"
-                            data-type="{{ $person->type }}"
-                            {{ old('productionperson_id', $productionOrder->productionperson_id) == $person->id ? 'selected' : '' }}
-                        >{{ $person->name }}</option>
-                    @endforeach
-                </select>
-
-                <span class="product-warn-pp text-info text-sm" style="display: {{ !$productionOrder->type ? 'block' : 'none' }}">
-                    Mohon pilih Tipe Order produksi
-                </span>
-
-                @if($errors->has('productionperson'))
-                    <span class="text-danger">{{ $errors->first('productionperson') }}</span>
+                <label for="note">Catatan</label>
+                <textarea class="form-control {{ $errors->has('note') ? 'is-invalid' : '' }}" name="note" id="note" rows="3" style="min-height: 0">{{ old('note', $preorder->note) }}</textarea>
+                @if($errors->has('note'))
+                    <span class="text-danger">{{ $errors->first('note') }}</span>
                 @endif
             </div>
         </div>
@@ -94,17 +47,11 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     <hr style="margin: .5em -15px;border-color:#ccc" />
 
     <h5 class="mb-2 mt-3">
-        {{ !$productionOrder->id ? "Pilih Produk" : "Produk Dipilih" }}
+        {{ !$preorder->id ? "Pilih Produk" : "Produk Dipilih" }}
     </h5>
 
-    @if (!$productionOrder->id)
-        <div class="product-notice">
-            <p>Mohon pilih "Jenis" lebih dulu</p>
-        </div>
-    @endif
-
-    @if ($status === 0)
-        <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+    @if ($editable)
+        <div class="product-group-action my-3" style="display: {{ !$preorder->preorder_details->count() ? 'none' : 'block' }}">
             <div class="row">
                 <div class="col">
                     <button type="button" class="btn py-1 border product-group-add" data-add="before">
@@ -118,21 +65,14 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     @endif
 
     @foreach ([
-        // [
-        //     'modal' => '#coverModal',
-        //     'name' => 'covers',
-        //     'type' => 'cover',
-        //     'placeholder' => 'Pilih Cover',
-        // ],
         [
             'modal' => '#productModal',
             'name' => 'products',
-            'type' => 'isi',
             'placeholder' => 'Pilih Produk',
         ],
     ] as $item)
         @php
-        $order_details = $productionOrder->production_order_details;
+        $order_details = $preorder->preorder_details;
 
         $groups = $order_details->groupBy('group');
 
@@ -146,10 +86,6 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
             @php
             $parent = $items->first();
             $list = $items->slice(1);
-            $all_check = $items->count() === $items->where('file', 1)
-                ->where('plate', 1)
-                ->where('plate_ambil', 1)
-                ->count();
 
             $label = "Group $loop->iteration"
             @endphp
@@ -157,30 +93,27 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 class="product-list-group{{ $group === 'fake' ? ' d-none' : '' }}"
                 data-group="{{ $group }}"
                 data-max-items="2"
-                data-type="{{ $item['type'] }}"
-                {{-- style="display: {{ $item['type'] !== $productionOrder->type ? 'none' : 'block' }}" --}}
             >
                 {{-- <h6 class="product-group-title font-weight-normal mb-0">{{ $label }}</h6> --}}
 
                 <div class="product-list">
                     @if ($parent)
-                        @include('admin.productionOrders.parts.item-product', [
+                        @include('admin.preorders.parts.item-product', [
                             'detail' => $parent,
                         ])
                     @endif
 
                     @if ($list->count())
-                        @each('admin.productionOrders.parts.item-product', $list, 'detail')
+                        @each('admin.preorders.parts.item-product', $list, 'detail')
                     @endif
 
-                    @if ($status === 0)
-                        @include('admin.productionOrders.parts.item-product', [
-                            'detail' => new App\Models\ProductionOrderDetail,
-                            'modal' => $item['modal'],
-                            'name' => $item['name'],
-                            'placeholder' => $item['placeholder'],
-                        ])
-                    @endif
+                    @include('admin.preorders.parts.item-product', [
+                        'detail' => new App\Models\PreorderDetail,
+                        'modal' => $item['modal'],
+                        'name' => $item['name'],
+                        'placeholder' => $item['placeholder'],
+                        'hidden' => !!$preorder->id,
+                    ])
                 </div>
 
                 <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
@@ -200,8 +133,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 </div>
 
                 <div class="product-faker d-none">
-                    @include('admin.productionOrders.parts.item-product', [
-                        'detail' => new App\Models\ProductionOrderDetail,
+                    @include('admin.preorders.parts.item-product', [
+                        'detail' => new App\Models\PreorderDetail,
                         'modal' => $item['modal'],
                         'name' => $item['name'],
                     ])
@@ -214,8 +147,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         @endforeach
     @endforeach
 
-    @if ($status === 0)
-        <div class="product-group-action my-3" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
+    @if ($editable)
+        <div class="product-group-action my-3" style="display: {{ !$preorder->preorder_details->count() ? 'none' : 'block' }}">
             <div class="row">
                 <div class="col">
                     <button type="button" class="btn py-1 border product-group-add">
@@ -228,29 +161,14 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         </div>
     @endif
 
-    <div class="product-summary" style="display: {{ !$productionOrder->production_order_details->count() ? 'none' : 'block' }}">
-        <div class="row border-top pt-2">
-            <div class="col text-right">
-                <p class="mb-0">
-                    <span class="text-sm">Grand Total</span>
-                    <br />
-                    <strong class="product-total">@money(data_get($productionOrder, 'total', 0))</strong>
-                </p>
-            </div>
-
-            @if (!$productionOrder->id)
-                <div class="col-auto opacity-0 pl-4 ml-1 order-action-placeholder" style="pointer-events: none">
-                    <button type="button" class="btn py-1"></button>
-                </div>
-            @endif
-        </div>
+    <div class="product-summary" style="display: {{ !$preorder->preorder_details->count() ? 'none' : 'block' }}">
     </div>
 
     <div class="row mt-4">
         <div class="col"></div>
 
         <div class="col-auto">
-            <button type="submit" class="btn {{ !$productionOrder->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
+            <button type="submit" class="btn {{ !$preorder->id ? 'btn-primary' : 'btn-secondary' }}">Simpan Order</a>
         </div>
     </div>
 </div>
@@ -258,38 +176,18 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 @push('footer')
 <!-- Modal Products -->
 @foreach ([
-    // [
-    //     'id' => 'coverModal',
-    //     'type' => 'cover',
-    //     'label' => 'Semua Cover',
-    //     'items' => $buku_products,
-    //     'url' => route("api.products.paginate"),
-    //     'selected_ids' => implode(',', []),
-    // ],
     [
         'id' => 'productModal',
-        'type' => 'isi',
         'label' => 'Semua Produk',
-        'items' => $buku_products,
-        'url' => route("api.products.paginate"),
-        'selected_ids' => implode(',', $productionOrder->production_order_details->pluck('product_id')->toArray()),
     ],
 ] as $modal)
-    <div
-        class="modal fade product-modal ajax-product-modal"
-        id="{{ $modal['id'] }}"
-        tabindex="-1"
-        role="dialog"
-        data-type="{{ $modal['type'] }}"
-    >
-        <form action="{{ $modal['url'] }}" id="form{{ $modal['id'] }}">
+    <div class="modal fade product-modal ajax-product-modal" id="{{ $modal['id'] }}" tabindex="-1" role="dialog">
+        <form action="{{ route("api.products.paginate") }}" id="form{{ $modal['id'] }}">
             <input type="hidden" name="page" value="1" />
             <input type="hidden" name="per_page" value="25" />
 
-            <input type="hidden" name="type" value="" />
-
             <input type="hidden" name="category_ids" value="{{ implode(',', [$buku_cat->id, ...$buku_cat->child()->pluck('id')]) }}" />
-            <input type="hidden" name="selected_ids" value="{{ $modal['selected_ids'] }}" />
+            <input type="hidden" name="selected_ids" value="{{ implode(',', $preorder->preorder_details->pluck('product_id')->toArray()) }}" />
 
             <input type="hidden" name="component" value="components.admin.ajax-product-item" />
 
@@ -342,13 +240,13 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
 
                         <hr class="mt-0 mb-2" />
 
-                        <div class="product-select" style="display: {{ !$products->count() ? 'none' : 'block' }}"></div>
+                        <div class="product-select" style="display: none"></div>
 
                         <div class="product-select-loading py-4 text-center" style="display: none">
                             <div class="spinner-border"></div>                        
                         </div>
 
-                        <div class="product-select-empty" style="display: {{ !$modal['items']->count() ? 'block' : 'none' }}">
+                        <div class="product-select-empty" style="display: none">
                             <p class="text-center m-0 py-3">Tidak ada produk</p>
                         </div>
 
@@ -423,7 +321,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
     pointer-events: none;
 }
 
-.product-list > .item-product:not(:first-child) > .col-5.row {
+.product-list > .item-product:not(:first-child) > .product-col-info.row {
     padding-left: 5rem;
 }
 
@@ -518,8 +416,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         var form = $('#modelForm');
 
         var orderProduct = form.find('.model-products');
-        var type = form.find('#type');
-        var type_person = form.find('#type_person');
+        var type = form.find('#type_person');
         var people = form.find('#productionperson_id');
 
         var groups = form.find('.product-list-group:not([data-group="fake"])');
@@ -702,8 +599,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         });
 
         $('.field-select2').each((index, item) => {
-            var el = $(item);
-            var placeholder = el.data('placeholder');
+            const el = $(item);
+            const placeholder = el.data('placeholder');
 
             placeholder && el.select2({
                 placeholder,
@@ -711,13 +608,6 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
         });
 
         type.on('change', function(e) {
-            var value = e.currentTarget.value;
-            var exists = false;
-
-            $('.product-notice')[exists ? 'hide' : 'show']();
-        });
-
-        type_person.on('change', function(e) {
             var value = e.currentTarget.value;
 
             people.val('').trigger('change').select2();
@@ -730,8 +620,8 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
             }
         });
 
-        if (type_person.val()) {
-            type_person.trigger('change');
+        if (type.val()) {
+            type.trigger('change');
         }
 
         function bindProductSelectItem(item) {
@@ -792,7 +682,7 @@ $status = $productionOrder->status ?: \App\Models\ProductionOrder::STATUS_PENDIN
                 calculatePrice();
 
                 product.removeClass('is-removable');
-                product.closest('.product-list-group').find('.product-add').trigger('click');
+                group.find('.product-add').trigger('click');
 
                 if (maxItems > 0 && items.length >= maxItems) {
                     items.last().next().hide();

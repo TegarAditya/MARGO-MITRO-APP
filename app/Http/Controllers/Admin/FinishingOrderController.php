@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Alert;
+use App\Models\ProductionOrder;
 use Illuminate\Support\Facades\Date;
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
 use NumberFormatter;
@@ -105,7 +106,7 @@ class FinishingOrderController extends Controller
         return view('admin.finishingOrders.dashboard', compact('salespeople', 'start_at', 'end_at', 'orders'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         abort_if(Gate::denies('production_order_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
@@ -113,6 +114,39 @@ class FinishingOrderController extends Controller
 
         $categories = Category::whereIn('slug', ['buku', 'bahan'])->get();
         $products = Product::with(['media', 'category'])->get();
+
+        if ($inputGroupIds = $request->old('finishing_group_ids')) {
+            $productionOrder = ProductionOrder::findOrFail($request->old('production_order_id'));
+            $group_ids = explode(', ', $inputGroupIds);
+
+            $productionOrder->load([
+                'production_order_details' => function($query) use ($group_ids) {
+                    $query->whereIn('group', $group_ids);
+                },
+            ]);
+            
+            $finishingOrder = new FinishingOrder([
+                'date' => $productionOrder->date,
+                'total' => $productionOrder->production_order_details->sum('ongkos_total'),
+                'type' => 'finishing',
+            ]);
+
+            $finishing_order_details = $productionOrder->production_order_details->map(function($item) {
+                $finishing_order_detail = new FinishingOrderDetail([
+                    'order_qty' => $item->order_qty,
+                    'prod_qty' => $item->prod_qty,
+                    'ongkos_satuan' => $item->ongkos_satuan,
+                    'ongkos_total' => $item->ongkos_total,
+                    'product_id' => $item->product_id,
+                ]);
+
+                return $finishing_order_detail;
+            });
+
+            $finishingOrder->finishing_order_details = $finishing_order_details;
+
+            return view('admin.finishingOrders.create', compact('productionpeople', 'products', 'categories', 'finishingOrder'));
+        }
 
         return view('admin.finishingOrders.create', compact('productionpeople', 'products', 'categories'));
     }
