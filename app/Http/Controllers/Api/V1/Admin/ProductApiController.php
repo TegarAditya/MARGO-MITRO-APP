@@ -17,14 +17,9 @@ class ProductApiController extends Controller
 {
     use MediaUploadingTrait;
 
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
-
     public function index()
     {
-        abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        // abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return new ProductResource(Product::with(['category', 'brand', 'unit'])->get());
     }
@@ -74,7 +69,7 @@ class ProductApiController extends Controller
 
     public function show(Product $product)
     {
-        abort_if(Gate::denies('product_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        // abort_if(Gate::denies('product_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return new ProductResource($product->load(['category', 'brand', 'unit']));
     }
@@ -104,7 +99,7 @@ class ProductApiController extends Controller
 
     public function destroy(Product $product)
     {
-        abort_if(Gate::denies('product_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        // abort_if(Gate::denies('product_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $product->delete();
 

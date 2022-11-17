@@ -138,7 +138,7 @@ $editable = true;
                         'modal' => $item['modal'],
                         'name' => $item['name'],
                     ])
-            
+
                     <div class="product-empty">
                         <p>Belum ada produk yang ditambahkan</p>
                     </div>
@@ -183,6 +183,7 @@ $editable = true;
 ] as $modal)
     <div class="modal fade product-modal ajax-product-modal" id="{{ $modal['id'] }}" tabindex="-1" role="dialog">
         <form action="{{ route("api.products.paginate") }}" id="form{{ $modal['id'] }}">
+            @csrf
             <input type="hidden" name="page" value="1" />
             <input type="hidden" name="per_page" value="25" />
 
@@ -243,7 +244,7 @@ $editable = true;
                         <div class="product-select" style="display: none"></div>
 
                         <div class="product-select-loading py-4 text-center" style="display: none">
-                            <div class="spinner-border"></div>                        
+                            <div class="spinner-border"></div>
                         </div>
 
                         <div class="product-select-empty" style="display: none">
@@ -499,7 +500,7 @@ $editable = true;
                         var selectedIds = (selectedInput.val() || '').split(',').filter(function(item) {
                             return item && item.toString() !== id.toString();
                         });
-    
+
                         selectedInput.val(selectedIds.join(','));
                     });
 
@@ -507,7 +508,7 @@ $editable = true;
 
                     product.remove();
                     calculatePrice();
-                    
+
                     if (products.children('.item-product').length <= 1) {
                         if (groups.length > 1) {
                             group.remove();
@@ -783,7 +784,7 @@ $editable = true;
                             .html(item.label)
                             .on('click', function(e) {
                                 e.preventDefault();
-    
+
                                 form.find('[name="page"]').val(item.label);
                                 retrieveProducts();
                             });
