@@ -112,6 +112,7 @@ $editable = true;
                         'modal' => $item['modal'],
                         'name' => $item['name'],
                         'placeholder' => $item['placeholder'],
+                        'hidden' => !!$preorder->id,
                     ])
                 </div>
 

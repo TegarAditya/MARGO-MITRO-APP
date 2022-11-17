@@ -14,7 +14,7 @@
         @if ($preorder->id)
             <div class="row mb-4">
                 <div class="col">
-                    <h4>PO No. #{{ $preorder->no_order }}</h4>
+                    <h4>Preorder No. #{{ $preorder->no_preorder }}</h4>
 
                     <div class="row">
                         <div class="col-auto">
@@ -41,7 +41,7 @@
 
                             <div class="col text-muted px-2">
                                 <span class="text-xs">No. Order</span>
-                                <p class="m-0">{{ $preorder->no_order }}</p>
+                                <p class="m-0">{{ $preorder->no_preorder }}</p>
                             </div>
                         </div>
                     </div>

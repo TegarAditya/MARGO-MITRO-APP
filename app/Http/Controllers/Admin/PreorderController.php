@@ -7,9 +7,11 @@ use App\Http\Requests\MassDestroyPreorderRequest;
 use App\Http\Requests\StorePreorderRequest;
 use App\Http\Requests\UpdatePreorderRequest;
 use App\Models\Category;
+use App\Models\HistoryProduction;
 use App\Models\Preorder;
 use App\Models\PreorderDetail;
 use App\Models\Product;
+use App\Models\SummaryOrder;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -91,7 +93,9 @@ class PreorderController extends Controller
                 'created_by' => $user->id,
             ])->save();
 
-            $order_details = Product::whereIn('id', array_keys($request->products))->get()->map(function($item) use ($preorder, $request) {
+            $products = Product::whereIn('id', array_keys($request->products))->get();
+            
+            $order_details = $products->map(function($item) use ($preorder, $request) {
                 $qty = (int) $request->products[$item->id]['qty'] ?: 0;
                 $group = (int) $request->products[$item->id]['group'] ?: 0;
 
@@ -104,6 +108,48 @@ class PreorderController extends Controller
             });
 
             $preorder->preorder_details()->createMany($order_details->all());
+            $preorder->load('preorder_details');
+
+            if ($preorder->preorder_details->count()) {
+                $summary_query = SummaryOrder::query()
+                    ->whereIn('product_id', $preorder->preorder_details->pluck('product_id'));
+                    // ->where('preorder_id', $preorder->id);
+
+                $summary_orders = $summary_query->get();
+
+                $upsert_summary_orders = $preorder->preorder_details->map(function(PreorderDetail $item) use ($summary_orders, $preorder) {
+                    $summary = $summary_orders->where('product_id', $item->product_id)
+                        // ->where('preorder_id', $preorder->id)
+                        ->first();
+
+                    return [
+                        'id' => $summary->id ?? null,
+                        'type' => 'preorder',
+                        'category_id' => null,
+                        'quantity' => $item->quantity + ($summary->quantity ?? 0),
+                        'preorder_id' => null, // $preorder->id,
+                        'order_id' => null,
+                        'product_id' => $item->product_id,
+                    ];
+                });
+
+                SummaryOrder::upsert($upsert_summary_orders->all(), ['id']);
+
+                $upsert_history_productions = $summary_query->get()->map(function(SummaryOrder $item) use ($preorder) {
+                    $preorder_detail = $preorder->preorder_details->where('product_id', $item->product_id)->first();
+
+                    return [
+                        'id' => null,
+                        'type' => "preorder_detail",
+                        'reference_id' => $preorder_detail->id ?? null,
+                        'quantity' => $preorder_detail->quantity ?? null,
+                        'summary_order_id' => $item->id,
+                        'product_id' => $item->product_id,
+                    ];
+                });
+
+                HistoryProduction::upsert($upsert_history_productions->all(), ['id']);
+            }
 
             DB::commit();
 
@@ -145,6 +191,7 @@ class PreorderController extends Controller
                 'date' => $request->date,
                 'note' => $request->note,
             ])->save();
+            $preorder->load('preorder_details');
 
             $products = Product::whereIn('id', array_keys($request->products))->get();
             $order_details = $products->map(function($item) use ($preorder, $request) {
@@ -164,35 +211,66 @@ class PreorderController extends Controller
             foreach ($order_details as $order_detail) {
                 $exists = $preorder->preorder_details()->where('product_id', $order_detail['product_id'])->first() ?: new PreorderDetail();
 
-                if ($exists->is_check != $order_detail['is_check'] && $order_detail['is_check'] == 1) {
-                    $product_stocks->put($order_detail['product_id'], $order_detail['order_qty']);
+                if ($exists->id) {
+                    $product_stocks->put($order_detail['product_id'], [
+                        'preorder_detail_id' => $exists->id,
+                        'quantity' => $order_detail['quantity'],
+                        'quantity_old' => $exists->quantity ?: 0,
+                    ]);
                 }
 
                 $exists->forceFill($order_detail)->save();
             }
 
             if ($product_stocks->count()) {
-                $upsert_products = $product_stocks->map(function($item, $key) use ($products) {
-                    $product = $products->find($key);
+                $summary_query = SummaryOrder::query()
+                    ->whereIn('product_id', $product_stocks->keys());
+                    // ->where('preorder_id', $preorder->id);
+
+                $summary_orders = $summary_query->get();
+
+                $upsert_summary_orders = $product_stocks->map(function($item, $key) use ($summary_orders) {
+                    $summary = $summary_orders->where('product_id', $key)->first();
 
                     return [
-                        'id' => $key,
-                        'stock' => !$product ? $item : ($product->stock + $item),
-                    ];
-                });
-
-                $upsert_stocks = $product_stocks->map(function($item, $key) use ($preorder) {
-                    return [
-                        'id' => null,
+                        'id' => $summary->id ?? null,
+                        'type' => 'preorder',
+                        'category_id' => null,
+                        'quantity' => $item['quantity'] + ($summary->quantity ?? 0) - $item['quantity_old'],
+                        'preorder_id' => null, // $preorder->id,
+                        'order_id' => null,
                         'product_id' => $key,
-                        'reference' => $preorder->id,
-                        'type' => 'production_order',
-                        'quantity' => $item,
                     ];
                 });
 
-                Product::upsert($upsert_products->all(), ['id']);
-                StockMovement::upsert($upsert_stocks->all(), ['id']);
+                $summary_orders = $summary_query->get();
+                $histories = HistoryProduction::whereIn('product_id', $product_stocks->keys())
+                    ->whereIn('reference_id', $product_stocks->pluck('preorder_detail_id'))
+                    ->whereIn('summary_order_id', $summary_orders->pluck('id'))
+                    ->where('type', 'preorder_details')
+                    ->get();
+
+                $upsert_history_productions = $summary_orders->map(function(SummaryOrder $item) use ($preorder, $product_stocks, $histories) {
+                    $stock = $product_stocks->get($item->product_id, []);
+                    $preorder_detail = $preorder->preorder_details
+                        ->where('product_id', $item->product_id)
+                        ->first();
+                    $history = $histories->where('product_id', $item->product_id)
+                        ->where('summary_order_id', $item->id)
+                        ->first();
+
+                    return [
+                        'id' => $history->id ?? null,
+                        'type' => "preorder_details",
+                        'reference_id' => $preorder_detail->id ?? null,
+                        'quantity' => $stock['quantity'],
+                        'summary_order_id' => $item->id,
+                        'product_id' => $item->product_id,
+                    ];
+                });
+
+                SummaryOrder::upsert($upsert_summary_orders->all(), ['id']);
+                HistoryProduction::upsert($upsert_history_productions->all(), ['id']);
             }
 
             // Delete items if removed

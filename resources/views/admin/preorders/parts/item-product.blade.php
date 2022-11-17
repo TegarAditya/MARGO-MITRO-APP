@@ -15,9 +15,10 @@ $foto = !$product->foto ? null : $product->foto->first();
 
 $modal = !isset($modal) ? '#productModal' : $modal;
 $name = !isset($name) ? 'products' : $name;
+$hidden = !isset($hidden) ? false : (bool) $hidden;
 $placeholder = !isset($placeholder) ? 'Pilih Produk' : $placeholder;
 @endphp
-<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}">
+<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price ?: $product->price }}" data-hpp="{{ $product->hpp }}" data-name="{{ $name }}" style="display: {{ $hidden ? 'none' : 'flex' }}">
     <div class="col-6 product-col-info row">
         <div class="col-auto" style="display: {{ (!$product->id || !$foto) ? 'none' : 'block' }}">
             @if ($foto)
