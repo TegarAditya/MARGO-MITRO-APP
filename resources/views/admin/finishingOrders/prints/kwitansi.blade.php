@@ -1,8 +1,9 @@
 @extends('layouts.print')
 
-@section('header.right')
+@section('header.center')
 <h6>KWITANSI PO</h6>
-
+@stop
+@section('header.left')
 <table cellspacing="0" cellpadding="0" class="text-sm" style="width: 9cm">
     <tbody>
         <tr>
@@ -16,7 +17,13 @@
             <td width="8">:</td>
             <td>{{ $finishingOrder->no_kwitansi }}</td>
         </tr>
+    </tbody>
+</table>
+@stop
 
+@section('header.right')
+<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 9cm">
+    <tbody>
         <tr>
             <td><strong>Tanggal</strong></td>
             <td>:</td>
@@ -95,7 +102,7 @@
 @push('styles')
 <style type="text/css" media="print">
 @page {
-    size: landscape;
+    size: portrait;
 }
 </style>
 @endpush

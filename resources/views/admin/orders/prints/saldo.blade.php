@@ -1,8 +1,10 @@
 @extends('layouts.print')
 
-@section('header.right')
+@section('header.center')
 <h6>Saldo Order</h6>
+@stop
 
+@section('header.right')
 <table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
     <tbody>
         <tr>
@@ -22,7 +24,13 @@
             <td>:</td>
             <td>{{ Carbon\Carbon::parse($order->date)->format('d-m-Y') }}</td>
         </tr>
+    </tbody>
+</table>
+@stop
 
+@section('header.right')
+<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
+    <tbody>
         <tr>
             <td><strong>Nama Freelance</strong></td>
             <td>:</td>
@@ -199,7 +207,7 @@
 @push('styles')
 <style type="text/css" media="print">
 @page {
-    size: landscape;
+    size: portrait;
 }
 </style>
 @endpush
