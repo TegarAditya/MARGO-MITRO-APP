@@ -412,6 +412,13 @@ $editable = true;
 
 @push('scripts')
 <script>
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+</script>
+<script>
 (function($, numeral) {
     $(function() {
         var form = $('#modelForm');
