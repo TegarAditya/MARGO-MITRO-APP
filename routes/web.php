@@ -93,6 +93,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('orders/destroy', 'OrderController@massDestroy')->name('orders.massDestroy');
     Route::get('orders/estimasi/{id}', 'OrderController@print_estimasi')->name('orders.estimasi');
     Route::get('orders/saldo/{id}', 'OrderController@print_saldo')->name('orders.saldo');
+    Route::get('orders/saldo_rekap/{id}', 'OrderController@print_saldo_rekap')->name('orders.saldo_rekap');
     Route::resource('orders', 'OrderController');
 
     // Order Detail
@@ -127,6 +128,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Pembayaran
     Route::delete('pembayarans/destroy', 'PembayaranController@massDestroy')->name('pembayarans.massDestroy');
     Route::get('pembayarans/general', 'PembayaranController@general')->name('pembayarans.general');
+    Route::get('pembayarans/export', 'PembayaranController@rekapSaldoExport')->name('pembayarans.export');
     Route::post('pembayarans/general', 'PembayaranController@generalSave')->name('pembayarans.general.save');
     Route::get('pembayarans/ajax/getTagihan', 'PembayaranController@getTagihan')->name('pembayarans.ajax.tagihan');
     Route::resource('pembayarans', 'PembayaranController');

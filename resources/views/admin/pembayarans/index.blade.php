@@ -6,9 +6,58 @@
             <a class="btn btn-success" href="{{ route('admin.pembayarans.general') }}">
                 {{ trans('global.add') }} {{ trans('cruds.pembayaran.title_singular') }}
             </a>
+            <a class="btn btn-warning" href="{{ route('admin.pembayarans.export') }}">
+                Export Rekap Saldo
+            </a>
         </div>
     </div>
 @endcan
+<div class="card">
+    <div class="card-header">
+        Laporan Pembayaran
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover datatable-saldo">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Sales</th>
+                        <th>Order</th>
+                        <th>Tagihan</th>
+                        <th>Pembayaran</th>
+                        <th>Hutang</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($saldos as $saldo)
+                    <tr>
+                        <td></td>
+                        <td>{{ $saldo->name }}</td>
+                        <td class="text-right">@money($saldo->pesanan)</td>
+                        <td class="text-right">@money($saldo->tagihan)</td>
+                        <td class="text-right">@money($saldo->bayar)</td>
+                        <td class="text-right">@money($saldo->tagihan - $saldo->bayar)</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="text-center">
+                            <strong>Total</strong>
+                        </td>
+                        <td class="text-right">@money($saldos->sum('pesanan'))</td>
+                        <td class="text-right">@money($saldos->sum('tagihan'))</td>
+                        <td class="text-right">@money($saldos->sum('bayar'))</td>
+                        <td class="text-right">@money($saldos->sum('tagihan') - $saldos->sum('bayar'))</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.pembayaran.title_singular') }} {{ trans('global.list') }}
@@ -84,4 +133,17 @@
 });
 
 </script>
+<script>
+    $(function () {
+       $('.datatable-saldo').DataTable({
+         'paging'      : true,
+         'lengthChange': false,
+         'searching'   : false,
+         'ordering'    : false,
+         'info'        : true,
+         'autoWidth'   : false,
+         'pageLength'  : 50
+       })
+     })
+   </script>
 @endsection

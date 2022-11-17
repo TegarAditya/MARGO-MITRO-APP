@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Alert;
+use App\Exports\Admin\RekapSaldoExport;
 
 class PembayaranController extends Controller
 {
@@ -73,7 +74,17 @@ class PembayaranController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.pembayarans.index');
+        $saldos = Salesperson::with(['orders.invoices' => function($query) {
+            $query->select(DB::raw('SUM(nominal)'));
+        }])->withCount(['tagihans as pesanan' => function($query) {
+            $query->select(DB::raw('SUM(total)'));
+        }, 'tagihans as tagihan' => function($query) {
+            $query->select(DB::raw('SUM(tagihan)'));
+        }, 'tagihans as bayar' => function($query) {
+            $query->select(DB::raw('SUM(saldo)'));
+        }])->whereHas('orders')->orderBy('pesanan', 'DESC')->get();
+
+        return view('admin.pembayarans.index', compact('saldos'));
     }
 
     public function create(Request $request)
@@ -341,5 +352,20 @@ class PembayaranController extends Controller
         } else {
             return response()->json(['status' => 'error', 'message' => 'Not Found']);
         }
+    }
+
+    public function rekapSaldoExport()
+    {
+        $saldos = Salesperson::with(['orders.invoices' => function($query) {
+            $query->select(DB::raw('SUM(nominal)'));
+        }])->withCount(['tagihans as pesanan' => function($query) {
+            $query->select(DB::raw('SUM(total)'));
+        }, 'tagihans as tagihan' => function($query) {
+            $query->select(DB::raw('SUM(tagihan)'));
+        }, 'tagihans as bayar' => function($query) {
+            $query->select(DB::raw('SUM(saldo)'));
+        }])->whereHas('orders')->orderBy('pesanan', 'DESC')->get();
+
+        return (new RekapSaldoExport($saldos))->download('Laporan Saldo.xlsx');
     }
 }

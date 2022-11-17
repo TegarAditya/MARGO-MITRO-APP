@@ -14,3 +14,6 @@
 <a class="px-1" href="{{ route('admin.' . $crudRoutePart . '.saldo', $row->id) }}" title="Cetak Saldo">
     <i class="fas fa-money text-warning  fa-lg"></i>
 </a>
+<a class="px-1" href="{{ route('admin.' . $crudRoutePart . '.saldo_rekap', $row->id) }}" title="Cetak Rekap Saldo">
+    <i class="fas fa-money text-danger  fa-lg"></i>
+</a>

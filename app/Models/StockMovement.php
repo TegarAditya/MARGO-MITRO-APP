@@ -34,6 +34,8 @@ class StockMovement extends Model
         'type',
         'product_id',
         'quantity',
+        'stock_awal',
+        'stock_akhir',
         'created_at',
         'updated_at',
         'deleted_at',

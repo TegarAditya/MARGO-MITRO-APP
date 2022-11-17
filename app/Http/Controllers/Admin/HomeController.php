@@ -8,6 +8,7 @@ use App\Models\OrderDetail;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\StockMovement;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
@@ -277,9 +278,23 @@ class HomeController
     //         }
 
     public function god(){
+        set_time_limit(0);
         DB::beginTransaction();
         try {
 
+            $products = Product::with(['stock_movements' => function ($q) {
+                $q->latest();
+            }])->whereHas('stock_movements')->get();
+
+            foreach($products as  $product) {
+                $stock = $product->stock;
+                foreach($product->stock_movements as $movement) {
+                    $stock_akhir = $stock;
+                    $stock_awal = $stock - $movement->quantity;
+                    $movement->update(['stock_awal' => $stock_awal, 'stock_akhir' => $stock_akhir]);
+                    $stock = $stock_awal;
+                }
+            }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();

@@ -493,4 +493,15 @@ class OrderController extends Controller
 
         return view('admin.orders.prints.saldo', compact('order', 'invoices', 'pembayarans'));
     }
+
+    public function print_saldo_rekap(Request $request)
+    {
+        $order = Order::findOrFail($request->id);
+        $order->load('salesperson');
+
+        $invoices = Invoice::where('order_id', $order->id)->get();
+        $pembayarans = Pembayaran::where('order_id', $order->id)->get();
+
+        return view('admin.orders.prints.saldo_rekap', compact('order', 'invoices', 'pembayarans'));
+    }
 }
