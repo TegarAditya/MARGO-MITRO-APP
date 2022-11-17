@@ -12,7 +12,8 @@ class CreateHistoryProductionsTable extends Migration
             $table->bigIncrements('id');
             $table->string('type');
             $table->unsignedBigInteger('reference_id')->nullable();
-            $table->integer('quantity');
+            $table->integer('pesanan')->nullable();
+            $table->integer('stock')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

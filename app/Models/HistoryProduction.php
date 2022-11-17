@@ -16,6 +16,7 @@ class HistoryProduction extends Model
         'preorder' => 'Preorder',
         'order'    => 'Order',
         'cetak'    => 'Cetak',
+        'finishing' => 'Finishing'
     ];
 
     public $table = 'history_productions';
@@ -31,7 +32,8 @@ class HistoryProduction extends Model
         'type',
         'summary_order_id',
         'product_id',
-        'quantity',
+        'pesanan',
+        'stock',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -39,7 +41,15 @@ class HistoryProduction extends Model
 
     public function reference()
     {
-        return $this->belongsTo(Preorder::class, 'reference_id');
+        if ($this->type === 'preorder') {
+            return $this->belongsTo(Preorder::class, 'reference_id');
+        } else if ($this->type === 'order') {
+            return $this->belongsTo(Order::class, 'reference_id');
+        } else if ($this->type === 'cetak') {
+            return $this->belongsTo(Realisasi::class, 'reference_id');
+        } else if ($this->type === 'finishing') {
+            return $this->belongsTo(ProductionOrder::class, 'reference_id');
+        }
     }
 
     public function summary_order()

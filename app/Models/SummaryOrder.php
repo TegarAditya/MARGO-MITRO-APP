@@ -26,26 +26,15 @@ class SummaryOrder extends Model
     ];
 
     protected $fillable = [
-        'preorder_id',
-        'order_id',
-        'product_id',
         'type',
         'category_id',
-        'quantity',
+        'product_id',
+        'pesanan',
+        'stock',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
-
-    public function preorder()
-    {
-        return $this->belongsTo(Preorder::class, 'preorder_id');
-    }
-
-    public function order()
-    {
-        return $this->belongsTo(Order::class, 'order_id');
-    }
 
     public function product()
     {
@@ -54,7 +43,11 @@ class SummaryOrder extends Model
 
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        if ($this->type === 'cover') {
+            return $this->belongsTo(Brand::class, 'category_id');
+        } else if ($this->type === 'isi') {
+            return $this->belongsTo(Category::class, 'category_id');
+        }
     }
 
     protected function serializeDate(DateTimeInterface $date)

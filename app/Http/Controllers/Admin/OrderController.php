@@ -470,7 +470,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($request->id);
 
         $details = OrderDetail::where('order_id', $order->id)
-                ->with(['product', 'bonus'])
+                ->with(['product', 'bonus', 'product.jenjang'])
                 ->get()
                 ->sortBy('product.tipe_pg')
                 ->sortBy('product.halaman_id')
@@ -478,7 +478,9 @@ class OrderController extends Controller
                 ->sortBy('product.tiga_nama')
                 ->sortBy('product.jenjang_id');
 
-        return view('admin.orders.prints.estimasi', compact('order', 'details'));
+        $groups = $details->groupBy('product.jenjang.name');
+
+        return view('admin.orders.prints.estimasi', compact('order', 'details', 'groups'));
     }
 
     public function print_saldo(Request $request)
