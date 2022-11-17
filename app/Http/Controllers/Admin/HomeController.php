@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\StockMovement;
 use App\Models\Product;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
@@ -277,30 +278,112 @@ class HomeController
     //             ]);
     //         }
 
+    // set_time_limit(0);
+    // DB::beginTransaction();
+    // try {
+
+    //     $products = Product::with(['stock_movements' => function ($q) {
+    //         $q->latest();
+    //     }])->whereHas('stock_movements')->get();
+
+    //     foreach($products as  $product) {
+    //         $stock = $product->stock;
+    //         foreach($product->stock_movements as $movement) {
+    //             $stock_akhir = $stock;
+    //             $stock_awal = $stock - $movement->quantity;
+    //             $movement->update(['stock_awal' => $stock_awal, 'stock_akhir' => $stock_akhir]);
+    //             $stock = $stock_awal;
+    //         }
+    //     }
+    //     DB::commit();
+    // } catch (\Exception $e) {
+    //     DB::rollback();
+
+    //     dd($e->getMessage());
+    // }
+
+
     public function god(){
-        set_time_limit(0);
-        DB::beginTransaction();
-        try {
+        $permissions = [[
+            'title' => 'keuangan_access',
+        ],
+        [
+            'title' => 'piutang_create',
+        ],
+        [
+            'title' => 'piutang_edit',
+        ],
+        [
+            'title' => 'piutang_show',
+        ],
+        [
+            'title' => 'piutang_delete',
+        ],
+        [
+            'title' => 'piutang_access',
+        ],
+        [
+            'title' => 'piutang_detail_access',
+        ],
+        [
+            'title' => 'kota_sale_access',
+        ],
+        [
+            'title' => 'alamat_sale_access',
+        ],
+        [
+            'title' => 'preorder_create',
+        ],
+        [
+            'title' => 'preorder_edit',
+        ],
+        [
+            'title' => 'preorder_show',
+        ],
+        [
+            'title' => 'preorder_delete',
+        ],
+        [
+            'title' => 'preorder_access',
+        ],
+        [
+            'title' => 'preorder_detail_create',
+        ],
+        [
+            'title' => 'preorder_detail_edit',
+        ],
+        [
+            'title' => 'preorder_detail_show',
+        ],
+        [
+            'title' => 'preorder_detail_delete',
+        ],
+        [
+            'title' => 'preorder_detail_access',
+        ],
+        [
+            'title' => 'summary_access',
+        ],
+        [
+            'title' => 'summary_order_show',
+        ],
+        [
+            'title' => 'summary_order_access',
+        ],
+        [
+            'title' => 'history_production_show',
+        ],
+        [
+            'title' => 'history_production_delete',
+        ],
+        [
+            'title' => 'history_production_access',
+        ],
+        [
+            'title' => 'praorder_access',
+        ]];
 
-            $products = Product::with(['stock_movements' => function ($q) {
-                $q->latest();
-            }])->whereHas('stock_movements')->get();
-
-            foreach($products as  $product) {
-                $stock = $product->stock;
-                foreach($product->stock_movements as $movement) {
-                    $stock_akhir = $stock;
-                    $stock_awal = $stock - $movement->quantity;
-                    $movement->update(['stock_awal' => $stock_awal, 'stock_akhir' => $stock_akhir]);
-                    $stock = $stock_awal;
-                }
-            }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            dd($e->getMessage());
-        }
+        Permission::insert($permissions);
 
         dd('done');
     }
