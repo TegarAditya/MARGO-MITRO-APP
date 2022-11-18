@@ -304,87 +304,60 @@ class HomeController
 
 
     public function god(){
-        $permissions = [[
-            'title' => 'keuangan_access',
-        ],
-        [
-            'title' => 'piutang_create',
-        ],
-        [
-            'title' => 'piutang_edit',
-        ],
-        [
-            'title' => 'piutang_show',
-        ],
-        [
-            'title' => 'piutang_delete',
-        ],
-        [
-            'title' => 'piutang_access',
-        ],
-        [
-            'title' => 'piutang_detail_access',
-        ],
-        [
-            'title' => 'kota_sale_access',
-        ],
-        [
-            'title' => 'alamat_sale_access',
-        ],
-        [
-            'title' => 'preorder_create',
-        ],
-        [
-            'title' => 'preorder_edit',
-        ],
-        [
-            'title' => 'preorder_show',
-        ],
-        [
-            'title' => 'preorder_delete',
-        ],
-        [
-            'title' => 'preorder_access',
-        ],
-        [
-            'title' => 'preorder_detail_create',
-        ],
-        [
-            'title' => 'preorder_detail_edit',
-        ],
-        [
-            'title' => 'preorder_detail_show',
-        ],
-        [
-            'title' => 'preorder_detail_delete',
-        ],
-        [
-            'title' => 'preorder_detail_access',
-        ],
-        [
-            'title' => 'summary_access',
-        ],
-        [
-            'title' => 'summary_order_show',
-        ],
-        [
-            'title' => 'summary_order_access',
-        ],
-        [
-            'title' => 'history_production_show',
-        ],
-        [
-            'title' => 'history_production_delete',
-        ],
-        [
-            'title' => 'history_production_access',
-        ],
-        [
-            'title' => 'praorder_access',
-        ]];
+        DB::beginTransaction();
+        try {
+            $order = Order::with(['order_details' => function($q) {
+                $q->where('price', 2600);
+            }])->where('id', 18)->first();
 
-        Permission::insert($permissions);
+            foreach($order->order_details as $order_detail) {
+                $price = 2200;
+                $qty = $order_detail->quantity;
 
+                $order_detail->update([
+                    'price' => $price,
+                    'total' => $qty * $price,
+                ]);
+            }
+
+            $invoice = Invoice::with(['invoice_details' => function($q) {
+                $q->where('price', 2600);
+            }])->where('id', 62)->first();
+
+            foreach($invoice->invoice_details as $invoice_detail) {
+                $price = 2200;
+                $qty = $invoice_detail->quantity;
+
+                $invoice_detail->update([
+                    'price' => $price,
+                    'total' => $qty * $price,
+                ]);
+            }
+
+            $inv_edit = Invoice::with('invoice_details')->where('id', 62)->first();
+            $inv_edit->update([
+                'nominal' => $inv_edit->invoice_details->sum('total')
+            ]);
+
+            $order_edit = Order::with('order_details')->where('id', 18)->first();
+
+            Tagihan::where('order_id', 18)->update([
+                'total' => $order_edit->invoice_details->sum('total'),
+                'tagihan' => $inv_edit->invoice_details->sum('total')
+            ]);
+
+            $orderAll = Order::with('order_details')->get();
+            foreach($orderAll as $order) {
+                $order->update([
+                    'nominal' => $order->invoice_details->sum('total')
+                ]);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e->getMessage());
+        }
         dd('done');
     }
 }
