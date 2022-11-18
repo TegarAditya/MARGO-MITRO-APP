@@ -10,6 +10,7 @@ use App\Models\InvoiceDetail;
 use App\Models\StockMovement;
 use App\Models\Product;
 use App\Models\Permission;
+use App\Models\Tagihan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
@@ -342,7 +343,7 @@ class HomeController
             $order_edit = Order::with('order_details')->where('id', 18)->first();
 
             Tagihan::where('order_id', 18)->update([
-                'total' => $order_edit->invoice_details->sum('total'),
+                'total' => $order_edit->order_details->sum('total'),
                 'tagihan' => $inv_edit->invoice_details->sum('total')
             ]);
 
