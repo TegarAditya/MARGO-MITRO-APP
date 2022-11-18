@@ -350,7 +350,7 @@ class HomeController
             $orderAll = Order::with('order_details')->get();
             foreach($orderAll as $order) {
                 $order->update([
-                    'nominal' => $order->invoice_details->sum('total')
+                    'nominal' => $order->order_details->sum('total')
                 ]);
             }
             DB::commit();
