@@ -363,24 +363,39 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
-        $fakap = collect();
-        $products = Product::with(['stock_movements' => function ($q) {
-                    $q->orderBy('id', 'DESC');
-                }])->whereHas('stock_movements')->get();
+        DB::beginTransaction();
+        try {
+            $invoice = Invoice::with(['invoice_details' => function($q) {
+                $q->where('price', 2600);
+            }])->where('id', 76)->first();
 
-        foreach($products as $product) {
-            if ($product->stock_movements->count() > 0) {
-                $movement = $product->stock_movements->first();
-                if ($product->stock !== $movement->stock_akhir) {
-                    $fakap->push([
-                        'id' => $movement->product_id,
-                        'stock_akhir' => $movement->stock_akhir,
-                        'stock' => $product->stock
-                    ]);
-                }
+            foreach($invoice->invoice_details as $invoice_detail) {
+                $price = 2200;
+                $qty = $invoice_detail->quantity;
+
+                $invoice_detail->update([
+                    'price' => $price,
+                    'total' => $qty * $price,
+                ]);
             }
+
+            $inv_edit = Invoice::with('invoice_details')->where('id', 76)->first();
+            $inv_edit->update([
+                'nominal' => $inv_edit->invoice_details->sum('total')
+            ]);
+
+            $order_edit = Order::with('order_details')->where('id', 8)->first();
+
+            Tagihan::where('order_id', 8)->update([
+                'total' => $order_edit->order_details->sum('total'),
+                'tagihan' => $inv_edit->invoice_details->sum('total')
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e->getMessage());
         }
-        dd($fakap);
         dd('done');
     }
 
