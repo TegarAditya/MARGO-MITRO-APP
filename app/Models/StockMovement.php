@@ -27,6 +27,7 @@ class StockMovement extends Model
         'created_at',
         'updated_at',
         'deleted_at',
+        'date'
     ];
 
     protected $fillable = [
@@ -36,6 +37,7 @@ class StockMovement extends Model
         'quantity',
         'stock_awal',
         'stock_akhir',
+        'date',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -49,6 +51,16 @@ class StockMovement extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function getDateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
+    }
+
+    public function setDateAttribute($value)
+    {
+        $this->attributes['date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
     }
 
     public function referensi() {

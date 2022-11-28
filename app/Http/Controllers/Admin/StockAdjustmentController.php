@@ -131,7 +131,10 @@ class StockAdjustmentController extends Controller
                         'reference' => $stockAdjustment->id,
                         'type' => 'adjustment',
                         'quantity' => $qty,
+                        'stock_awal' => $item->stock,
+                        'stock_akhir' => $item->stock + $qty,
                         'product_id' => $item->id,
+                        'date' => $request->date,
                     ]);
                     $item->update(['stock' => $item->stock + $qty ]);
 
@@ -243,6 +246,10 @@ class StockAdjustmentController extends Controller
                     'product_id' => $item->id,
                 ],[
                     'quantity' => $qty,
+                    'stock_awal' => $item->stock,
+                    'stock_akhir' => $item->stock + $qty,
+                    'product_id' => $item->id,
+                    'date' => $request->date,
                 ]);
                 $item->update(['stock' => $item->stock + $qty ]);
 

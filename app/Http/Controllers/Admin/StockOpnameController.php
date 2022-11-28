@@ -11,9 +11,11 @@ use App\Models\Semester;
 use Gate;
 use DB;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Exports\Admin\StockDetailExport;
+use Carbon\Carbon;
 
 class StockOpnameController extends Controller
 {
@@ -97,6 +99,15 @@ class StockOpnameController extends Controller
     public function stockDetail(Request $request)
     {
         $covers = Brand::all();
+
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+
         $title = Product::select(['name', 'isi_id', 'kelas_id', 'halaman_id', 'semester_id', 'tipe_pg'])
             ->where(function($q) {
                 $q->where('stock', '!=', 0)
@@ -113,12 +124,19 @@ class StockOpnameController extends Controller
             ->sortBy('tiga_nama')
             ->sortByDesc('semester_id');
 
-        $products = Product::withCount([
-            'stock_movements as masuk' => function($query) {
-                $query->where('quantity', '>', 0)->select(DB::raw('SUM(quantity)'));
-            }, 'stock_movements as keluar' => function($query) {
-                $query->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
+        $products = Product::withCount(['stock_movements as masuk' => function($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])
+                ->where('quantity', '>', 0)->select(DB::raw('SUM(quantity)'));
+            }, 'stock_movements as keluar' => function($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])
+                ->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
             }])
+            ->with(['stock_movements' => function($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])->orderBy('id', 'DESC');
+            }])
+            ->whereHas('stock_movements', function($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end]);
+            })
             ->where('semester_id', $request->semester)
             ->where('jenjang_id', $request->jenjang)
             ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
@@ -127,21 +145,33 @@ class StockOpnameController extends Controller
         $jenjang = Category::find($request->jenjang);
         $semester = Semester::find($request->semester);
         $pg = $request->pg;
+        $tanggal = date('d-m-Y', strtotime($start)) .' - '. date('d-m-Y', strtotime($end));
 
         if ($request->export === 'export') {
-            return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.'.xlsx');
+            return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.' Tanggal '.$tanggal.'.xlsx');
         }
 
-        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang', 'pg', 'semester'));
+        return view('admin.stockOpnames.detail', compact('covers', 'title', 'products', 'jenjang', 'pg', 'semester', 'tanggal'));
     }
 
     public function stockExport(Request $request)
     {
         $covers = Brand::all();
+
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+
         $title = Product::select(['name', 'isi_id', 'kelas_id', 'halaman_id', 'semester_id', 'tipe_pg'])
             ->where(function($q) {
                 $q->where('stock', '!=', 0)
-                ->orWhereHas('stock_movements');
+                ->orWhereHas('stock_movements', function($query){
+                    $query->whereBetween('created_at', [$start, $end]);
+                });
             })
             ->where('jenjang_id', $request->jenjang)
             ->where('semester_id', $request->semester)
@@ -154,20 +184,32 @@ class StockOpnameController extends Controller
             ->sortBy('tiga_nama')
             ->sortByDesc('semester_id');
 
-        $products = Product::withCount([
-            'stock_movements as masuk' => function($query) {
-                $query->where('quantity', '>', 0)->select(DB::raw('SUM(quantity)'));
-            }, 'stock_movements as keluar' => function($query) {
-                $query->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
+        $products = Product::withCount(['stock_movements as masuk' => function($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])
+                ->where('quantity', '>', 0)->select(DB::raw('SUM(quantity)'));
+            }, 'stock_movements as keluar' => function($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])
+                ->where('quantity', '<', 0)->select(DB::raw('sum(quantity)'));
             }])
-            ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
-            ->where('jenjang_id', $request->jenjang)
+            ->with(['stock_movements' => function($query) use ($start, $end) {
+                $query->whereBetween('created_at', [$start, $end])->orderBy('id', 'DESC');
+            }])
+            ->whereHas('stock_movements', function($query){
+                $query->whereBetween('created_at', [$start, $end]);
+            })
             ->where('semester_id', $request->semester)
+            ->where('jenjang_id', $request->jenjang)
+            ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
             ->get();
 
-        $jenjang = Category::find($request->jenjang);
-        $pg = $request->pg;
 
-        return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.'.xlsx');
+        $jenjang = Category::find($request->jenjang);
+        $semester = Semester::find($request->semester);
+        $pg = $request->pg;
+        $tanggal = date('d-m-Y', strtotime($start)) .' - '. date('d-m-Y', strtotime($end));
+
+        if ($request->export === 'export') {
+            return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.' Tanggal '.$tanggal.'.xlsx');
+        }
     }
 }

@@ -129,6 +129,9 @@ class RealisasiController extends Controller
                     'type' => 'realisasi',
                     'quantity' => $qty,
                     'product_id' => $item->id,
+                    'stock_awal' => $item->stock,
+                    'stock_akhir' => $item->stock + $qty,
+                    'date' => $request->date,
                 ]);
                 $item->update([ 'stock' => $item->stock + $qty ]);
 
@@ -246,7 +249,10 @@ class RealisasiController extends Controller
                     'reference' => $realisasi->id,
                     'type' => 'realisasi',
                     'quantity' => $qty,
+                    'stock_awal' => $item->stock,
+                    'stock_akhir' => $item->stock + $qty,
                     'product_id' => $item->id,
+                    'date' => $request->date,
                 ]);
                 $item->update([ 'stock' => $item->stock + $qty ]);
 

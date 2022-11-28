@@ -180,7 +180,10 @@ class InvoiceController extends Controller
                     'reference' => $invoice->id,
                     'type' => 'invoice',
                     'quantity' => -1 * $qty,
+                    'stock_awal' => $item->stock,
+                    'stock_akhir' => $item->stock - $qty,
                     'product_id' => $item->id,
+                    'date' => $request->date,
                 ]);
                 $item->update([ 'stock' => $item->stock - $qty ]);
 
@@ -215,7 +218,10 @@ class InvoiceController extends Controller
                         'reference' => $invoice->id,
                         'type' => 'kelengkapan',
                         'quantity' => -1 * $qty_bonus,
+                        'stock_awal' => $bonus_product->stock,
+                        'stock_akhir' => $bonus_product->stock - $qty_bonus,
                         'product_id' => $bonus_product->id,
+                        'date' => $request->date,
                     ]);
                     $bonus_product->update([ 'stock' => $bonus_product->stock - $qty_bonus ]);
                 }
@@ -338,6 +344,9 @@ class InvoiceController extends Controller
                     'product_id' => $item->id,
                 ],[
                     'quantity' => -1 * $qty,
+                    'stock_awal' => $item->stock,
+                    'stock_akhir' => $item->stock - $qty,
+                    'date' => $request->date,
                 ]);
                 $item->update([ 'stock' => $item->stock - $qty ]);
 
@@ -376,6 +385,9 @@ class InvoiceController extends Controller
                         'product_id' => $bonus_product->id
                     ], [
                         'quantity' => -1 * $qty_bonus,
+                        'stock_awal' => $bonus_product->stock,
+                        'stock_akhir' => $bonus_product->stock - $qty_bonus,
+                        'date' => $request->date,
                     ]);
                     $bonus_product->update([ 'stock' => $bonus_product->stock - $qty_bonus ]);
                 }
@@ -694,6 +706,9 @@ class InvoiceController extends Controller
                             'type' => 'invoice',
                             'quantity' => -1 * $qty,
                             'product_id' => $item->id,
+                            'stock_awal' => $item->stock,
+                            'stock_akhir' => $item->stock - $qty,
+                            'date' => $request->date,
                         ]);
                         $item->update([ 'stock' => $item->stock - $qty ]);
 

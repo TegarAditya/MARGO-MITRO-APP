@@ -53,7 +53,7 @@
                     <div class="card-body">
                         <form action="{{ route('admin.stock-opnames.detail') }}">
                             <div class="row">
-                                <div class="col-4">
+                                <div class="col-3">
                                     <div class="form-group">
                                         <label for="jenjang">{{ trans('cruds.buku.fields.jenjang') }}</label>
                                         <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang" id="jenjang">
@@ -67,7 +67,7 @@
                                         <span class="help-block">{{ trans('cruds.buku.fields.jenjang_helper') }}</span>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-3">
                                     <div class="form-group">
                                         <label for="semester">{{ trans('cruds.buku.fields.semester') }}</label>
                                         <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
@@ -81,7 +81,7 @@
                                         <span class="help-block">{{ trans('cruds.buku.fields.semester_helper') }}</span>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-3">
                                     <div class="form-group">
                                         <label for="pg">Tipe PG</label>
                                         <select class="form-control select2 {{ $errors->has('pg') ? 'is-invalid' : '' }}" name="pg" id="pg">
@@ -92,6 +92,28 @@
                                             <span class="text-danger">{{ $errors->first('pg') }}</span>
                                         @endif
                                     </div>
+                                </div>
+                                <div class="col-3">
+                                    <x-admin.form-group
+                                        type="text"
+                                        id="date"
+                                        name="date"
+                                        containerClass=" m-0"
+                                        boxClass=" px-2 py-1"
+                                        class="form-control-sm"
+                                        value="{{ request('date', old('date'))}}"
+                                        placeholder="Pilih Tanggal"
+                                    >
+                                        <x-slot name="label">
+                                            <label for="date">Tanggal</label>
+                                        </x-slot>
+
+                                        <x-slot name="right">
+                                            <button type="button" class="btn btn-sm border-0 btn-default px-2 date-clear" data-action="+" style="display:{{ !request('date', old('date')) ? 'none' : 'block' }}">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </x-slot>
+                                    </x-admin.form-group>
                                 </div>
                             </div>
 
@@ -305,6 +327,41 @@
 
 @section('scripts')
 @parent
+<script src="https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.umd.min.js"></script>
+
+<script>
+(function($) {
+    $(function() {
+        var picker = new easepick.create({
+            element: $('#date').get(0),
+            css: [
+                'https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.css',
+            ],
+            plugins: ['RangePlugin', 'LockPlugin'],
+            RangePlugin: {
+                tooltip: true,
+            },
+            LockPlugin: {
+                maxDate: new Date(),
+            },
+        });
+
+        picker.on('select', function(e) {
+            $('#date').trigger('change');
+            $('.date-clear').show();
+        });
+
+        $('.date-clear').on('click', function(e) {
+            e.preventDefault();
+
+            picker.clear();
+            $(e.currentTarget).hide();
+        });
+
+    });
+})(jQuery);
+</script>
+
 <script>
 $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)

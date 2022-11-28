@@ -303,62 +303,170 @@ class HomeController
     //     dd($e->getMessage());
     // }
 
+    //ubah harga
+
+    // DB::beginTransaction();
+    //     try {
+    //         $order = Order::with(['order_details' => function($q) {
+    //             $q->where('price', 2600);
+    //         }])->where('id', 18)->first();
+
+    //         foreach($order->order_details as $order_detail) {
+    //             $price = 2200;
+    //             $qty = $order_detail->quantity;
+
+    //             $order_detail->update([
+    //                 'price' => $price,
+    //                 'total' => $qty * $price,
+    //             ]);
+    //         }
+
+    //         $invoice = Invoice::with(['invoice_details' => function($q) {
+    //             $q->where('price', 2600);
+    //         }])->where('id', 62)->first();
+
+    //         foreach($invoice->invoice_details as $invoice_detail) {
+    //             $price = 2200;
+    //             $qty = $invoice_detail->quantity;
+
+    //             $invoice_detail->update([
+    //                 'price' => $price,
+    //                 'total' => $qty * $price,
+    //             ]);
+    //         }
+
+    //         $inv_edit = Invoice::with('invoice_details')->where('id', 62)->first();
+    //         $inv_edit->update([
+    //             'nominal' => $inv_edit->invoice_details->sum('total')
+    //         ]);
+
+    //         $order_edit = Order::with('order_details')->where('id', 18)->first();
+
+    //         Tagihan::where('order_id', 18)->update([
+    //             'total' => $order_edit->order_details->sum('total'),
+    //             'tagihan' => $inv_edit->invoice_details->sum('total')
+    //         ]);
+
+    //         $orderAll = Order::with('order_details')->get();
+    //         foreach($orderAll as $order) {
+    //             $order->update([
+    //                 'nominal' => $order->order_details->sum('total')
+    //             ]);
+    //         }
+    //         DB::commit();
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+
+    //         dd($e->getMessage());
+    //     }
+
 
     public function god(){
-        DB::beginTransaction();
-        try {
-            $order = Order::with(['order_details' => function($q) {
-                $q->where('price', 2600);
-            }])->where('id', 18)->first();
+        set_time_limit(0);
+        $fakap = collect();
+        $products = Product::with(['stock_movements' => function ($q) {
+                    $q->orderBy('id', 'DESC');
+                }])->whereHas('stock_movements')->get();
 
-            foreach($order->order_details as $order_detail) {
-                $price = 2200;
-                $qty = $order_detail->quantity;
-
-                $order_detail->update([
-                    'price' => $price,
-                    'total' => $qty * $price,
-                ]);
+        foreach($products as $product) {
+            if ($product->stock_movements->count() > 0) {
+                $movement = $product->stock_movements->first();
+                if ($product->stock !== $movement->stock_akhir) {
+                    $fakap->push([
+                        'id' => $movement->product_id,
+                        'stock_akhir' => $movement->stock_akhir,
+                        'stock' => $product->stock
+                    ]);
+                }
             }
-
-            $invoice = Invoice::with(['invoice_details' => function($q) {
-                $q->where('price', 2600);
-            }])->where('id', 62)->first();
-
-            foreach($invoice->invoice_details as $invoice_detail) {
-                $price = 2200;
-                $qty = $invoice_detail->quantity;
-
-                $invoice_detail->update([
-                    'price' => $price,
-                    'total' => $qty * $price,
-                ]);
-            }
-
-            $inv_edit = Invoice::with('invoice_details')->where('id', 62)->first();
-            $inv_edit->update([
-                'nominal' => $inv_edit->invoice_details->sum('total')
-            ]);
-
-            $order_edit = Order::with('order_details')->where('id', 18)->first();
-
-            Tagihan::where('order_id', 18)->update([
-                'total' => $order_edit->order_details->sum('total'),
-                'tagihan' => $inv_edit->invoice_details->sum('total')
-            ]);
-
-            $orderAll = Order::with('order_details')->get();
-            foreach($orderAll as $order) {
-                $order->update([
-                    'nominal' => $order->order_details->sum('total')
-                ]);
-            }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            dd($e->getMessage());
         }
+        dd($fakap);
         dd('done');
     }
+
+    //mbenerke stock pg
+    // DB::beginTransaction();
+    // try {
+    //     $products = Product::with(['stock_movements'])->whereHas('stock_movements')
+    //         ->where('semester_id', 7)->where('tipe_pg', '!=', 'buku')->get();
+
+    //     foreach($products as  $product) {
+    //         $stock = 0;
+    //         foreach($product->stock_movements as $movement) {
+    //             $stock_awal = $stock;
+    //             $stock_akhir = $stock_awal + $movement->quantity;
+    //             $movement->update(['stock_awal' => $stock_awal, 'stock_akhir' => $stock_akhir]);
+    //             $stock = $stock_akhir;
+    //         }
+    //         $product->update(['stock' => $stock]);
+    //     }
+    //     DB::commit();
+    // } catch (\Exception $e) {
+    //     DB::rollback();
+
+    //     dd($e->getMessage());
+    // }
+    // dd('done');
+
+    //mbenerke movement buku
+    // DB::beginTransaction();
+    // try {
+    //     $products = Product::with(['stock_movements' => function ($q) {
+    //         $q->latest();
+    //     }])->whereHas('stock_movements')->get();
+
+    //     foreach($products as  $product) {
+    //         $stock = $product->stock;
+    //         foreach($product->stock_movements as $movement) {
+    //             $stock_akhir = $stock;
+    //             $stock_awal = $stock - $movement->quantity;
+    //             $movement->update(['stock_awal' => $stock_awal, 'stock_akhir' => $stock_akhir]);
+    //             $stock = $stock_awal;
+    //         }
+    //     }
+    //     DB::commit();
+    // } catch (\Exception $e) {
+    //     DB::rollback();
+
+    //     dd($e->getMessage());
+    // }
+
+    //Ngecek movement karo stock
+    // $fakap = collect();
+    // $products = Product::with(['stock_movements' => function ($q) {
+    //             $q->orderBy('id', 'DESC');
+    //         }])->whereHas('stock_movements')->get();
+
+    // foreach($products as $product) {
+    //     if ($product->stock_movements->count() > 0) {
+    //         $movement = $product->stock_movements->first();
+    //         if ($product->stock !== $movement->stock_akhir) {
+    //             $fakap->push([
+    //                 'id' => $movement->product_id,
+    //                 'stock_akhir' => $movement->stock_akhir,
+    //                 'stock' => $product->stock
+    //             ]);
+    //         }
+    //     }
+    // }
+    // dd($fakap);
+
+    // $fakap = collect();
+    // $products = Product::with(['stock_movements' => function ($q) {
+    //             $q->orderBy('id', 'ASC');
+    //         }])->whereHas('stock_movements')->get();
+
+    // foreach($products as $product) {
+    //     if ($product->stock_movements->count() > 0) {
+    //         $movement = $product->stock_movements->first();
+    //         if ($movement->stock_awal !== 0) {
+    //             $fakap->push([
+    //                 'id' => $movement->product_id,
+    //                 'stock_awal' => $movement->stock_awal,
+    //                 'stock' => $product->stock
+    //             ]);
+    //         }
+    //     }
+    // }
+    // dd($fakap);
 }

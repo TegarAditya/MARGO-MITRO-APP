@@ -12,7 +12,7 @@
 @endphp
 <div class="card">
     <div class="card-header">
-        Laporan Stock {{ ucwords($pg) }} Jenjang {{ $jenjang->name }} {{ $semester->name }}
+        Laporan Stock {{ ucwords($pg) }} Jenjang {{ $jenjang->name }} {{ $semester->name }} Tanggal {{ $tanggal }}
     </div>
 
     <div class="card-body">
@@ -26,7 +26,7 @@
                             Tema/Mapel
                         </th>
                         @foreach ($covers as $cover)
-                            <th colspan="6">
+                            <th colspan="7">
                                 {{ $cover->name }}
                             </th>
                         @endforeach
@@ -37,14 +37,20 @@
 
                             </th>
                             <th>
+                                Stock Awal
+                            </th>
+                            <th>
                                 Masuk
                             </th>
                             <th>
                                 Keluar
                             </th>
                             <th>
-                                Sisa
+                                Stock Akhir
                             </th>
+                            {{-- <th>
+                                Stock Real
+                            </th> --}}
                             <th>
                                 HPP
                             </th>
@@ -68,8 +74,20 @@
                                         ->where('halaman_id', $item->halaman_id)->where('semester_id', $item->semester_id)->where('brand_id', $cover->id)->first();
                                 @endphp
                                 @if($result)
+                                    @php
+                                        if ($result->stock_movements->count() > 0) {
+                                            $stock_akhir = $result->stock_movements->first()->stock_akhir;
+                                            $stock_awal = $result->stock_movements->sortBy('id')->first()->stock_awal;
+                                        } else {
+                                            $stock_akhir = 0;
+                                            $stock_awal = 0;
+                                        }
+                                    @endphp
                                     <td>
                                         <a href="{{ route('admin.buku.show', $result->id) }}"><i class="fas fa-eye text-success  fa-lg"></i></a>
+                                    </td>
+                                    <td class="text-center">
+                                        {{ number_format($stock_awal,0,",",".") }}
                                     </td>
                                     <td class="text-center">
                                         {{ $result->masuk ? number_format($result->masuk,0,",",".") : 0 }}
@@ -78,16 +96,20 @@
                                         {{ $result->keluar ?  number_format(abs($result->keluar),0,",",".") : 0 }}
                                     </td>
                                     <td class="text-center">
-                                        {{ number_format($result->stock,0,",",".") }}
+                                        {{ number_format($stock_akhir,0,",",".") }}
                                     </td>
+                                    {{-- <td class="text-center">
+                                        {{ number_format($result->stock,0,",",".") }}
+                                    </td> --}}
                                     <td class="text-right">
                                         @money($result->hpp)
                                     </td>
                                     <td class="text-right">
-                                        @money($result->harga_stock)
+                                        @money($stock_akhir * $result->hpp)
                                     </td>
                                 @else
                                     <td class="text-center"></td>
+                                    <td class="text-center">-</td>
                                     <td class="text-center">-</td>
                                     <td class="text-center">-</td>
                                     <td class="text-center">-</td>
@@ -108,11 +130,14 @@
                                 $summary = $products->where('brand_id', $cover->id);
                             @endphp
                             <td class="text-center"></td>
+                            <td class="text-center"></td>
                             <td class="text-center">{{ number_format($summary->sum('masuk'),0,",",".") }}</td>
                             <td class="text-center">{{ number_format(abs($summary->sum('keluar')),0,",",".") }}</td>
-                            <td class="text-center">{{ number_format($summary->sum('stock'),0,",",".") }}</td>
                             <td class="text-center"></td>
-                            <td class="text-right">@money($summary->sum('harga_stock'))</td>
+                            {{-- <td class="text-center">{{ number_format($summary->sum('stock'),0,",",".") }}</td> --}}
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            {{-- <td class="text-right">@money($summary->sum('harga_stock'))</td> --}}
                         @endforeach
                     </tr>
                 </tfoot>

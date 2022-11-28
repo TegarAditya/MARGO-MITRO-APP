@@ -40,9 +40,10 @@ class StockDetailExport implements FromCollection, ShouldAutoSize
         $covers = Brand::all();
 
         foreach($covers as $cover) {
+            $atas[$cover->slug. 'awal'] = $cover->name. '  Stock Awal';
             $atas[$cover->slug. 'masuk'] = $cover->name. '  Masuk';
             $atas[$cover->slug. 'keluar'] = $cover->name. '  Keluar';
-            $atas[$cover->slug. 'sisa'] = $cover->name. '  Sisa';
+            $atas[$cover->slug. 'akhir'] = $cover->name. '  Stock Akhir';
             $atas[$cover->slug. 'hpp'] = $cover->name. '  HPP';
             $atas[$cover->slug. 'total'] = $cover->name. '  Total';
         }
@@ -65,15 +66,25 @@ class StockDetailExport implements FromCollection, ShouldAutoSize
                         ->where('halaman_id', $title->halaman_id)->where('semester_id', $title->semester_id)->where('brand_id', $cover->id)->first();
 
                 if($result) {
+                    if ($result->stock_movements->count() > 0) {
+                        $stock_akhir = $result->stock_movements->first()->stock_akhir;
+                        $stock_awal = $result->stock_movements->sortBy('id')->first()->stock_awal;
+                    } else {
+                        $stock_akhir = 0;
+                        $stock_awal = 0;
+                    }
+
+                    $row[$cover->slug. 'awal'] = (string) ($stock_awal ?? 0) ;
                     $row[$cover->slug. 'masuk'] = (string) ($result->masuk ?? 0) ;
                     $row[$cover->slug. 'keluar'] = (string) ($result->keluar ? abs($result->keluar) : 0);
-                    $row[$cover->slug. 'sisa'] = (string) ($result->stock ?? 0);
+                    $row[$cover->slug. 'akhir'] = (string) ($stock_akhir ?? 0);
                     $row[$cover->slug. 'hpp'] = (string) ($result->hpp ?? 0);
                     $row[$cover->slug. 'total'] = (string) ($result->harga_stock ?? 0);
                 } else {
+                    $row[$cover->slug. 'awal'] = '-';
                     $row[$cover->slug. 'masuk'] = '-';
                     $row[$cover->slug. 'keluar'] = '-';
-                    $row[$cover->slug. 'sisa'] = '-';
+                    $row[$cover->slug. 'akhir'] = '-';
                     $row[$cover->slug. 'hpp'] = '-';
                     $row[$cover->slug. 'total'] = '-';
                 }
