@@ -2,9 +2,9 @@
 @section('content')
 <div style="margin-bottom: 10px;" class="row">
     <div class="col-lg-12">
-        <a class="btn btn-warning" href="{{ route('admin.stock-opnames.export', ['jenjang' => $jenjang->id, 'pg' => $pg, 'semester' => $semester->id]) }}">
+        {{-- <a class="btn btn-warning" href="{{ route('admin.stock-opnames.export', ['jenjang' => $jenjang->id, 'pg' => $pg, 'semester' => $semester->id]) }}">
             Export Stock
-        </a>
+        </a> --}}
     </div>
 </div>
 @php
