@@ -79,7 +79,7 @@ class StockDetailExport implements FromCollection, ShouldAutoSize
                     $row[$cover->slug. 'keluar'] = (string) ($result->keluar ? abs($result->keluar) : 0);
                     $row[$cover->slug. 'akhir'] = (string) ($stock_akhir ?? 0);
                     $row[$cover->slug. 'hpp'] = (string) ($result->hpp ?? 0);
-                    $row[$cover->slug. 'total'] = (string) ($result->harga_stock ?? 0);
+                    $row[$cover->slug. 'total'] = (string) (($result->hpp * $stock_akhir) ?? 0);
                 } else {
                     $row[$cover->slug. 'awal'] = '-';
                     $row[$cover->slug. 'masuk'] = '-';
