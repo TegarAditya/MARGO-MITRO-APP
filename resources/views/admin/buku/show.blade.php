@@ -16,7 +16,7 @@
             <h3 class="mt-1">History Product Movement</h3>
             <h5 class="mt-2 mb-4">#BUKU: {{ $product->name }}</h5>
             <div class="mb-3 table-responsive">
-                <table class=" table table-bordered table-striped table-hover datatable datatable-StockMovement">
+                <table class="table table-bordered table-striped table-hover datatable datatable-movement">
                     <thead>
                         <tr>
                             <th></th>
@@ -235,20 +235,15 @@
 @section('scripts')
 @parent
 <script>
-    $(function () {
-  let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-
-  $.extend(true, $.fn.dataTable.defaults, {
-    orderCellsTop: true,
-    order: [[ 5, 'desc' ]],
-    pageLength: 25,
-  });
-  let table = $('.datatable-StockMovement:not(.ajaxTable)').DataTable({ buttons: dtButtons })
-  $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
-      $($.fn.dataTable.tables(true)).DataTable()
-          .columns.adjust();
-  });
-
+$(function () {
+    $('.datatable-movement').DataTable({
+        'paging'      : true,
+        'lengthChange': false,
+        'searching'   : false,
+        'ordering'    : false,
+        'info'        : true,
+        'autoWidth'   : false
+    })
 })
 
 </script>
