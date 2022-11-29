@@ -105,7 +105,7 @@ class StockOpnameController extends Controller
             $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
         } else {
             $start = Carbon::now()->startOfMonth();
-            $end = Carbon::now();
+            $end = Carbon::now()->endOfMonth();
         }
 
         $title = Product::select(['name', 'isi_id', 'kelas_id', 'halaman_id', 'semester_id', 'tipe_pg'])
@@ -163,15 +163,13 @@ class StockOpnameController extends Controller
             $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
         } else {
             $start = Carbon::now()->startOfMonth();
-            $end = Carbon::now();
+            $end = Carbon::now()->endOfMonth();
         }
 
         $title = Product::select(['name', 'isi_id', 'kelas_id', 'halaman_id', 'semester_id', 'tipe_pg'])
             ->where(function($q) {
                 $q->where('stock', '!=', 0)
-                ->orWhereHas('stock_movements', function($query){
-                    $query->whereBetween('created_at', [$start, $end]);
-                });
+                ->orWhereHas('stock_movements');
             })
             ->where('jenjang_id', $request->jenjang)
             ->where('semester_id', $request->semester)
@@ -194,7 +192,7 @@ class StockOpnameController extends Controller
             ->with(['stock_movements' => function($query) use ($start, $end) {
                 $query->whereBetween('created_at', [$start, $end])->orderBy('id', 'DESC');
             }])
-            ->whereHas('stock_movements', function($query){
+            ->whereHas('stock_movements', function($query) use ($start, $end) {
                 $query->whereBetween('created_at', [$start, $end]);
             })
             ->where('semester_id', $request->semester)
@@ -202,14 +200,11 @@ class StockOpnameController extends Controller
             ->where('tipe_pg', ($request->pg === 'buku' ? '=': '!='), 'non_pg')
             ->get();
 
-
         $jenjang = Category::find($request->jenjang);
         $semester = Semester::find($request->semester);
         $pg = $request->pg;
         $tanggal = date('d-m-Y', strtotime($start)) .' - '. date('d-m-Y', strtotime($end));
 
-        if ($request->export === 'export') {
-            return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.' Tanggal '.$tanggal.'.xlsx');
-        }
+        return (new StockDetailExport($jenjang, $products, $title))->download('Laporan Stock '.ucwords($pg).' Jenjang '.$jenjang->name.' Tanggal '.$tanggal.'.xlsx');
     }
 }
