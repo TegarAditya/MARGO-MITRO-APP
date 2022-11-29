@@ -54,6 +54,10 @@ class ReportOrdersExport implements FromCollection, ShouldAutoSize
                 $product = $detail->product;
                 $bonus = $detail->bonus;
 
+                if (!$product) {
+                    continue;
+                }
+
                 $row = [
                     'no' => $i,
                     'no_order' => $order->no_order,
