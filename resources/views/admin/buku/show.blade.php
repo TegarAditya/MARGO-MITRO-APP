@@ -27,7 +27,13 @@
                                 {{ trans('cruds.stockMovement.fields.reference') }}
                             </th>
                             <th>
+                                Stock Awal
+                            </th>
+                            <th>
                                 {{ trans('cruds.stockMovement.fields.quantity') }}
+                            </th>
+                            <th>
+                                Stock Akhir
                             </th>
                             <th>
                                 Stock
@@ -62,7 +68,13 @@
                                     @endif
                                 </td>
                                 <td>
+                                    {{ $stockMovement->stock_awal ?? '' }}
+                                </td>
+                                <td>
                                     {{ $stockMovement->quantity ?? '' }}
+                                </td>
+                                <td>
+                                    {{ $stockMovement->stock_akhir ?? '' }}
                                 </td>
                                 <td>
                                     {{ $stock_actual }}
