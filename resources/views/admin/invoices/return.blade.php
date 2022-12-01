@@ -76,15 +76,19 @@
                         <h5 class="product-group-title">{{ $item['label'] }}</h5>
 
                         <div class="product-list">
-                            @if ($item['items']->count())
-                                @each('admin.invoices.parts.item-invoice-detail', $item['items'], 'detail')
-                            @endif
-
                             @include('admin.invoices.parts.item-invoice-detail', [
                                 'detail' => new App\Models\OrderDetail,
                                 'modal' => $item['modal'],
                                 'name' => $item['name'],
                             ])
+
+                            @if ($item['items']->count())
+                                @php
+                                    $sortedProducts = $item['items']->sortByDesc('product.tipe_pg')->sortBy('product.halaman_id')->sortBy('product.kelas_id')->sortBy('product.name')->sortBy('product.jenjang_id');
+                                @endphp
+                                @each('admin.invoices.parts.item-invoice-detail', $sortedProducts, 'detail')
+                            @endif
+
                         </div>
 
                         <div class="product-action mb-1 mt-2 py-2 border-top{{ $errors->has($item['name']) ? '' : ' d-none'}}">
@@ -200,27 +204,39 @@
                             @php
                             $product = $detail->product;
                             $category = $product->category;
+                            $cover = $product->brand;
+                            $isi = $product->isi;
+                            $jenjang = $product->jenjang;
                             $search = implode(' ', [
-                                $product->name,
+                                $product->nama_buku,
                                 !$category ? '' : $category->name,
+                                !$cover ? '' : $cover->name,
+                                !$isi ? '' : $isi->name,
+                                !$jenjang ? '' : $jenjang->name,
                             ]);
                             $selected = $invoice_details->where('product_id', $product->id)->count();
 
-                            $order_detail = $order_details->where('product_id', $product->id)->first();
-                            // $disabled = (!$order_detail ? false : ($order_detail->moved >= $order_detail->quantity)) || ($product->stock <= 0);
+                            $order_detail = $order_details->where('product_id', $product->id);
+                            $sum_qty = $order_detail->sum('quantity');
+                            $sum_moved = $order_detail->sum('moved');
+                            $sum_total = $order_detail->sum('total');
+
+                            $bonus = $detail->bonus ?: null;
+
+                            $disabled = (!$order_detail ? false : ($sum_qty <= 0));
                             @endphp
                             <a
                                 href="{{ route('admin.products.show', $product->id) }}"
-                                class="product-select-item{{ $selected ? ' selected' : '' }}"
+                                class="product-select-item{{ $selected ? ' selected' : '' }}{{ $disabled ? ' disabled' : '' }}"
                                 data-search="{{ strtolower($search) }}"
                                 data-id="{{ $product->id }}"
-                                data-price="{{ $product->price }}"
+                                data-price="{{ $detail->price }}"
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
                                 @if ($detail)
-                                    data-qty="{{ $detail->quantity }}"
-                                    data-moved="{{ $detail->moved }}"
-                                    data-max="{{ $detail->moved }}"
+                                    data-qty="{{ $sum_qty }}"
+                                    data-moved="{{ $sum_moved }}"
+                                    data-max="{{ $sum_moved }}"
                                     data-order="{{ $detail->order_id }}"
                                 @endif
                                 @if ($foto = $product->foto->first())
@@ -239,19 +255,44 @@
 
                                     <div class="col">
                                         <div class="product-content">
-                                            <h6 class="text-sm product-name mb-1">{{ $product->name }}</h6>
+                                            <h6 class="text-sm product-name mb-1">{{ $product->nama_buku }}</h6>
 
                                             <p class="mb-0 text-sm">
-                                                Order Qty: <span class="product-qty-max">{{ $order_detail->quantity ?? '' }}</span>
+                                                Cover - Isi : <span class="product-category">{{ !$cover ? '' : $cover->name }} - {{ !$isi ? '' : $isi->name }}</span>
                                             </p>
 
                                             <p class="mb-0 text-sm">
+                                                Jenjang: <span class="product-category">{{ !$jenjang ? '' : $jenjang->name }}</span>
+                                            </p>
+
+                                            <p class="mb-0 text-sm text-bold">
+                                                Pesanan: <span class="product-qty-max">{{ $sum_qty ?? '' }}</span>
+                                            </p>
+
+                                            <p class="mb-0 text-sm text-bold">
                                                 Stock: <span class="product-stock">{{ $product->stock }}</span>
                                             </p>
 
-                                            <p class="mb-0 text-sm">
-                                                Terkirim: <span class="product-moved">{{ $order_detail->moved ?? '' }}</span>
+                                            <p class="mb-0 text-sm text-bold">
+                                                Terkirim: <span class="product-moved">{{ $sum_moved ?? '' }}</span>
                                             </p>
+                                        </div>
+                                        <div style="display: none">
+                                            <div class="product-pg">
+                                                <h6 class="text-sm product-name mb-1">Kelengkapan</h6>
+
+                                            <p class="mb-0 text-sm">
+                                                    Pesanan: <span class="product-qty-max">{{ !$bonus ? '' : $bonus->quantity }}</span>
+                                            </p>
+
+                                                <p class="mb-0 text-sm">
+                                                    Stock: <span class="product-stock">{{ !$bonus ? '' :  $bonus->product->stock }}</span>
+                                                </p>
+
+                                                <p class="mb-0 text-sm">
+                                                    Terkirim: <span class="product-moved">{{ !$bonus ? '' : $bonus->moved }}</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -292,14 +333,14 @@
     pointer-events: none;
 }
 
-.product-list > .item-product:last-child .product-delete {
+    .product-list > .item-product:first-child .product-delete {
     opacity: 0.5;
     pointer-events: none;
     background-color: #aeaeae;
     border-color: #969696;
 }
 
-.product-list > .item-product:last-child > .product-col-content {
+    .product-list > .item-product:first-child > .product-col-content {
     opacity: 0.66;
     pointer-events: none;
 }
@@ -472,7 +513,7 @@
                 var product = productFake.clone();
 
                 !products.children('.item-product').length && products.html('');
-                product.appendTo(products);
+                product.prependTo(products);
 
                 bindProduct(product);
                 group.find('.product-action').hide();

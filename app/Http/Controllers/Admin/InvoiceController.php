@@ -695,7 +695,7 @@ class InvoiceController extends Controller
                         'tagihan' => $order->invoices()->sum('nominal') ?: 0
                     ]);
 
-                    $products = Product::where('id', $element['product_id'])->get()->map(function($item) use ($invoice, $order, $element, $multiplier) {
+                    $products = Product::where('id', $element['product_id'])->get()->map(function($item) use ($invoice, $order, $element, $multiplier, $request) {
                         $qty = (int) $element['qty'] ?: 0;
                         $price = (float) $element['price'] ?: 0;
 
@@ -713,7 +713,7 @@ class InvoiceController extends Controller
                         $item->update([ 'stock' => $item->stock - $qty ]);
 
                         $order->order_details()->where('product_id', $item->id)->update([
-                            'moved' => DB::raw("order_details.moved + $qty"),
+                            'retur' => DB::raw("order_details.retur - $qty"),
                         ]);
 
                         return [
