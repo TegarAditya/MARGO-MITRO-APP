@@ -206,7 +206,8 @@ class InvoiceController extends Controller
                     $bonus = InvoicePackage::create([
                         'product_id' => $order_bonus->product_id,
                         'invoice_detail_id' => $invoice_detail->id,
-                        'quantity' => $qty_bonus
+                        'quantity' => $qty_bonus,
+                        'invoice_id' => $invoice->id,
                     ]);
                     $order_bonus->update([
                         'moved' => $order_bonus->move + $qty_bonus,
@@ -682,19 +683,19 @@ class InvoiceController extends Controller
             foreach($row as $key => $value) {
                 $order = Order::findOrFail($key);
 
+                $invoice = Invoice::create([
+                    'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
+                    'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
+                    'date' => $request->date,
+                    'nominal' => $multiplier * (float) $value->sum('nominal'),
+                    'order_id' => $order->id
+                ]);
+
+                $order->tagihan()->update([
+                    'tagihan' => $order->invoices()->sum('nominal') ?: 0
+                ]);
+
                 foreach($value as $element) {
-                    $invoice = Invoice::create([
-                        'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
-                        'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
-                        'date' => $request->date,
-                        'nominal' => $multiplier * (float) $value->sum('nominal'),
-                        'order_id' => $order->id
-                    ]);
-
-                    $order->tagihan()->update([
-                        'tagihan' => $order->invoices()->sum('nominal') ?: 0
-                    ]);
-
                     $products = Product::where('id', $element['product_id'])->get()->map(function($item) use ($invoice, $order, $element, $multiplier, $request) {
                         $qty = (int) $element['qty'] ?: 0;
                         $price = (float) $element['price'] ?: 0;
@@ -724,9 +725,9 @@ class InvoiceController extends Controller
                             'total' => $qty * $price,
                         ];
                     });
-
-                    $invoice->invoice_details()->createMany($products->all());
                 }
+
+                $invoice->invoice_details()->createMany($products->all());
             }
 
             DB::commit();
