@@ -261,6 +261,11 @@
                                     data-pgqty="{{ $bonus->quantity ?? 0 }}"
                                     data-pgmoved="{{ $bonus->moved ?? 0}}"
                                     data-pgmax="{{ ($bonus->quantity - $bonus->moved) ?? 0 }}"
+                                    @php
+                                        if (!$bonus->product->id) {
+                                            dd($bonus);
+                                        }
+                                    @endphp
                                 @endif
                                 @if ($detail)
                                     data-qty="{{ $sum_qty }}"
