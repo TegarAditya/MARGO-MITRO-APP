@@ -65,6 +65,11 @@
                     Export Excel
                 </a>
             </div>
+            <div class="col-auto">
+                <a href="#" class="btn btn-default export-btn" data-export="export">
+                    Export Rekap Sisa
+                </a>
+            </div>
         </div>
 
         <table class="mt-3 table table-bordered table-invoices">

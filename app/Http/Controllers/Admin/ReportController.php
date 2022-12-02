@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Exports\Admin\ReportOrdersExport;
+use App\Exports\Admin\ReportSisaOrdersExport;
 use App\Exports\Admin\ReportInvoicesExport;
 use App\Exports\Admin\ReportPembayaransExport;
 use App\Exports\Admin\ReportRealisasisExport;
@@ -50,6 +51,8 @@ class ReportController extends Controller
 
         if ($request->export === 'excel') {
             return (new ReportOrdersExport($orders))->download('report-orders.xlsx');
+        } else if ($request->export === 'export') {
+            return (new ReportSisaOrdersExport($orders))->download('report-sisa-orders.xlsx');
         }
 
         return view('admin.report.orders', compact('orders', 'salespersons'));
