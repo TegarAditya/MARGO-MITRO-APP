@@ -256,11 +256,11 @@
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
                                 @if($bonus)
-                                    data-pg="{{ $bonus->product->id }}"
-                                    data-pgstock="{{ $bonus->product->stock }}"
-                                    data-pgqty="{{ $bonus->quantity }}"
-                                    data-pgmoved="{{ $bonus->moved }}"
-                                    data-pgmax="{{ $bonus->quantity - $bonus->moved }}"
+                                    data-pg="{{ $bonus->product->id ?? 0 }}"
+                                    data-pgstock="{{ $bonus->product->stock ?? 0 }}"
+                                    data-pgqty="{{ $bonus->quantity ?? 0 }}"
+                                    data-pgmoved="{{ $bonus->moved ?? 0}}"
+                                    data-pgmax="{{ ($bonus->quantity - $bonus->moved) ?? 0 }}"
                                 @endif
                                 @if ($detail)
                                     data-qty="{{ $sum_qty }}"
