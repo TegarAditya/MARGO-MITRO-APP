@@ -245,7 +245,8 @@
 
                             $bonus = $detail->bonus ?: null;
 
-                            $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty)) || ($product->stock <= 0);
+                            // $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty)) || ($product->stock <= 0);
+                            $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty));
                             @endphp
                             <a
                                 href="{{ route('admin.products.show', $product->id) }}"
@@ -503,7 +504,8 @@
 
                 qty.on('change blur', function(e) {
                     var el = $(e.currentTarget);
-                    var qtyMax = parseInt(Math.min(product.data('max'), product.data('stock')) || 0);
+                    // var qtyMax = parseInt(Math.min(product.data('max'), product.data('stock')) || 0);
+                    var qtyMax = parseInt(product.data('max') || 0);
                     var qtyMin = parseInt(product.find('.product-qty').attr('min') || 0);
                     var valueNum = parseInt(el.val());
                     var value = (isNaN(valueNum) || valueNum <= 0) ? qtyMin : valueNum;
