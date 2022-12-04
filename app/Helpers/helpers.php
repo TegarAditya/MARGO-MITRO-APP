@@ -21,4 +21,13 @@ if (! function_exists('money')) {
         return formatCurrency($amount, 'IDR');
     }
 }
+
+if (! function_exists('angka')) {
+    function angka($angka)
+    {
+        return number_format($angka,0,',','.');
+    }
+}
+
+
 ?>

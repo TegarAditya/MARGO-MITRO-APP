@@ -50,8 +50,20 @@
     <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
         <thead>
             <tr>
+                <th width="1%" class="align-middle text-center">No.</th>
+                <th width="1%" class="align-middle">Cover</th>
+                <th class="align-middle">Tema/Mapel</th>
+                <th width="1%" class="align-middle">Kelas</th>
+                <th width="1%" class="align-middle text-center">Hal</th>
+                <th class="text-center">Sisa</th>
+                <th width="1%" class="text-center">Kelengkapan</th>
+            </tr>
+        </thead>
+
+        {{-- <thead>
+            <tr>
                 <th rowspan="2" width="1%" class="align-middle text-center">No.</th>
-                {{-- <th rowspan="2" class="align-middle">Jenjang</th> --}}
+                <th rowspan="2" class="align-middle">Jenjang</th>
                 <th rowspan="2" class="align-middle">Tema/Mapel</th>
                 <th rowspan="2" width="1%" class="align-middle">Kelas</th>
                 <th rowspan="2" width="1%" class="align-middle text-center">Hal</th>
@@ -67,7 +79,7 @@
                 <th class="text-center">Buku</th>
                 <th class="text-center">PG</th>
             </tr>
-        </thead>
+        </thead> --}}
 
         <tbody>
             @foreach ($value as $detail)
@@ -78,15 +90,12 @@
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>
                     {{-- <td>{{ $product->jenjang->name ?? '' }}</td> --}}
+                    <td>{{ $product->brand->name ?? '' }}</td>
                     <td>{{ $product->name }}</td>
                     <td class="text-center">{{ $product->kelas->name ?? '' }}</td>
                     <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
-                    <td class="text-center">{{ $detail->quantity }}</td>
-                    <td class="text-center">{{ $bonus ? $bonus->quantity : '-' }}</td>
-                    <td class="text-center">{{ $detail->moved }}</td>
-                    <td class="text-center">{{ $bonus ? $bonus->moved : '-' }}</td>
-                    <td class="text-center">{{ ($detail->quantity - $detail->moved) }}</td>
-                    <td class="text-center">{{ $bonus ? ($bonus->quantity - $bonus->moved) : '-' }}</td>
+                    <td class="text-center">{{ angka($detail->quantity - $detail->moved) }}</td>
+                    <td class="text-center">{{ $bonus ? angka($bonus->quantity - $bonus->moved) : '-' }}</td>
                 </tr>
             @endforeach
         </tbody>

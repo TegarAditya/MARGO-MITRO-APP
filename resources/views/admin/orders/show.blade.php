@@ -14,8 +14,8 @@
             </div>
 
             <div class="col-auto">
-                <a class="btn btn-info" href="{{ route('admin.stock-adjustments.edit', $order->id) }}">
-                    Edit Adjustment
+                <a class="btn btn-info" href="{{ route('admin.orders.edit', $order->id) }}">
+                    Edit Order
                 </a>
             </div>
         </div>

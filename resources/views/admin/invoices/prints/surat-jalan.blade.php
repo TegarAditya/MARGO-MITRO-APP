@@ -66,14 +66,19 @@
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
         <th width="1%" class="text-center">No.</th>
-        <th>Jenjang - Kelas</th>
+        <th>Jenjang</th>
+        <th width="1%">Cover</th>
         <th>Tema/Mapel</th>
+        <th width="1%" class="text-center">Kelas</th>
         <th width="1%" class="text-center">Hal</th>
         <th class="px-3" width="1%">Jumlah</th>
         <th class="px-3" width="1%">Kelengkapan</th>
     </thead>
 
     <tbody>
+        @php
+            $jenjang = null;
+        @endphp
         @foreach ($inv_details as $detail)
             @php
             $product = $detail->product;
@@ -83,13 +88,25 @@
                 $qty_bonus = $bonus->quantity;
             }
             @endphp
+            @if ($jenjang !== $product->jenjang->id)
+                @php
+                    $jenjang = $product->jenjang->id;
+                @endphp
+                <tr>
+                    <td class="text-center" colspan="8">
+                        <b>JENJANG {{ $product->jenjang->name ?? '' }}</b>
+                    </td>
+                <tr>
+            @endif
             <tr>
                 <td class="px-3">{{ $loop->iteration }}</td>
-                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
+                <td>{{ $product->jenjang->name ?? '' }}</td>
+                <td>{{ $product->brand->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
+                <td class="text-center">{{ $product->kelas->name ?? '' }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
-                <td class="px-3 text-center">{{ abs($detail->quantity) }}</td>
-                <td class="px-3 text-center">{{ $bonus ? abs($qty_bonus) : '-' }}</td>
+                <td class="px-3 text-center">{{ angka(abs($detail->quantity)) }}</td>
+                <td class="px-3 text-center">{{ $bonus ? angka(abs($qty_bonus)) : '-' }}</td>
             </tr>
         @endforeach
 
@@ -97,21 +114,33 @@
             @php
             $product = $detail->product;
             @endphp
+            @if ($jenjang !== $product->jenjang->id)
+                @php
+                    $jenjang = $product->jenjang->id;
+                @endphp
+                <tr>
+                    <td class="text-center" colspan="8">
+                        <b>JENJANG {{ $product->jenjang->name ?? '' }}</b>
+                    </td>
+                <tr>
+            @endif
             <tr>
                 <td class="px-3">{{ $loop->iteration }}</td>
-                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
+                <td>{{ $product->jenjang->name ?? '' }}</td>
+                <td>{{ $product->brand->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
+                <td class="text-center">{{ $product->kelas->name ?? '' }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
                 <td class="px-3 text-center">-</td>
-                <td class="px-3 text-center">{{ abs($detail->quantity) }}</td>
+                <td class="px-3 text-center">{{ angka(abs($detail->quantity)) }}</td>
             </tr>
         @endforeach
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="4" class="text-center"><strong>TOTAL</strong></th>
-            <th class="text-center"><strong>{{ $total_buku }}</strong></th>
-            <th class="text-center"><strong>{{ $total_kelengkapan }}</strong></th>
+            <th colspan="6" class="text-center"><strong>TOTAL</strong></th>
+            <th class="text-center"><strong>{{ angka($total_buku) }}</strong></th>
+            <th class="text-center"><strong>{{ angka($total_kelengkapan) }}</strong></th>
         </tr>
     </tfoot>
 </table>

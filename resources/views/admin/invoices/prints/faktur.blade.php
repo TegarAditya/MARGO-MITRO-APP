@@ -61,12 +61,13 @@
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
         <th width="1%" class="text-center">No.</th>
-        <th>Jenjang - Kelas</th>
+        <th>Jenjang</th>
         <th>Tema/Mapel</th>
+        <th width="1%" class="text-center">Kelas</th>
         <th width="1%" class="text-center">Hal</th>
-        <th width="15%" class="text-right">Harga</th>
+        <th width="12%" class="text-center">Harga</th>
         <th width="1%" class="text-center">Qty</th>
-        <th width="20%" class="text-right">Subtotal</th>
+        <th width="20%" class="text-center">Subtotal</th>
     </thead>
 
     <tbody>
@@ -76,18 +77,19 @@
             @endphp
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
-                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
+                <td>{{ $product->jenjang->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
+                <td class="text-center">{{ $product->kelas->name ?? '' }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
                 <td class="text-right">@money($item->price)</td>
-                <td class="text-center">{{ abs($item->quantity) }}</td>
+                <td class="text-center">{{ angka(abs($item->quantity) )}}</td>
                 <td class="text-right">@money(abs($item->total))</td>
             </tr>
         @endforeach
     </tbody>
 
     <thead>
-        <th colspan="7">Kelengkapan</th>
+        <th colspan="7">KELENGKAPAN</th>
     </thead>
 
     <tbody>
@@ -97,11 +99,12 @@
             @endphp
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
-                <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
+                <td>{{ $product->jenjang->name ?? '' }}</td>
                 <td>{{ $product->name }}</td>
+                <td class="text-center">{{ $product->kelas->name ?? '' }}</td>
                 <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
                 <td class="text-center">-</td>
-                <td class="text-center">{{ abs($item->quantity) }}</td>
+                <td class="text-center">{{ angka(abs($item->quantity)) }}</td>
                 <td class="text-right">@money(abs($item->total))</td>
             </tr>
         @endforeach
@@ -109,8 +112,8 @@
 
     <tfoot>
         <tr>
-            <td colspan="6" class="text-center px-3"><strong>Total</strong></td>
-            <td class="text-right">@money(abs($invoice->nominal))</td>
+            <td colspan="7" class="text-center px-3"><strong>Total</strong></td>
+            <td class="text-right"><b>@money(abs($invoice->nominal))</b></td>
         </tr>
     </tfoot>
 </table>
