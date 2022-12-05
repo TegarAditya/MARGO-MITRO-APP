@@ -82,7 +82,7 @@ class PembayaranController extends Controller
             $query->select(DB::raw('SUM(tagihan)'));
         }, 'tagihans as bayar' => function($query) {
             $query->select(DB::raw('SUM(saldo)'));
-        }])->whereHas('orders')->orderBy('pesanan', 'DESC')->get();
+        }])->whereHas('orders')->orderBy('id', 'ASC')->get();
 
         return view('admin.pembayarans.index', compact('saldos'));
     }
