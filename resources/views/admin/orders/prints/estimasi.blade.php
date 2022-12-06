@@ -46,7 +46,17 @@
 
 @section('content')
 @foreach ($groups as $key => $value)
-    <h6>JENJANG {{ $key }}</h6>
+    @if ($loop->first)
+        <h5 class="text-center my-3">JENJANG {{ $key }}</h5>
+    @else
+        <h5 class="pagebreak text-center my-3">JENJANG {{ $key }}</h5>
+    @endif
+
+    @php
+        $total_sisa = 0;
+        $total_pg = 0;
+    @endphp
+
     <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
         <thead>
             <tr>
@@ -60,32 +70,15 @@
             </tr>
         </thead>
 
-        {{-- <thead>
-            <tr>
-                <th rowspan="2" width="1%" class="align-middle text-center">No.</th>
-                <th rowspan="2" class="align-middle">Jenjang</th>
-                <th rowspan="2" class="align-middle">Tema/Mapel</th>
-                <th rowspan="2" width="1%" class="align-middle">Kelas</th>
-                <th rowspan="2" width="1%" class="align-middle text-center">Hal</th>
-                <th colspan="2" class="text-center">Pesanan</th>
-                <th colspan="2" class="text-center">Dikirim</th>
-                <th colspan="2" class="text-center">Sisa</th>
-            </tr>
-            <tr>
-                <th class="text-center">Buku</th>
-                <th class="text-center">PG</th>
-                <th class="text-center">Buku</th>
-                <th class="text-center">PG</th>
-                <th class="text-center">Buku</th>
-                <th class="text-center">PG</th>
-            </tr>
-        </thead> --}}
-
         <tbody>
             @foreach ($value as $detail)
                 @php
                 $product = $detail->product;
                 $bonus = $detail->bonus;
+                $sisa = $detail->quantity - $detail->moved;
+                $pg = $bonus ? $bonus->quantity - $bonus->moved : 0;
+                $total_sisa += $sisa;
+                $total_pg += $pg;
                 @endphp
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>
@@ -94,13 +87,19 @@
                     <td>{{ $product->name }}</td>
                     <td class="text-center">{{ $product->kelas->name ?? '' }}</td>
                     <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
-                    <td class="text-center">{{ angka($detail->quantity - $detail->moved) }}</td>
-                    <td class="text-center">{{ $bonus ? angka($bonus->quantity - $bonus->moved) : '-' }}</td>
+                    <td class="text-center">{{ angka($sisa) }}</td>
+                    <td class="text-center">{{ angka($pg)}}</td>
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <th class="align-middle" colspan="5"><b>Total</b></th>
+                <th class="text-center">{{ angka($total_sisa) }}</th>
+                <th width="1%" class="text-center">{{ angka($total_pg) }}</th>
+            </tr>
+        </tfoot>
     </table>
-    <br><br>
 @endforeach
 @endsection
 

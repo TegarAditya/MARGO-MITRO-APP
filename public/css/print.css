@@ -20,3 +20,10 @@ h1, h2, h3, h4, h5, h6 {
     padding-left: .75rem;
     padding-right: .75rem;
 }
+
+
+@media print {
+    .pagebreak {
+        page-break-before: always;
+    }
+  }
