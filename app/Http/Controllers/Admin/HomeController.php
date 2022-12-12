@@ -366,8 +366,7 @@ class HomeController
         DB::beginTransaction();
         try {
             $products = collect([]);
-            $order = Order::with('order_details')->where('id', 14)->get();
-
+            $order = Order::with('order_details')->where('id', 14)->first();
             foreach($order->order_details as $order_detail) {
                 if (!$order_detail->product) {
                     $products->push([
