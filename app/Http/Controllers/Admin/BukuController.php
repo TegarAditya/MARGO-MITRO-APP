@@ -155,6 +155,10 @@ class BukuController extends Controller
         try {
             foreach($kelas as $kelas_id) {
                 $request->merge(['kelas_id' => $kelas_id]);
+                if ($request->tipe_pg !== 'non_pg') {
+                    $request->name = Product::TIPE_PG_SELECT[$request->tipe_pg] .' - ' . $request->name;
+                }
+
                 $product = Product::create($request->all());
 
                 if ($request->jenis_pg !== 'no_pg') {
