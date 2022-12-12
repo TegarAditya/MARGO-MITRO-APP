@@ -368,7 +368,7 @@ class HomeController
             $products = collect([]);
             $order = Order::with('order_details')->where('id', 14)->get();
 
-            foreach($orders->order_details as $order_detail) {
+            foreach($order->order_details as $order_detail) {
                 if (!$order_detail->product) {
                     $products->push([
                         'id' => $order_detail->product_id,
