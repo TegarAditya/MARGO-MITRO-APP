@@ -365,32 +365,17 @@ class HomeController
         set_time_limit(0);
         DB::beginTransaction();
         try {
-            $invoice = Invoice::with(['invoice_details' => function($q) {
-                $q->where('price', 2600);
-            }])->where('id', 76)->first();
+            $products = collect([]);
+            $order = Order::with('order_details')->where('id', 14)->get();
 
-            foreach($invoice->invoice_details as $invoice_detail) {
-                $price = 2200;
-                $qty = $invoice_detail->quantity;
-
-                $invoice_detail->update([
-                    'price' => $price,
-                    'total' => $qty * $price,
-                ]);
+            foreach($orders->order_details as $order_detail) {
+                if (!$order_detail->product) {
+                    $products->push([
+                        'id' => $order_detail->product_id,
+                    ]);
+                }
             }
-
-            $inv_edit = Invoice::with('invoice_details')->where('id', 76)->first();
-            $inv_edit->update([
-                'nominal' => $inv_edit->invoice_details->sum('total')
-            ]);
-
-            $order_edit = Order::with('order_details')->where('id', 8)->first();
-
-            Tagihan::where('order_id', 8)->update([
-                'total' => $order_edit->order_details->sum('total'),
-                'tagihan' => $inv_edit->invoice_details->sum('total')
-            ]);
-            DB::commit();
+            dd($products);
         } catch (\Exception $e) {
             DB::rollback();
 
