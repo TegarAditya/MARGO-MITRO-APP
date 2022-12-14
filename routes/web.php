@@ -94,6 +94,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('orders/estimasi/{id}', 'OrderController@print_estimasi')->name('orders.estimasi');
     Route::get('orders/saldo/{id}', 'OrderController@print_saldo')->name('orders.saldo');
     Route::get('orders/saldo_rekap/{id}', 'OrderController@print_saldo_rekap')->name('orders.saldo_rekap');
+    Route::post('orders/change-price', 'OrderController@change_price')->name('orders.change_price');
+    Route::post('orders/change-price-single', 'OrderController@change_price_single')->name('orders.change_price_single');
     Route::resource('orders', 'OrderController');
 
     // Order Detail
@@ -216,6 +218,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('preorder-details', 'PreorderDetailController');
 
     // Summary Order
+    Route::get('summary-orders/synchronize', 'SummaryOrderController@synchronizeOrder')->name('summary-order.synchronize');
     Route::resource('summary-orders', 'SummaryOrderController', ['except' => ['create', 'store', 'edit', 'update', 'destroy']]);
 
     // History Production

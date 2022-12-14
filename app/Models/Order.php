@@ -86,6 +86,10 @@ class Order extends Model
         return $this->belongsTo(Semester::class, 'semester_id');
     }
 
+    public function fakturs() {
+        return $this->hasManyThrough(InvoiceDetail::class, Invoice::class);
+    }
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');

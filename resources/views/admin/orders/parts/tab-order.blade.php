@@ -156,9 +156,10 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-6">
+            <div class="col-12">
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary" name="filter" value="filter">Filter Buku</a>
+                    <button type="submit" class="btn btn-primary mr-3" name="filter" value="filter">Filter Buku</button>
+                    <a class="btn btn-warning" data-toggle="modal" data-target="#gantiHargaModal">Ganti Harga</a>
                 </div>
             </div>
         </div>
@@ -410,6 +411,46 @@
         </div>
     </div>
 @endforeach
+
+<div class="modal fade" id="gantiHargaModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Ubah Harga</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" method="POST" action="{{ route('admin.orders.change_price') }}">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="order_id" value="{{ $order->id ?? '' }}">
+                    <div class='row'>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="harga_awal" class="control-label">Harga Awal</label>
+                                <div>
+                                    <input type="number" class="form-control" id="harga_awal"  name="harga_awal" step="10" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="harga_koreksi" class="control-label">Harga Koreksi</label>
+                                <div>
+                                    <input type="number" class="form-control" id="harga_koreksi"  name="harga_koreksi" step="10" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Ubah</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endpush
 
 @push('styles')

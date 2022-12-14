@@ -20,6 +20,7 @@ use App\Models\Pembayaran;
 use App\Models\Semester;
 use App\Models\Price;
 use App\Models\PriceDetail;
+use App\Models\Tagihan;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -503,5 +504,67 @@ class OrderController extends Controller
         $pembayarans = Pembayaran::where('order_id', $order->id)->get();
 
         return view('admin.orders.prints.saldo_rekap', compact('order', 'invoices', 'pembayarans'));
+    }
+
+    public function change_price(Request $request)
+    {
+        $order_id = $request->order_id;
+        $harga_awal = $request->harga_awal;
+        $harga_koreksi = $request->harga_koreksi;
+
+        DB::beginTransaction();
+        try {
+            $order = Order::with(['order_details' => function($q) use($harga_awal) {
+                $q->where('price', $harga_awal);
+            }, 'invoices.invoice_details' => function($q) use($harga_awal) {
+                $q->where('price', $harga_awal);
+            }])->where('id', $order_id)->first();
+
+            foreach($order->order_details as $order_detail) {
+                $qty = $order_detail->quantity;
+
+                $order_detail->update([
+                    'price' => $harga_koreksi,
+                    'total' => $qty * $harga_koreksi,
+                ]);
+            }
+
+            foreach($order->invoices as $invoice) {
+                foreach($invoice->invoice_details as $invoice_detail) {
+                    $qty = $invoice_detail->quantity;
+
+                    $invoice_detail->update([
+                        'price' => $harga_koreksi,
+                        'total' => $qty * $harga_koreksi,
+                    ]);
+                }
+
+                if ($invoice->invoice_details) {
+                    $inv_edit = Invoice::with('invoice_details')->where('id', $invoice->id)->first();
+                    $inv_edit->update([
+                        'nominal' => $inv_edit->invoice_details->sum('total')
+                    ]);
+                }
+            }
+
+            Tagihan::where('order_id', $order_id)->update([
+                'total' => OrderDetail::where('order_id', $order_id)->sum('total'),
+                'tagihan' => Invoice::where('order_id', $order_id) ->sum('nominal')
+            ]);
+
+            DB::commit();
+
+            Alert::success('Success', 'Harga berhasil diubah');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();;
+        }
+    }
+
+    public function change_price_single(Request $request)
+    {
+        dd('aaa');
     }
 }
