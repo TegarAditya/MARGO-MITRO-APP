@@ -534,7 +534,8 @@
 
                 bonus.on('change keyup blur', function(e) {
                     var el = $(e.currentTarget);
-                    var qtyMax = parseInt(Math.min(product.data('pgmax'), product.data('pgstock')) || 0);
+                    // var qtyMax = parseInt(Math.min(product.data('pgmax'), product.data('pgstock')) || 0);
+                    var qtyMax = parseInt(Math.min(product.data('pgmax')) || 0);
                     var qtyMin = parseInt(0);
                     var valueNum = parseInt(el.val());
                     var value = (isNaN(valueNum) || valueNum <= 0) ? qtyMin : valueNum;
