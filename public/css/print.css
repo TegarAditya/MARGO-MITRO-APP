@@ -12,8 +12,9 @@ h1, h2, h3, h4, h5, h6 {
     padding: .75cm;
 }
 
-.table thead th, .table tbody td, .table tfoot td {
-    border-color: #000;
+.table thead th, .table tbody td, .table tfoot td, .table tfoot th {
+    border: solid #000 !important;
+    border-width: 1px 1px 1px 1px !important;
 }
 
 .table.table-sm td, .table.table-sm th {
@@ -26,4 +27,4 @@ h1, h2, h3, h4, h5, h6 {
     .pagebreak {
         page-break-before: always;
     }
-  }
+}
