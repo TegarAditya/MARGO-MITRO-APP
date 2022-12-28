@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Salesperson;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderPackage;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\StockMovement;
@@ -363,10 +364,22 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
+        $order_details = OrderDetail::all();
+        foreach($order_details as $detail) {
+            $bonus = OrderPackage::where('order_detail_id', $detail->id)->update(
+                ['order_id' => $detail->order_id]
+            );
+        }
+        dd('done');
+    }
+
+    public function checkDeletedProduct() {
+        set_time_limit(0);
         DB::beginTransaction();
         try {
+            $order_id = 14;
             $products = collect([]);
-            $order = Order::with('order_details')->where('id', 14)->first();
+            $order = Order::with('order_details')->where('id', $order_id)->first();
             foreach($order->order_details as $order_detail) {
                 if (!$order_detail->product) {
                     $products->push([

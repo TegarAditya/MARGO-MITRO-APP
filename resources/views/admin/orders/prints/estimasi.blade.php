@@ -94,7 +94,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th class="align-middle" colspan="5"><b>Total</b></th>
+                <th class="text-center" colspan="5"><b>Total</b></th>
                 <th class="text-center">{{ angka($total_sisa) }}</th>
                 <th width="1%" class="text-center">{{ angka($total_pg) }}</th>
             </tr>
