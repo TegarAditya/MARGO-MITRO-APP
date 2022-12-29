@@ -364,13 +364,20 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
-        $order_details = OrderDetail::all();
-        foreach($order_details as $detail) {
-            $bonus = OrderPackage::where('order_detail_id', $detail->id)->update(
-                ['order_id' => $detail->order_id]
-            );
+        $this->fixPgMoved();
+    }
+
+    public function fixPgMoved() {
+        $order_packages = OrderPackage::whereHas('product', function ($query) {
+            $query->where('jenjang_id', 3);
+        })->whereRaw('quantity > moved')->where('order_id', 10)->get();
+        foreach($order_packages as $bonus) {
+            if ($bonus->product->jenjang_id === 3) {
+                $bonus->moved = $bonus->quantity;
+                $bonus->save();
+            }
         }
-        dd('done');
+        dd('nani');
     }
 
     public function checkDeletedProduct() {
@@ -395,6 +402,15 @@ class HomeController
         }
         dd('done');
     }
+
+    // ngisi order id di order_packages
+    // $order_details = OrderDetail::all();
+    // foreach($order_details as $detail) {
+    //     $bonus = OrderPackage::where('order_detail_id', $detail->id)->update(
+    //         ['order_id' => $detail->order_id]
+    //     );
+    // }
+    // dd('done');
 
     //mbenerke stock pg
     // DB::beginTransaction();
