@@ -371,6 +371,7 @@ class HomeController
         $order_packages = OrderPackage::whereHas('product', function ($query) {
             $query->where('jenjang_id', 3);
         })->whereRaw('quantity > moved')->where('order_id', 10)->get();
+        dd($order_packages);
         foreach($order_packages as $bonus) {
             if ($bonus->product->jenjang_id === 3) {
                 $bonus->moved = $bonus->quantity;
