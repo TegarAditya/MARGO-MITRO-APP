@@ -229,7 +229,7 @@
                             $cover = $product->brand;
                             $isi = $product->isi;
                             $jenjang = $product->jenjang;
-                            $search = implode(' ', [
+                            $search = implode(';', [
                                 $product->nama_buku,
                                 !$category ? '' : $category->name,
                                 !$cover ? '' : $cover->name,
@@ -246,7 +246,12 @@
                             $bonus = $detail->bonus ?: null;
 
                             // $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty)) || ($product->stock <= 0);
-                            $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty));
+                            if ($bonus) {
+                                $pgmax = $bonus->quantity - $bonus->moved;
+                                $disabled = (!$order_detail ? false : (($sum_moved >= $sum_qty) && ($pgmax <= 0)));
+                            } else {
+                                $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty));
+                            }
                             @endphp
                             <a
                                 href="{{ route('admin.products.show', $product->id) }}"
@@ -709,7 +714,7 @@
                     .attr('required', true);
             }
 
-            productSearchClear.trigger('click');
+            // productSearchClear.trigger('click');
             modals.modal('hide');
             selected.addClass('selected');
             productSummary.show();

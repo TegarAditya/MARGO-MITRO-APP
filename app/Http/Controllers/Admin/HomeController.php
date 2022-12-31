@@ -364,7 +364,8 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
-        Tagihan::whereNull('salesperson_id')->forceDelete();
+        $test = Order::whereDoesntHave('tagihan')->get();
+        dd($test);
     }
 
     public function fixPgMoved() {
