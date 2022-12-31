@@ -46,8 +46,8 @@
                     @foreach ($row->invoice_details as $detail)
                         <tr>
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-center align-middle">{{ $no }}</td>
-                                <td rowspan="{{ $rowspan }}" class="align-middle">
+                                <td rowspan="{{ $rowspan }}" class="text-center align-top">{{ $no }}</td>
+                                <td rowspan="{{ $rowspan }}" class="align-top">
                                     <div class="d-flex">
                                         <div class="flex-grow-1 pr-2">
                                             <a href="{{ $link }}">{{ $row->no_suratjalan }}</a>
@@ -60,7 +60,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td rowspan="{{ $rowspan }}" class="align-middle">
+                                <td rowspan="{{ $rowspan }}" class="align-top">
                                     <div class="d-flex">
                                         <div class="flex-grow-1 pr-2">
                                             <a href="{{ $link }}">{{ $row->no_invoice }}</a>
@@ -73,7 +73,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td rowspan="{{ $rowspan }}" class="text-center align-middle">
+                                <td rowspan="{{ $rowspan }}" class="text-center align-top">
                                     {{ $row->date }}
                                     <span class="text-center ml-1 {{ $is_out ? 'text-success' : 'text-danger' }}">
                                         <strong class="text-xs">
@@ -107,9 +107,9 @@
                             <td class="text-right">@money(abs($detail->total))</td>
 
                             @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-right align-middle">@money(abs($row->nominal))</td>
+                                <td rowspan="{{ $rowspan }}" class="text-right align-top">@money(abs($row->nominal))</td>
 
-                                <td rowspan="{{ $rowspan }}" class="text-center align-middle">
+                                <td rowspan="{{ $rowspan }}" class="text-center align-top">
                                     <a href="{{ route('admin.invoices.destroy', $row->id) }}" class="invoice-delete-btn">
                                         <i class="fa fa-trash text-danger"></i>
                                     </a>

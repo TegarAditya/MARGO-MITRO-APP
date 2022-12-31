@@ -30,7 +30,7 @@ class KotaSale extends Model
         return $this->belongsTo(Salesperson::class, 'sales_id');
     }
 
-    public function kota()
+    public function city()
     {
         return $this->belongsTo(City::class, 'kota_id');
     }

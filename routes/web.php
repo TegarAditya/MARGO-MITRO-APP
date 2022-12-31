@@ -87,6 +87,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('salespeople/parse-csv-import', 'SalespersonController@parseCsvImport')->name('salespeople.parseCsvImport');
     Route::post('salespeople/process-csv-import', 'SalespersonController@processCsvImport')->name('salespeople.processCsvImport');
     Route::post('salespeople/import', 'SalespersonController@import')->name('salespeople.import');
+    Route::get('salespeople/select', 'SalespersonController@select')->name('salespeople.select');
     Route::resource('salespeople', 'SalespersonController');
 
     // Order

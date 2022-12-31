@@ -265,4 +265,11 @@ class SalespersonController extends Controller
         Alert::success('Success', 'Sales Person berhasil di import');
         return redirect()->back();
     }
+
+    public function select(Request $request)
+    {
+        $sales = $request->sales;
+        $kota_sales = KotaSale::where('sales_id', $sales)->pluck('name', 'id');
+        return response()->json($kota_sales);
+    }
 }

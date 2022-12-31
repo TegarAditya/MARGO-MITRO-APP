@@ -692,7 +692,8 @@ class InvoiceController extends Controller
                 ]);
 
                 $order->tagihan()->update([
-                    'tagihan' => $order->invoices()->sum('nominal') ?: 0
+                    'tagihan' => $order->invoices()->sum('nominal') ?: 0,
+                    'retur' => DB::raw("tagihan.retur + $value->sum('nominal')"),
                 ]);
 
                 foreach($value as $element) {

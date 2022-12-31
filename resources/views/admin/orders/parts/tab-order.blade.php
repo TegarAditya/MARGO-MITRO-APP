@@ -55,7 +55,7 @@
             </div>
             <div class="col-6">
                 <div class="form-group">
-                    <label class="required" for="kota_sales_id">{{ trans('cruds.order.fields.salesperson') }}</label>
+                    <label class="required" for="kota_sales_id">Kota Sales</label>
                     <select class="form-control select2 {{ $errors->has('kota_sales') ? 'is-invalid' : '' }}" name="kota_sales_id" id="kota_sales_id">
                         @foreach($kotasales as $id => $entry)
                             <option value="{{ $id }}" {{ (old('kota_sales_id') ? old('kota_sales_id') : $order->kota_sales_id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
@@ -337,7 +337,7 @@
                             $semester = $product->semester;
                             $kelas = $product->kelas;
                             $halaman = $product->halaman;
-                            $search = implode(' ', [
+                            $search = implode(';', [
                                 $product->nama_buku,
                                 !$category ? '' : $category->name,
                                 !$cover ? '' : $cover->name,
@@ -747,7 +747,7 @@
                     var el = $(item);
                     var search = el.data('search');
 
-                    keyword.split(' ').map(function(key) {
+                    keyword.split(';').map(function(key) {
                         search.indexOf(key) < 0 ? el.hide() : (results++);
                     });
                 });
@@ -815,7 +815,7 @@
             product.find('.product-subtotal').html(numeral(data.price).format('$0,0'));
             product.find('.product-img').attr('src', data.image).parent()[!data.image ? 'hide' : 'show']();
 
-            productSearchClear.trigger('click');
+            // productSearchClear.trigger('click');
             modals.modal('hide');
             selected.addClass('selected');
             productSummary.show();
@@ -826,17 +826,17 @@
     });
 })(jQuery, window.numeral);
 </script>
-{{-- <script>
+<script>
 $(document).ready(function() {
     $('#salesperson_id').change(function() {
-        $('#custom_price').empty();
+        $('#kota_sales_id').empty();
         let salesId = $(this).val();
         if (salesId) {
-            $('#custom_price').select2({
+            $('#kota_sales_id').select2({
                 allowClear: true,
-                placeholder: "Harga Normal",
+                placeholder: "Pilih Kota",
                 ajax: {
-                    url: "{{ route('admin.custom-prices.select') }}?sales=" + salesId,
+                    url: "{{ route('admin.salespeople.select') }}?sales=" + salesId,
                     dataType: 'json',
                     delay: 250,
                     processResults: function(data) {
@@ -852,9 +852,11 @@ $(document).ready(function() {
                 }
             });
         } else {
-            $('#custom_price').empty();
+            $('#kota_sales_id').empty();
         }
     });
 });
-</script> --}}
+
+
+</script>
 @endpush

@@ -256,6 +256,7 @@
                                 data-price="{{ $detail->price }}"
                                 data-hpp="{{ $product->hpp }}"
                                 data-stock="{{ $product->stock }}"
+                                data-jenjang="{{ $product->jenjang_id }}"
                                 @if($bonus)
                                     data-pg="{{ $bonus->product->id}}"
                                     data-pgstock="{{ $bonus->product->stock }}"
@@ -528,6 +529,7 @@
                     if(jenjang.includes(jenjang_id)){
                         pembagi = 33.34;
                     }
+                    console.log(pembagi);
                     let bonus_qty = Math.ceil(qty.val()/pembagi);
                     bonus.val(bonus_qty).trigger('change');
                 });
@@ -670,6 +672,7 @@
             product.attr('data-stock', data.stock).data('stock', data.stock);
             product.attr('data-max', data.max).data('max', data.max);
             product.attr('data-qty', data.qty).data('qty', data.qty);
+            product.attr('data-jenjang', data.jenjang).data('stock', data.jenjang);
             product.find('.product-col-main').html(content);
             product.find('.product-qty1').val(qty || 0)
                 .attr('id', 'fieldQty-'+data.id)

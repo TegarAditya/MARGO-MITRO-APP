@@ -64,7 +64,7 @@ class OrderController extends Controller
             $table->editColumn('actions', function ($row) {
                 $viewGate = 'order_show';
                 $editGate = 'order_edit';
-                $deleteGate = 'order_delete_hidden'; // 'order_delete';
+                $deleteGate = 'order_delete';
                 $crudRoutePart = 'orders';
 
                 return view('partials.datatablesActionsOrderIndex', compact(
@@ -94,16 +94,7 @@ class OrderController extends Controller
             });
 
             $table->addColumn('salesperson_area', function ($row) {
-                $labels = [];
-                foreach ($row->salesperson->area_pemasarans as $area_pemasaran) {
-                    if ($area_pemasaran === $row->salesperson->area_pemasarans->last()) {
-                        $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
-                    } else {
-                        $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->name);
-                    }
-                }
-
-                return implode(' ', $labels);
+                return $row->kotasale ? $row->kotasale->city->name : '';
             });
 
             $table->addColumn('tagihan', function ($row) {
@@ -127,7 +118,7 @@ class OrderController extends Controller
     {
         abort_if(Gate::denies('order_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $salespeople = Salesperson::get()->pluck('nama_sales', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         // $customprices = CustomPrice::get()->pluck('nama', 'id')->prepend('Harga Normal', '');
         // $customprices = collect(['Harga Normal', '']);
@@ -137,7 +128,7 @@ class OrderController extends Controller
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $products = collect([]);
-        $kotasales = KotaSale::pluck('name', 'id')->prepend('Semua Kota', '');
+        $kotasales = collect([])->prepend('Pilih Kota', '');
 
         return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas', 'kotasales'));
     }
@@ -198,6 +189,7 @@ class OrderController extends Controller
                             if ($item->pg_id) {
                                 $bonus = OrderPackage::create([
                                     'product_id' => $item->pg_id,
+                                    'order_id' => $order->id,
                                     'order_detail_id' => $order_detail->id,
                                     'quantity' => $pg_bonus,
                                 ]);
@@ -206,6 +198,7 @@ class OrderController extends Controller
                             if ($item->kunci_id) {
                                 $bonus = OrderPackage::create([
                                     'product_id' =>  $item->kunci_id,
+                                    'order_id' => $order->id,
                                     'order_detail_id' => $order_detail->id,
                                     'quantity' => $pg_bonus,
                                 ]);
@@ -221,6 +214,8 @@ class OrderController extends Controller
                 'total' => $order_details->sum('total'),
                 'tagihan' => 0,
                 'saldo' => 0,
+                'retur' => 0,
+                'diskon' => 0
             ]);
 
             DB::commit();
@@ -238,7 +233,7 @@ class OrderController extends Controller
     {
         abort_if(Gate::denies('order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $salespeople = Salesperson::get()->pluck('nama_sales', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $covers = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         // $customprices = CustomPrice::where('sales_id', $order->salesperson_id)->get()->pluck('nama', 'id')->prepend('Harga Normal', '');
         $customprices = Price::get()->pluck('nama', 'id')->prepend('Harga Normal', '');
@@ -246,10 +241,10 @@ class OrderController extends Controller
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        $kotasales = KotaSale::pluck('name', 'id')->prepend('Semua Kota', '');
+        $kotasales = KotaSale::where('sales_id', $order->salesperson_id)->pluck('name', 'id');
 
         if ($request->cover || $request->isi || $request->jenjang || $request->custom_price || $request->kelas || $request->semester) {
-            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang', 'semester']);
+            $query = Product::with(['media', 'category', 'brand', 'isi', 'jenjang', 'semester', 'pg', 'pg.category', 'pg.brand', 'pg.isi', 'pg.jenjang', 'pg.semester']);
             if ($request->cover) {
                 $query->where('brand_id', $request->cover);
             }
@@ -281,9 +276,19 @@ class OrderController extends Controller
 
             $products = $query->get();
 
+            foreach($products as $product) {
+                if ($product->pg && $product->pg->brand_id !== $request->cover) {
+                    $products->push($product->pg);
+                }
+            }
+
             if ($custom_price) {
                 $products->map(function($product) use($custom_price) {
-                    $product->price = $custom_price;
+                    if ($product->tipe_pg === 'non_pg') {
+                        $product->price = $custom_price;
+                    } else if ($product->tipe_pg === 'pg') {
+                        $product->price = 6000;
+                    }
                     return $product;
                 });
             }
@@ -378,6 +383,7 @@ class OrderController extends Controller
                             } else {
                                 $bonus = OrderPackage::create([
                                     'product_id' => $item->pg_id,
+                                    'order_id' => $order->id,
                                     'order_detail_id' => $order_detail->id,
                                     'quantity' => $pg_bonus,
                                 ]);
@@ -393,6 +399,7 @@ class OrderController extends Controller
                             } else {
                                 $bonus = OrderPackage::create([
                                     'product_id' => $item->kunci_id,
+                                    'order_id' => $order->id,
                                     'order_detail_id' => $order_detail->id,
                                     'quantity' => $pg_bonus,
                                 ]);
@@ -408,6 +415,7 @@ class OrderController extends Controller
                     'unit_price' => $unit_price,
                     'price' => $price,
                     'total' => $total,
+                    'order_detail_id' => $order_detail->id
                 ]);
             });
 
@@ -415,15 +423,17 @@ class OrderController extends Controller
                 ->whereNotIn('product_id', $detail_collection->pluck('product_id'))
                 ->forceDelete();
 
+            OrderPackage::where('order_id', $order->id)
+                ->whereNotIn('order_detail_id', $detail_collection->pluck('order_detail_id'))
+                ->delete();
+
             // Last but not least
             $tagihan = $order->tagihan()->firstOrNew([
                 'order_id' => $order->id,
-                'salesperson_id' => $order->salesperson_id,
-            ], [
-                'order_id' => $order->id,
-                'salesperson_id' => $order->salesperson_id,
             ]);
 
+            $tagihan->salesperson_id = $order->salesperson_id;
+            $tagihan->semester_id = $order->semester_id;
             $tagihan->total = $detail_collection->sum('total');
             $tagihan->tagihan = $order->invoices()->sum('nominal') ?: 0;
             $tagihan->saldo = $tagihan->tagihan_movements()->sum('nominal') ?: 0;
@@ -454,7 +464,16 @@ class OrderController extends Controller
     {
         abort_if(Gate::denies('order_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        // $order->delete();
+        $order->load('invoices');
+
+        if ($order->invoices->count() > 0) {
+            Alert::warning('Warning', 'Sales Order tidak bisa di hapus');
+            return back();
+        }
+
+        OrderDetail::where('order_id', $order->id)->forceDelete();
+        $order->delete();
+        Alert::success('Success', 'Sales Order berhasil dihapus');
 
         return back();
     }

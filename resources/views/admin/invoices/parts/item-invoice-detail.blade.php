@@ -29,7 +29,7 @@ $foto = !$product->foto ? null : $product->foto->first();
 $modal = !isset($modal) ? '#productModal' : $modal;
 $name = !isset($name) ? 'products' : $name;
 @endphp
-<div class="item-product row" data-id="{{ $product->id }}" data-price="{{ $detail->price }}" data-moved="{{ $order_detail->moved ?? 0 }}" data-max="{{ $qtyMax }}"
+<div class="item-product row" data-id="{{ $product->id }}" data-jenjang="{{ $product->jenjang_id }}" data-price="{{ $detail->price }}" data-moved="{{ $order_detail->moved ?? 0 }}" data-max="{{ $qtyMax }}"
     data-qty="{{ $detail->quantity }}"
     data-stock="{{ $product->stock }}"
     data-name="{{ $name }}"

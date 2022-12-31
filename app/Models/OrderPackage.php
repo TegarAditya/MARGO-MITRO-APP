@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderPackage extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
     use HasFactory;
 
     public $table = 'order_packages';
@@ -24,6 +24,7 @@ class OrderPackage extends Model
         'quantity',
         'moved',
         'product_id',
+        'order_id',
         'order_detail_id',
         'created_at',
         'updated_at',

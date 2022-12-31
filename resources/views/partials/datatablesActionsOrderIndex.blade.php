@@ -17,3 +17,13 @@
 <a class="px-1" href="{{ route('admin.' . $crudRoutePart . '.saldo_rekap', $row->id) }}" title="Cetak Rekap Saldo">
     <i class="fas fa-money text-danger  fa-lg"></i>
 </a>
+@can($deleteGate)
+    <form action="{{ route('admin.' . $crudRoutePart . '.destroy', $row->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
+        <input type="hidden" name="_method" value="DELETE">
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        {{-- <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}"> --}}
+        <button class="px-1" type="submit" title="delete" style="border: none; background-color:transparent;">
+            <i class="fas fa-trash fa-lg text-danger"></i>
+        </button>
+    </form>
+@endcan
