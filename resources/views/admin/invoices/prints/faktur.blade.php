@@ -41,9 +41,7 @@
             <td><strong>Area Pemasaran</strong></td>
             <td>:</td>
             <td>
-                @foreach ($invoice->order->salesperson->area_pemasarans as $area)
-                    {{ $area->name }};
-                @endforeach
+                {{ $invoice->order->kotasale ? $invoice->order->kotasale->city->name : ''}}
             </td>
         </tr>
 
