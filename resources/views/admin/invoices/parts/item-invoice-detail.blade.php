@@ -97,7 +97,7 @@ $name = !isset($name) ? 'products' : $name;
                 boxClass=" p-0"
                 class="form-control-sm hide-arrows text-center product-qty product-qty1"
                 value="{{ abs($detail->quantity) }}"
-                :min="!$product->id ? 0 : 1"
+                :min="0"
                 max="{{ $qtyMax }}"
             >
                 <x-slot name="left">
