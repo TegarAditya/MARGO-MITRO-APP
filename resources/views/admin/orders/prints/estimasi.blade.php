@@ -34,7 +34,7 @@
             <td><strong>Area Pemasaran</strong></td>
             <td>:</td>
             <td>
-                {{ $invoice->order->kotasale ? $invoice->order->kotasale->city->name : ''}}
+                {{ $order->kotasale ? $order->kotasale->city->name : ''}}
             </td>
         </tr>
 
