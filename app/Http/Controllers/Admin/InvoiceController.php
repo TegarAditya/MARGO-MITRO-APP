@@ -119,11 +119,10 @@ class InvoiceController extends Controller
     {
         abort_if(Gate::denies('invoice_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $orders = Order::with('salesperson')->whereHas('tagihan', function($q){
-            $q->whereRaw('total > tagihan ');
-        })->get()->mapWithKeys(function($item) {
-            return [$item->id => $item->no_order .' - '.$item->salesperson->name ];
-        })->prepend(trans('global.pleaseSelect'), '');
+        $orders = Order::with('salesperson')->whereHas('order_details')
+            ->get()->mapWithKeys(function($item) {
+                return [$item->id => $item->no_order .' - '.$item->salesperson->name ];
+            })->prepend(trans('global.pleaseSelect'), '');
         $order_details = OrderDetail::with(['product', 'product.media', 'bonus'])
             ->whereHas('product')
             ->get();
@@ -248,9 +247,10 @@ class InvoiceController extends Controller
     {
         abort_if(Gate::denies('invoice_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $orders = Order::get()->mapWithKeys(function($item) {
-            return [$item->id => $item->no_order];
-        })->prepend(trans('global.pleaseSelect'), '');
+        $orders = Order::whereHas('order_details')
+            ->get()->mapWithKeys(function($item) {
+                return [$item->id => $item->no_order];
+            })->prepend(trans('global.pleaseSelect'), '');
         $order_details = OrderDetail::with(['product', 'product.media'])
             ->whereHas('product')
             ->get();
