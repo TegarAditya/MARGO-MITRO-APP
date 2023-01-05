@@ -440,6 +440,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="hal_harga" class="control-label">Halaman</label>
+                                <div>
+                                    <select class="form-control select2" name="hal_harga" id="hal_harga" required>
+                                        @foreach($halaman as $id => $entry)
+                                            <option value="{{ $id }}">Halaman {{ $entry }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Ubah</button>
@@ -856,7 +868,5 @@ $(document).ready(function() {
         }
     });
 });
-
-
 </script>
 @endpush

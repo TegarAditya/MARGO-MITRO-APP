@@ -71,22 +71,18 @@
         <tbody>
             @foreach ($value as $detail)
                 @php
-                $product = $detail->product;
-                $bonus = $detail->bonus;
-                $sisa = $detail->quantity - $detail->moved;
-                $pg = $bonus ? $bonus->quantity - $bonus->moved : 0;
-                $total_sisa += $sisa;
-                $total_pg += $pg;
+                $total_sisa += $detail['sisa'];
+                $total_pg += $detail['kelengkapan'];
                 @endphp
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>
                     {{-- <td>{{ $product->jenjang->name ?? '' }}</td> --}}
-                    <td>{{ $product->brand->name ?? '' }}</td>
-                    <td>{{ $product->name }}</td>
-                    <td class="text-center">{{ $product->kelas->name ?? '' }}</td>
-                    <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
-                    <td class="text-center">{{ angka($sisa) }}</td>
-                    <td class="text-center">{{ angka($pg)}}</td>
+                    <td>{{ $detail['cover'] }}</td>
+                    <td>{{ $detail['mapel'] }}</td>
+                    <td class="text-center">{{ $detail['kelas'] }}</td>
+                    <td class="text-center">{{ $detail['hal'] }}</td>
+                    <td class="text-center">{{ angka($detail['sisa']) }}</td>
+                    <td class="text-center">{{ angka($detail['kelengkapan'])}}</td>
                 </tr>
             @endforeach
         </tbody>

@@ -126,11 +126,12 @@ class OrderController extends Controller
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $products = collect([]);
         $kotasales = collect([])->prepend('Pilih Kota', '');
 
-        return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas', 'kotasales'));
+        return view('admin.orders.create', compact('salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas', 'halaman', 'kotasales'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -240,6 +241,7 @@ class OrderController extends Controller
         $isi = Category::where('type', 'isi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kotasales = KotaSale::where('sales_id', $order->salesperson_id)->pluck('name', 'id');
 
@@ -307,7 +309,7 @@ class OrderController extends Controller
             'semester'
         ]);
 
-        return view('admin.orders.edit', compact('order', 'salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas', 'kotasales'));
+        return view('admin.orders.edit', compact('order', 'salespeople', 'products', 'customprices', 'covers', 'isi', 'jenjang', 'semesters', 'kelas', 'halaman', 'kotasales'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order)
@@ -490,7 +492,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($request->id);
 
         $details = OrderDetail::where('order_id', $order->id)
-                ->with(['product', 'bonus', 'product.jenjang'])
+                ->with(['product', 'bonus', 'product.jenjang', 'product.jadi_pg'])
                 ->get()
                 ->sortBy('product.tipe_pg')
                 ->sortBy('product.halaman_id')
@@ -498,7 +500,70 @@ class OrderController extends Controller
                 ->sortBy('product.tiga_nama')
                 ->sortBy('product.jenjang_id');
 
-        $groups = $details->groupBy('product.jenjang.name');
+        $collections = collect([]);
+
+        $products = $details->where('product.tipe_pg', '=', 'non_pg');
+        foreach($products as $detail) {
+            $product = $detail->product;
+            $bonus = $detail->bonus;
+            $sisa = $detail->quantity - $detail->moved;
+            $pg = $bonus ? $bonus->quantity - $bonus->moved : 0;
+
+            $collections->push([
+                'product_id' => $product->id,
+                'cover' => $product->brand->name ?? '',
+                'mapel' => $product->name,
+                'kelas' => $product->kelas->name ?? '',
+                'hal' => $product->halaman->name ?? '',
+                'jenjang' => $product->jenjang->name ?? '',
+                'sisa' => $sisa,
+                'kelengkapan' => $pg,
+            ]);
+        }
+
+        $bonus = $details->where('product.tipe_pg', '!=', 'non_pg');
+        foreach($bonus as $detail) {
+            $product = $detail->product->jadi_pg;
+            $sisa = 0;
+            $pg = $detail->quantity - $detail->moved;
+            $diganti = $product->id;
+            $result = $collections->search(function($item) use($diganti)  {
+                return $item['product_id'] === $diganti;
+            });
+            if ($result !== false) {
+                $collections->transform(function($item) use ($pg, $diganti) {
+                    if ($item['product_id'] === $diganti) {
+                        $kelengkapan = $item['kelengkapan'] + $pg;
+                    } else {
+                        $kelengkapan = $item['kelengkapan'];
+                    }
+
+                    return [
+                        'product_id' => $item['product_id'],
+                        'cover' => $item['cover'],
+                        'mapel' => $item['mapel'],
+                        'kelas' => $item['kelas'],
+                        'hal' => $item['hal'],
+                        'jenjang' => $item['jenjang'],
+                        'sisa' => $item['sisa'],
+                        'kelengkapan' => $kelengkapan,
+                    ];
+                });
+            } else {
+                $collections->push([
+                    'product_id' => $product->id,
+                    'cover' => $product->brand->name ?? '',
+                    'mapel' => $product->name,
+                    'kelas' => $product->kelas->name ?? '',
+                    'hal' => $product->halaman->name ?? '',
+                    'jenjang' => $product->jenjang->name ?? '',
+                    'sisa' => $sisa,
+                    'kelengkapan' => $pg,
+                ]);
+            }
+        }
+
+        $groups = $collections->groupBy('jenjang');
 
         return view('admin.orders.prints.estimasi', compact('order', 'details', 'groups'));
     }
@@ -530,6 +595,7 @@ class OrderController extends Controller
         $order_id = $request->order_id;
         $harga_awal = $request->harga_awal;
         $harga_koreksi = $request->harga_koreksi;
+        $halaman = $request->hal_harga;
 
         DB::beginTransaction();
         try {
@@ -540,22 +606,26 @@ class OrderController extends Controller
             }])->where('id', $order_id)->first();
 
             foreach($order->order_details as $order_detail) {
-                $qty = $order_detail->quantity;
+                if ($order_detail->product->halaman_id == $halaman) {
+                    $qty = $order_detail->quantity;
 
-                $order_detail->update([
-                    'price' => $harga_koreksi,
-                    'total' => $qty * $harga_koreksi,
-                ]);
+                    $order_detail->update([
+                        'price' => $harga_koreksi,
+                        'total' => $qty * $harga_koreksi,
+                    ]);
+                }
             }
 
             foreach($order->invoices as $invoice) {
                 foreach($invoice->invoice_details as $invoice_detail) {
-                    $qty = $invoice_detail->quantity;
+                    if ($invoice_detail->product->halaman_id == $halaman) {
+                        $qty = $invoice_detail->quantity;
 
-                    $invoice_detail->update([
-                        'price' => $harga_koreksi,
-                        'total' => $qty * $harga_koreksi,
-                    ]);
+                        $invoice_detail->update([
+                            'price' => $harga_koreksi,
+                            'total' => $qty * $harga_koreksi,
+                        ]);
+                    }
                 }
 
                 if ($invoice->invoice_details) {
