@@ -682,7 +682,7 @@
             product.find('.product-qty1').val(qty || 0)
                 .attr('id', 'fieldQty-'+data.id)
                 .attr('name', name+'['+data.id+'][qty]')
-                .attr('min', data.max == 0 ? 0 : 1)
+                .attr('min', 0)
                 .attr('required', true);
             product.find('.product-price').val(price != 0 ? price : data.price)
                 .attr('name', name+'['+data.id+'][price]');
