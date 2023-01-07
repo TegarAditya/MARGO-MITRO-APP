@@ -683,17 +683,19 @@ class InvoiceController extends Controller
             foreach($row as $key => $value) {
                 $order = Order::findOrFail($key);
 
+                $nominal = $value->sum('nominal');
+
                 $invoice = Invoice::create([
                     'no_suratjalan' => Invoice::generateNoSJ($order->semester_id),
                     'no_invoice' => Invoice::generateNoInvoice($order->semester_id),
                     'date' => $request->date,
-                    'nominal' => $multiplier * (float) $value->sum('nominal'),
+                    'nominal' => $multiplier * (float) $nominal,
                     'order_id' => $order->id
                 ]);
 
                 $order->tagihan()->update([
                     'tagihan' => $order->invoices()->sum('nominal') ?: 0,
-                    'retur' => DB::raw("tagihan.retur + $value->sum('nominal')"),
+                    'retur' => DB::raw("retur + $nominal"),
                 ]);
 
                 foreach($value as $element) {

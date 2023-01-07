@@ -25,7 +25,9 @@ class Tagihan extends Model
     protected $fillable = [
         'order_id',
         'total',
+        'retur',
         'saldo',
+        'diskon',
         'salesperson_id',
         'created_at',
         'updated_at',
