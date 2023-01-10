@@ -13,7 +13,7 @@
 
             <div class="row">
                 <div class="col row">
-                    <div class="col-4">
+                    {{-- <div class="col-4">
                         <div class="form-group mb-0">
                             <label class="small mb-0" for="order_id">{{ trans('cruds.invoice.fields.order') }}</label>
                             <select class="form-control select2 {{ $errors->has('order_id') ? 'is-invalid' : '' }}" name="order_id" id="order_id">
@@ -26,7 +26,7 @@
                                 <span class="text-danger">{{ $errors->first('order') }}</span>
                             @endif
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="col-4">
                         <div class="form-group mb-0">
@@ -42,7 +42,22 @@
                             @endif
                         </div>
                     </div>
-
+                    <div class="col-4">
+                        <div class="form-group  mb-0">
+                            <label class="small mb-0" for="invoice_type">Jenis Invoice</label>
+                            <select class="form-control select2 {{ $errors->has('order') ? 'is-invalid' : '' }}" name="invoice_type" id="invoice_type" required>
+                                @foreach([
+                                    'kirim' => 'Pengiriman',
+                                    'retur' => 'Retur'
+                                ] as $id => $entry)
+                                    <option value="{{ $id }}" {{ (old('invoice_type') ? old('invoice_type') : (request('invoice_type') == $id ? 'selected' : '')) }}>{{ $entry }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('invoice_type'))
+                                <span class="text-danger">{{ $errors->first('invoice_type') }}</span>
+                            @endif
+                        </div>
+                    </div>
                     <div class="col-4">
                         <x-admin.form-group
                             type="text"

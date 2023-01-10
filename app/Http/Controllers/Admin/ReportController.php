@@ -89,6 +89,12 @@ class ReportController extends Controller
             });
         }
 
+        if ($request->invoice_type == 'kirim') {
+            $invoicesQuery->where('nominal', '>=' , 0);
+        } else if ($request->invoice_type == 'retur'){
+            $invoicesQuery->where('nominal', '<' , 0);
+        }
+
         if ($product_id = $request->product_id) {
             $invoicesQuery->whereHas('invoice_details', function($query) use ($product_id) {
                 $query->where('product_id', $product_id);
