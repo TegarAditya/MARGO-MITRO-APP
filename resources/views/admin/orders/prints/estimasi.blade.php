@@ -53,6 +53,7 @@
     @php
         $total_sisa = 0;
         $total_pg = 0;
+        $mapel = null;
     @endphp
 
     <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
@@ -78,12 +79,15 @@
                     <td class="text-center">{{ $loop->iteration }}</td>
                     {{-- <td>{{ $product->jenjang->name ?? '' }}</td> --}}
                     <td>{{ $detail['cover'] }}</td>
-                    <td>{{ $detail['mapel'] }}</td>
+                    <td>{{ ($mapel == $detail['mapel']) ? ' ' : $detail['mapel']}}</td>
                     <td class="text-center">{{ $detail['kelas'] }}</td>
                     <td class="text-center">{{ $detail['hal'] }}</td>
                     <td class="text-center">{{ angka($detail['sisa']) }}</td>
                     <td class="text-center">{{ angka($detail['kelengkapan'])}}</td>
                 </tr>
+                @php
+                    $mapel = $detail['mapel'];
+                @endphp
             @endforeach
         </tbody>
         <tfoot>

@@ -27,6 +27,23 @@
 
                 <div class="col-6 text-right">
                     <h6 class="h6 text-primary m-0">{{ $order->date }}</h6>
+                    <br>
+                    <a class="px-2 btn btn-lg" href="{{ route('admin.orders.estimasi', $order->id) }}" target="_blank" title="Cetak Estimasi">
+                        <i class="fas fa-print text-secondary  fa-lg"></i>
+                    </a>
+                    <a class="px-2 btn btn-lg" href="{{ route('admin.orders.saldo', $order->id) }}" target="_blank" title="Cetak Saldo">
+                        <i class="fas fa-money text-warning  fa-lg"></i>
+                    </a>
+                    <a class="px-2 btn btn-lg" href="{{ route('admin.orders.saldo_rekap', $order->id) }}" target="_blank" title="Cetak Rekap Saldo">
+                        <i class="fas fa-money text-danger  fa-lg"></i>
+                    </a>
+                    <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <button class="px-2 btn btn-lg" type="submit" title="delete" style="border: none; background-color:transparent;">
+                            <i class="fas fa-trash fa-lg text-danger"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         @endif

@@ -175,9 +175,11 @@
             <hr style="margin: .5em -15px;border-color:#ccc" />
 
             <div class="product-list-group">
-                <div class="row">
-                    <div class="col"><h5 class="product-group-title">{{ $item['label'] }}</h5></div>
-                    <div class="col-4 float-right">
+                <div class="row mb-2">
+                    <div class="col py-1">
+                        <h5 class="product-group-title">{{ $item['label'] }}</h5>
+                    </div>
+                    <div class="col-4 py-1">
                         <x-admin.form-group
                             type="text"
                             name="element-product-search"
@@ -199,7 +201,11 @@
                             </x-slot>
                         </x-admin.form-group>
                     </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-md btn-primary float-right">Simpan Order</a>
+                    </div>
                 </div>
+
                 <div class="product-list">
                     @include('admin.orders.parts.item-product', [
                         'detail' => new App\Models\OrderDetail,
@@ -593,7 +599,7 @@
 
                 el.show();
 
-                keyword.split(' ').map(function(key) {
+                keyword.split(';').map(function(key) {
                     search.includes(key) ? (results++) : el.hide();
                 });
 

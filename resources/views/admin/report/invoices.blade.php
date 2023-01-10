@@ -110,7 +110,7 @@
                 $print = function($type) use ($invoice) {
                     return route('admin.invoices.show', ['invoice' => $invoice->id, 'print' => $type]);
                 };
-                $is_out = 0 < $invoice->nominal;
+                $is_out = 0 <= $invoice->nominal;
                 $no = $loop->iteration;
                 @endphp
 

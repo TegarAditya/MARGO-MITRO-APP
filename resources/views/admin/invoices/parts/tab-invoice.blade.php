@@ -93,7 +93,36 @@
         <hr style="margin: .5em -15px;border-color:#ccc" />
 
         <div class="product-list-group">
-            <h5 class="product-group-title">{{ $item['label'] }}</h5>
+            <div class="row mb-2">
+                <div class="col py-1">
+                    <h5 class="product-group-title">{{ $item['label'] }}</h5>
+                </div>
+                <div class="col-4 py-1">
+                    <x-admin.form-group
+                        type="text"
+                        name="element-product-search"
+                        id="element-product-search"
+                        containerClass=" m-0"
+                        boxClass=" p-0"
+                        class="form-control-sm element-product-search px-1"
+                    >
+                        <x-slot name="left">
+                            <button type="button" class="btn btn-sm border-0 px-2 element-product-search-act">
+                                <i class="fa fa-search text-sm"></i>
+                            </button>
+                        </x-slot>
+
+                        <x-slot name="right">
+                            <button type="button" class="btn btn-sm border-0 px-2 element-product-search-clear" id="element-product-search-clear">
+                                <i class="fa fa-times text-sm"></i>
+                            </button>
+                        </x-slot>
+                    </x-admin.form-group>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-md btn-primary float-right">Simpan Invoice</a>
+                </div>
+            </div>
 
             <div class="product-list">
                 @include('admin.invoices.parts.item-invoice-detail', [
@@ -468,8 +497,37 @@
         var productSearchClear = modals.find('.product-search-clear');
         var productSelectItems = modals.find('.product-select-item');
         var productSelectTarget;
+        var elementProductSearch = $('#element-product-search');
+        var elementProductSearchClear = $('#element-product-search-clear');
 
         var jenjang = ['3', '4', '11'];
+
+        elementProductSearch.on('change keyup blur', function(e) {
+            var keyword = $(e.currentTarget).val().toLowerCase();
+
+            allProducts.children().each(function(i, item) {
+                var el = $(item);
+                var search = String(el.find('.product-name').html()).toLowerCase();
+                var results = 0;
+
+                el.show();
+
+                keyword.split(';').map(function(key) {
+                    search.includes(key) ? (results++) : el.hide();
+                });
+
+                if (!results && i !== 0) {
+                    el.hide();
+                } else {
+                    el.show();
+                }
+            });
+        });
+
+        elementProductSearchClear.on('click', function(e) {
+            e.preventDefault();
+            elementProductSearch.val('').trigger('change');
+        });
 
         $('.product-list-group').each(function(index, item) {
             var group = $(item);
@@ -642,7 +700,7 @@
                     var el = $(item);
                     var search = el.data('search');
 
-                    keyword.split(' ').map(function(key) {
+                    keyword.split(';').map(function(key) {
                         search.indexOf(key) < 0 ? el.hide() : (results++);
                     });
                 });

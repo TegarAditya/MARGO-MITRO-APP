@@ -32,7 +32,7 @@ class SalespersonController extends Controller
         abort_if(Gate::denies('salesperson_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Salesperson::with(['area_pemasarans'])->select(sprintf('%s.*', (new Salesperson())->table));
+            $query = Salesperson::with(['area_pemasarans'])->select(sprintf('%s.*', (new Salesperson())->table))->orderBy('code', 'ASC');
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -61,11 +61,11 @@ class SalespersonController extends Controller
             });
             $table->editColumn('area_pemasaran', function ($row) {
                 $labels = [];
-                foreach ($row->area_pemasarans as $area_pemasaran) {
-                    if ($area_pemasaran === $row->area_pemasarans->last()) {
-                        $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->name);
+                foreach ($row->kota as $area_pemasaran) {
+                    if ($area_pemasaran === $row->kota->last()) {
+                        $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $area_pemasaran->city->name);
                     } else {
-                        $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->name);
+                        $labels[] = sprintf('<span class="label label-info label-many">%s,</span>', $area_pemasaran->city->name);
                     }
                 }
 

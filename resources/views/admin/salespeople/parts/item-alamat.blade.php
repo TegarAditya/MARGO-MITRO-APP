@@ -1,5 +1,5 @@
 @php
-$kota = $detail->kota ?: new App\Models\City;
+$kota = $detail->city ?: new App\Models\City;
 $alamat = $detail->alamats ?: null
 @endphp
 <div class="row item-alamat" data-id="{{ $detail->id }}">

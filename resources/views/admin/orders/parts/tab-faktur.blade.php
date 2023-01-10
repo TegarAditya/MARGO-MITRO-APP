@@ -12,20 +12,12 @@
     <table class="table table-bordered table-invoice">
         <thead>
             <tr>
-                <th rowspan="2" width="1%">No.</th>
-                <th rowspan="2">No. Surat Jalan</th>
-                <th rowspan="2">No. Invoice</th>
-                <th rowspan="2" width="120">Tanggal</th>
-                {{-- <th rowspan="2" width="120">Masuk/Keluar</th> --}}
-                <th colspan="3" class="text-center py-2">Produk</th>
-                <th rowspan="2" class="text-center" width="10%">Total</th>
-                <th rowspan="2" class="text-center" width="1%"></th>
-            </tr>
-
-            <tr>
-                <th class="pt-2">Nama</th>
-                <th class="text-center pt-2" width="1%">Qty</th>
-                <th class="text-center pt-2" width="10%">Subtotal</th>
+                <th width="1%">No.</th>
+                <th>No. Surat Jalan</th>
+                <th>No. Invoice</th>
+                <th class="text-center" width="15%">Tanggal</th>
+                <th class="text-center" width="15%">Total</th>
+                <th class="text-center" width="10%"></th>
             </tr>
         </thead>
 
@@ -33,90 +25,85 @@
             @foreach ($order->invoices as $row)
                 <tbody>
                     @php
-                    $rowspan = $row->invoice_details->count();
                     $link = route('admin.invoices.show', $row->id);
                     $print = function($type) use ($row) {
                         return route('admin.invoices.show', ['invoice' => $row->id, 'print' => $type]);
                     };
-                    $is_out = 0 < $row->nominal;
+                    $is_out = 0 <= $row->nominal;
 
                     $no = $loop->iteration;
                     @endphp
+                    <tr>
+                        <td class="text-center">{{ $no }}</td>
+                        <td class="text-center">
+                            <div class="d-flex">
+                                <div class="flex-grow-1 pr-2">
+                                    <a href="{{ $link }}">{{ $row->no_suratjalan }}</a>
+                                </div>
 
-                    @foreach ($row->invoice_details as $detail)
-                        <tr>
-                            @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-center align-top">{{ $no }}</td>
-                                <td rowspan="{{ $rowspan }}" class="align-top">
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1 pr-2">
-                                            <a href="{{ $link }}">{{ $row->no_suratjalan }}</a>
-                                        </div>
-
-                                        <div>
-                                            <a href="{{ $print('sj') }}" target="_blank">
-                                                <i class="fa fa-print text-dark"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td rowspan="{{ $rowspan }}" class="align-top">
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1 pr-2">
-                                            <a href="{{ $link }}">{{ $row->no_invoice }}</a>
-                                        </div>
-
-                                        <div>
-                                            <a href="{{ $print('inv') }}" target="_blank">
-                                                <i class="fa fa-print text-dark"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td rowspan="{{ $rowspan }}" class="text-center align-top">
-                                    {{ $row->date }}
-                                    <span class="text-center ml-1 {{ $is_out ? 'text-success' : 'text-danger' }}">
-                                        <strong class="text-xs">
-                                            @if ($is_out)
-                                                <i class="fa fa-arrow-up"></i>
-                                            @else
-                                                <i class="fa fa-arrow-down"></i>
-                                            @endif
-                                        </strong>
-                                    </span>
-                                </td>
-                                {{-- <td rowspan="{{ $rowspan }}" class="{{ $is_out ? 'text-warning' : 'text-info' }}">
-                                    {{ $is_out ? 'Keluar' : 'Masuk' }}
-                                </td> --}}
-                            @endif
-
-                            <td>
-                                @if ($product = $detail->product)
-                                    <p class="m-0">
-                                        <span>{{ $product->nama_buku }}</span>
-                                        <br />
-                                        <span class="text-xs text-muted">
-                                            @money($detail->price)
-                                        </span>
-                                    </p>
-                                @else
-                                    <p class="m-0">Produk</p>
-                                @endif
-                            </td>
-                            <td class="text-center">{{ abs($detail->quantity) }}</td>
-                            <td class="text-right">@money(abs($detail->total))</td>
-
-                            @if ($loop->first)
-                                <td rowspan="{{ $rowspan }}" class="text-right align-top">@money(abs($row->nominal))</td>
-
-                                <td rowspan="{{ $rowspan }}" class="text-center align-top">
-                                    <a href="{{ route('admin.invoices.destroy', $row->id) }}" class="invoice-delete-btn">
-                                        <i class="fa fa-trash text-danger"></i>
+                                <div class="mr-2">
+                                    <a href="{{ $print('sj') }}" target="_blank">
+                                        <i class="fa fa-print text-dark"></i>
                                     </a>
-                                </td>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex">
+                                <div class="flex-grow-1 pr-2">
+                                    <a href="{{ $link }}">{{ $row->no_invoice }}</a>
+                                </div>
+
+                                <div class="mr-2">
+                                    <a href="{{ $print('inv') }}" target="_blank">
+                                        <i class="fa fa-print text-dark"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center align-top">
+                            {{ $row->date }}
+                            <span class="text-center ml-1 {{ $is_out ? 'text-success' : 'text-danger' }}">
+                                <strong class="text-xs">
+                                    @if ($is_out)
+                                        <i class="fa fa-arrow-up"></i>
+                                    @else
+                                        <i class="fa fa-arrow-down"></i>
+                                    @endif
+                                </strong>
+                            </span>
+                        </td>
+                        {{-- <td class="{{ $is_out ? 'text-warning' : 'text-info' }}">
+                            {{ $is_out ? 'Keluar' : 'Masuk' }}
+                        </td> --}}
+
+                        {{-- <td>
+                            @if ($product = $detail->product)
+                                <p class="m-0">
+                                    <span>{{ $product->nama_buku }}</span>
+                                    <br />
+                                    <span class="text-xs text-muted">
+                                        @money($detail->price)
+                                    </span>
+                                </p>
+                            @else
+                                <p class="m-0">Produk</p>
                             @endif
-                        </tr>
-                    @endforeach
+                        </td> --}}
+                        {{-- <td class="text-center">{{ abs($detail->quantity) }}</td>
+                        <td class="text-right">@money(abs($detail->total))</td> --}}
+
+                        <td class="text-right align-top">@money(abs($row->nominal))</td>
+
+                        <td class="text-center align-top">
+                            <a href="{{ route('admin.invoices.edit', $row->id) }}" class="btn btn-md invoice-edit-btn">
+                                <i class="fa fa-edit text-primary"></i>
+                            </a>
+                            <a href="{{ route('admin.invoices.destroy', $row->id) }}" class="btn btn-md invoice-delete-btn">
+                                <i class="fa fa-trash text-danger"></i>
+                            </a>
+                        </td>
+                    </tr>
                 </tbody>
             @endforeach
         @else

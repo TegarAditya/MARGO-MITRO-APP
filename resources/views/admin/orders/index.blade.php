@@ -133,13 +133,13 @@
         }
     },
     columns: [
-        { data: 'placeholder', name: 'placeholder' },
+        { data: 'placeholder', name: 'placeholder', searchable: false },
         { data: 'no_order', name: 'no_order', class: 'text-center'  },
         { data: 'date', name: 'date', class: 'text-center'  },
         { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center'  },
-        { data: 'salesperson_area', name: 'salesperson.area', class: 'text-center'  },
-        { data: 'tagihan', name: 'tagihan'},
-        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center'  }
+        { data: 'salesperson_kotasale', name: 'salesperson.kotasale', class: 'text-center', searchable: false },
+        { data: 'tagihan', name: 'tagihan', searchable: false },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center', searchable: false }
     ],
     orderCellsTop: true,
     order: [[ 2, 'desc' ]],

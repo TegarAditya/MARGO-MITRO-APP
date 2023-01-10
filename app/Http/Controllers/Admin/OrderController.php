@@ -93,7 +93,7 @@ class OrderController extends Controller
                 return $row->semester ? $row->semester->name : '';
             });
 
-            $table->addColumn('salesperson_area', function ($row) {
+            $table->addColumn('salesperson_kotasale', function ($row) {
                 return $row->kotasale ? $row->kotasale->city->name : '';
             });
 
@@ -103,7 +103,7 @@ class OrderController extends Controller
                 '<br>Total Bayar: Rp '.number_format($row->pembayarans->sum('nominal'), 0, ',', '.');
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'salesperson_name', 'salesperson_area', 'lunas', 'tagihan']);
+            $table->rawColumns(['actions', 'placeholder', 'salesperson_name', 'salesperson_kotasale', 'lunas', 'tagihan']);
 
             return $table->make(true);
         }
