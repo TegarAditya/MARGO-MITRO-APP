@@ -364,8 +364,100 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
-        $test = Order::whereDoesntHave('tagihan')->get();
-        dd($test);
+        $this->gantiHargaOrder();
+        dd('done');
+    }
+
+    public function gantiHargaOrder() {
+        $order_details = OrderDetail::whereHas('product', function($q) {
+            $q->where('tipe_pg', '!=', 'non_pg');
+        })->get();
+
+        foreach($order_details as $detail) {
+            $detail->update([
+                'price' => 0,
+                'total' => 0,
+            ]);
+        }
+    }
+
+    public function gantiHargaInvoice() {
+        $invoice_details = InvoiceDetail::whereHas('product', function($q) {
+            $q->where('tipe_pg', '!=', 'non_pg');
+        })->get();
+
+        foreach($invoice_details as $detail) {
+            $detail->update([
+                'price' => 0,
+                'total' => 0,
+            ]);
+        }
+    }
+
+    public function gantiTotalInvoice() {
+        $invoices = Invoice::with('invoice_details')->get();
+
+        foreach($invoices as $invoice) {
+            $sum = $invoice->invoice_details->sum('total');
+            $invoice->update([
+                'nominal' => $sum
+            ]);
+        }
+
+        $orders = Order::get();
+
+        foreach($orders as $order) {
+            Tagihan::where('order_id', $order->id)->update([
+                'total' => OrderDetail::where('order_id', $order_id)->sum('total'),
+                'tagihan' => Invoice::where('order_id', $order_id) ->sum('nominal')
+            ]);
+        }
+    }
+
+
+    public function test_a_a(){
+        set_time_limit(0);
+        DB::beginTransaction();
+        try {
+            $order_id = 120;
+            $order_details = OrderDetail::whereHas('product', function($q) {
+                $q->where('tipe_pg', '!=', 'non_pg');
+            })->where('order_id', $order_id)->get();
+
+            foreach($order_details as $detail) {
+                $detail->update([
+                    'price' => 0,
+                    'total' => 0,
+                ]);
+            }
+            $invoice_id = 304;
+            $invoice_details = InvoiceDetail::whereHas('product', function($q) {
+                $q->where('tipe_pg', '!=', 'non_pg');
+            })->where('invoice_id', $invoice_id)->get();
+
+            foreach($invoice_details as $detail) {
+                $detail->update([
+                    'price' => 0,
+                    'total' => 0,
+                ]);
+            }
+
+            $inv_edit = Invoice::with('invoice_details')->where('id', $invoice_id)->first();
+            $inv_edit->update([
+                'nominal' => $inv_edit->invoice_details->sum('total')
+            ]);
+
+            Tagihan::where('order_id', $order_id)->update([
+                'total' => OrderDetail::where('order_id', $order_id)->sum('total'),
+                'tagihan' => Invoice::where('order_id', $order_id) ->sum('nominal')
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e->getMessage());
+        }
+        dd('done');
     }
 
     public function fixPgMoved() {
@@ -396,6 +488,7 @@ class HomeController
                     ]);
                 }
             }
+            DB::commit();
             dd($products);
         } catch (\Exception $e) {
             DB::rollback();

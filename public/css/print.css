@@ -22,6 +22,9 @@ h1, h2, h3, h4, h5, h6 {
     padding-right: .75rem;
 }
 
+.table tbody tr:nth-child(even) {background: #CCC}
+.table tbody tr:nth-child(odd) {background: #FFF}
+
 
 @media print {
     .pagebreak {
