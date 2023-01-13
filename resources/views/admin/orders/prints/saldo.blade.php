@@ -52,7 +52,62 @@
 @stop
 
 @section('content')
-@foreach ($invoices as $invoice)
+<h5>Pengiriman</h5>
+@foreach ($kirims as $invoice)
+    <div class="row">
+        <div class="col-3">
+            <p class="mb-0 text-sm">
+                No. Invoice
+                <br />
+                <strong>{{ $invoice->no_invoice }}</strong>
+            </p>
+        </div>
+        <div class="col-3">
+            <p class="mb-0 text-sm">
+                Tanggal
+                <br />
+                <strong>{{ Carbon\Carbon::parse($invoice->date)->format('d-m-Y') }}</strong>
+            </p>
+        </div>
+    </div>
+    <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
+        <thead>
+            <th width="1%" class="text-center">No.</th>
+            <th>Jenjang - Kelas</th>
+            <th>Tema/Mapel</th>
+            <th width="1%" class="text-center">Hal</th>
+            <th width="15%" class="text-right">Harga</th>
+            <th width="1%" class="text-center">Qty</th>
+            <th width="20%" class="text-right">Subtotal</th>
+        </thead>
+
+        <tbody>
+            @foreach ($invoice->invoice_details as $invoice_detail)
+                @php
+                $product = $invoice_detail->product;
+                @endphp
+                <tr>
+                    <td class="text-center">{{ $loop->iteration }}</td>
+                    <td>{{ $product->jenjang->name ?? '' }} - Kelas {{ $product->kelas->name ?? '' }}</td>
+                    <td>{{ $product->name }}</td>
+                    <td class="text-center">{{ $product->halaman->name ?? '' }}</td>
+                    <td class="text-right">@money($invoice_detail->price)</td>
+                    <td class="text-center">{{ abs($invoice_detail->quantity) }}</td>
+                    <td class="text-right">@money(abs($invoice_detail->total))</td>
+                </tr>
+            @endforeach
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="6" class="text-center px-3"><strong>Total</strong></td>
+                <td class="text-right">@money(abs($invoice->nominal))</td>
+            </tr>
+        </tfoot>
+    </table>
+@endforeach
+<h5>Retur</h5>
+@foreach ($returs as $invoice)
     <div class="row">
         <div class="col-3">
             <p class="mb-0 text-sm">
@@ -107,7 +162,7 @@
 @endforeach
 <div class="my-2 mb-2 ml-5 text-right">
     <p class="m-0">Total Tagihan</p>
-    <h5 class="m-0">@money($invoices->sum('nominal'))</h5>
+    <h5 class="m-0">@money($total_invoice)</h5>
 </div>
 <hr class="my-2 mt-4 text-right mx-0" />
 <h5>Pembayaran</h5>
@@ -162,7 +217,7 @@
         <p class="mb-0">
             <span>Total Tagihan</span>
             <br />
-            <span class="h5 mb-0 tagihan-total font-weight-bold">@money($invoices->sum('nominal'))</span>
+            <span class="h5 mb-0 tagihan-total font-weight-bold">@money($total_invoice)</span>
         </p>
     </div>
 

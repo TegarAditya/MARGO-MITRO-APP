@@ -573,10 +573,12 @@ class OrderController extends Controller
         $order = Order::findOrFail($request->id);
         $order->load('salesperson');
 
-        $invoices = Invoice::where('order_id', $order->id)->get();
+        $total_invoice = Invoice::where('order_id', $order->id)->sum('nominal');
+        $kirims = Invoice::where('order_id', $order->id)->where('nominal', '>=', 0)->get();
+        $returs = Invoice::where('order_id', $order->id)->where('nominal', '<', 0)->get();
         $pembayarans = Pembayaran::where('order_id', $order->id)->get();
 
-        return view('admin.orders.prints.saldo', compact('order', 'invoices', 'pembayarans'));
+        return view('admin.orders.prints.saldo', compact('order', 'total_invoice', 'kirims', 'returs', 'pembayarans'));
     }
 
     public function print_saldo_rekap(Request $request)
@@ -584,10 +586,12 @@ class OrderController extends Controller
         $order = Order::findOrFail($request->id);
         $order->load('salesperson');
 
-        $invoices = Invoice::where('order_id', $order->id)->get();
+        $total_invoice = Invoice::where('order_id', $order->id)->sum('nominal');
+        $kirims = Invoice::where('order_id', $order->id)->where('nominal', '>=', 0)->get();
+        $returs = Invoice::where('order_id', $order->id)->where('nominal', '<', 0)->get();
         $pembayarans = Pembayaran::where('order_id', $order->id)->get();
 
-        return view('admin.orders.prints.saldo_rekap', compact('order', 'invoices', 'pembayarans'));
+        return view('admin.orders.prints.saldo_rekap', compact('order', 'total_invoice', 'kirims', 'returs', 'pembayarans'));
     }
 
     public function change_price(Request $request)

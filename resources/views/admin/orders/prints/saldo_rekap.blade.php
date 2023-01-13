@@ -56,7 +56,7 @@
     </thead>
 
     <tbody>
-        @forelse ($invoices as $invoice)
+        @forelse ($kirims as $invoice)
             <tr>
                 <td class="text-right px-3">{{ $loop->iteration }}.</td>
                 <td>{{ $invoice->no_suratjalan }}</td>
@@ -74,13 +74,50 @@
     <tfoot>
         <tr>
             <td colspan="4" class="text-center px-3"><strong>Total</strong></td>
-            <td class="text-right">@money(abs($invoices->sum('nominal')))</td>
+            <td class="text-right">@money(abs($kirims->sum('nominal')))</td>
         </tr>
     </tfoot>
 </table>
+
+@if ($returs->count() > 0)
+<h5>Retur</h5>
+<table cellspacing="0" cellpadding="0" class="table table-sm table-bordered mt-2" style="width: 100%">
+    <thead>
+        <th width="1%" class="text-center">No.</th>
+        <th>No. Invoice</th>
+        <th>No. Surat Jalan</th>
+        <th>Tanggal</th>
+        <th width="20%" class="text-right">Total Kirim</th>
+    </thead>
+
+    <tbody>
+        @forelse ($returs as $invoice)
+            <tr>
+                <td class="text-right px-3">{{ $loop->iteration }}.</td>
+                <td>{{ $invoice->no_suratjalan }}</td>
+                <td>{{ $invoice->no_invoice }}</td>
+                <td>{{ $invoice->date }}</td>
+                <td class="text-right px-3">@money(abs($invoice->nominal))</td>
+            </tr>
+        @empty
+            <tr>
+                <td class="px-3" colspan="5">Belum ada Retur</td>
+            </tr>
+        @endforelse
+    </tbody>
+
+    <tfoot>
+        <tr>
+            <td colspan="4" class="text-center px-3"><strong>Total</strong></td>
+            <td class="text-right">@money(abs($returs->sum('nominal')))</td>
+        </tr>
+    </tfoot>
+</table>
+@endif
+
 <div class="my-2 mb-2 ml-5 text-right">
     <p class="m-0">Total Tagihan</p>
-    <h5 class="m-0">@money($invoices->sum('nominal'))</h5>
+    <h5 class="m-0">@money($total_invoice)</h5>
 </div>
 <hr class="my-2 mt-4 text-right mx-0" />
 <h5>Pembayaran</h5>
@@ -135,7 +172,7 @@
         <p class="mb-0">
             <span>Total Tagihan</span>
             <br />
-            <span class="h5 mb-0 tagihan-total font-weight-bold">@money($invoices->sum('nominal'))</span>
+            <span class="h5 mb-0 tagihan-total font-weight-bold">@money($total_invoice)</span>
         </p>
     </div>
 
