@@ -82,6 +82,10 @@ class PembayaranController extends Controller
             $query->select(DB::raw('SUM(tagihan)'));
         }, 'tagihans as bayar' => function($query) {
             $query->select(DB::raw('SUM(saldo)'));
+        }, 'tagihans as retur' => function($query) {
+            $query->select(DB::raw('SUM(retur)'));
+        }, 'tagihans as diskon' => function($query) {
+            $query->select(DB::raw('SUM(diskon)'));
         }])->whereHas('orders')->orderBy('id', 'ASC')->get();
 
         return view('admin.pembayarans.index', compact('saldos'));
@@ -124,6 +128,7 @@ class PembayaranController extends Controller
             ]);
             $tagihan->update([
                 'saldo' => $tagihan->saldo + (float) $request->nominal,
+                'diskon' => $tagihan->diskon + (float) $request->diskon,
             ]);
 
             DB::commit();
@@ -188,6 +193,7 @@ class PembayaranController extends Controller
             ]);
             $tagihan->update([
                 'saldo' => $tagihan->tagihan_movements()->sum('nominal') ?: 0,
+                'diskon' => $tagihan->pembayarans()->sum('diskon') ?: 0,
             ]);
 
             DB::commit();
@@ -235,6 +241,7 @@ class PembayaranController extends Controller
 
             $tagihan->update([
                 'saldo' => $tagihan->tagihan_movements()->sum('nominal') ?: 0,
+                'diskon' => $tagihan->pembayarans()->sum('diskon') ?: 0,
             ]);
 
             $pembayaran->delete();
@@ -319,6 +326,7 @@ class PembayaranController extends Controller
                 ]);
                 $tagihan->update([
                     'saldo' => $tagihan->saldo + (float) $nominal,
+                    'diskon' => $tagihan->diskon + (float) $diskon,
                 ]);
 
                 $counter++;
@@ -364,7 +372,11 @@ class PembayaranController extends Controller
             $query->select(DB::raw('SUM(tagihan)'));
         }, 'tagihans as bayar' => function($query) {
             $query->select(DB::raw('SUM(saldo)'));
-        }])->whereHas('orders')->orderBy('pesanan', 'DESC')->get();
+        }, 'tagihans as retur' => function($query) {
+            $query->select(DB::raw('SUM(retur)'));
+        }, 'tagihans as diskon' => function($query) {
+            $query->select(DB::raw('SUM(diskon)'));
+        }])->whereHas('orders')->orderBy('id', 'ASC')->get();
 
         return (new RekapSaldoExport($saldos))->download('Laporan Saldo.xlsx');
     }

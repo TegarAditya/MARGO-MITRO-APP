@@ -26,7 +26,9 @@
                         <th>Sales</th>
                         <th>Order</th>
                         <th>Tagihan</th>
+                        <th>Retur</th>
                         <th>Pembayaran</th>
+                        <th>Diskon</th>
                         <th>Hutang</th>
                     </tr>
                 </thead>
@@ -37,7 +39,9 @@
                         <td>{{ $saldo->name }}</td>
                         <td class="text-right">@money($saldo->pesanan)</td>
                         <td class="text-right">@money($saldo->tagihan)</td>
+                        <td class="text-right">@money($saldo->retur)</td>
                         <td class="text-right">@money($saldo->bayar)</td>
+                        <td class="text-right">@money($saldo->diskon)</td>
                         <td class="text-right">@money($saldo->tagihan - $saldo->bayar)</td>
                     </tr>
                     @endforeach
@@ -49,7 +53,9 @@
                         </td>
                         <td class="text-right">@money($saldos->sum('pesanan'))</td>
                         <td class="text-right">@money($saldos->sum('tagihan'))</td>
+                        <td class="text-right">@money($saldos->sum('retur'))</td>
                         <td class="text-right">@money($saldos->sum('bayar'))</td>
+                        <td class="text-right">@money($saldos->sum('diskon'))</td>
                         <td class="text-right">@money($saldos->sum('tagihan') - $saldos->sum('bayar'))</td>
                     </tr>
                 </tfoot>
