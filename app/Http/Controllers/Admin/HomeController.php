@@ -365,6 +365,10 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
+        $this->tambahReturTagihan();
+    }
+
+    public function updateDiskonTagihan() {
         $tagihans = Tagihan::all();
 
         foreach($tagihans as $tagihan) {
@@ -376,12 +380,13 @@ class HomeController
     }
 
     public function tambahReturTagihan() {
-        $invoices = Invoice::where('nominal', '<', 0)->get();
+        $orders = Order::whereHas('invoices', function ($q) {
+            $q->where('nominal', '<', 0);
+        })->get();
 
-        foreach($invoices as $invoice) {
-            $nominal = abs($invoice->nominal);
-            Tagihan::where('order_id', $invoice->order_id)->update([
-                'retur' => DB::raw("retur + $nominal"),
+        foreach($orders as $order) {
+            $order->tagihan()->update([
+                'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
             ]);
         }
         dd('done');

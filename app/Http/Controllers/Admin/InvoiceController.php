@@ -166,7 +166,7 @@ class InvoiceController extends Controller
 
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0,
-                'retur' => $order->invoices()->where('nominal', '<', 0)->sum('nominal') ?: 0
+                'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
             ]);
 
             $products = Product::whereIn('id', array_keys($request->products))->get()->each(function($item) use ($invoice, $order, $request, $multiplier) {
@@ -306,7 +306,7 @@ class InvoiceController extends Controller
 
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0,
-                'retur' => $order->invoices()->where('nominal', '<', 0)->sum('nominal') ?: 0
+                'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
             ]);
 
             // Restore to previous data
@@ -538,7 +538,7 @@ class InvoiceController extends Controller
 
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0,
-                'retur' => $order->invoices()->where('nominal', '<', 0)->sum('nominal') ?: 0
+                'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
             ]);
 
             DB::commit();
@@ -606,7 +606,7 @@ class InvoiceController extends Controller
             ]);
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0,
-                'retur' => $order->invoices()->where('nominal', '<', 0)->sum('nominal') ?: 0
+                'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
             ]);
 
             DB::commit();
@@ -699,7 +699,7 @@ class InvoiceController extends Controller
 
                 $order->tagihan()->update([
                     'tagihan' => $order->invoices()->sum('nominal') ?: 0,
-                    'retur' => $order->invoices()->where('nominal', '<', 0)->sum('nominal') ?: 0
+                    'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
                 ]);
 
                 foreach($value as $element) {
