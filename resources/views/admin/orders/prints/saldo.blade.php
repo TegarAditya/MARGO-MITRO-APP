@@ -106,6 +106,7 @@
         </tfoot>
     </table>
 @endforeach
+@if ($returs->count() > 0)
 <h5>Retur</h5>
 @foreach ($returs as $invoice)
     <div class="row">
@@ -160,6 +161,7 @@
         </tfoot>
     </table>
 @endforeach
+@endif
 <div class="my-2 mb-2 ml-5 text-right">
     <p class="m-0">Total Tagihan</p>
     <h5 class="m-0">@money($total_invoice)</h5>

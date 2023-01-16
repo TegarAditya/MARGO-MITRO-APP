@@ -26,7 +26,9 @@ class RekapSaldoExport implements FromCollection, ShouldAutoSize
             'sales' => 'Sales',
             'order' => 'Order',
             'tagihan' => 'Tagihan',
+            'retur' => 'Retur',
             'pembayaran' => 'Pembayaran',
+            'diskon' => 'Diskon',
             'hutang' => 'Hutang',
         ]);
 
@@ -39,7 +41,9 @@ class RekapSaldoExport implements FromCollection, ShouldAutoSize
                 'sales' => (string) $saldo->name,
                 'order' => (string) $saldo->pesanan,
                 'tagihan' => (string) $saldo->tagihan,
+                'retur' => (string) $saldo->retur,
                 'pembayaran' => (string) $saldo->bayar,
+                'diskon' => (string) $saldo->diskon,
                 'hutang' => (string) ($saldo->tagihan - $saldo->bayar),
             ];
 
