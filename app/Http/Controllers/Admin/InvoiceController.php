@@ -633,8 +633,8 @@ class InvoiceController extends Controller
         abort_if(Gate::denies('invoice_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $sales = Salesperson::with('tagihans')->whereHas('tagihans', function($q){
-            $q->whereRaw('tagihan > saldo')
-            ->whereRaw('total > tagihan ');
+            $q->whereRaw('tagihan > saldo');
+            // ->whereRaw('total > tagihan ');
          })->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         if ($request->salesman) {
