@@ -702,39 +702,42 @@ class InvoiceController extends Controller
                     'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
                 ]);
 
-                foreach($value as $element) {
-                    $products = Product::where('id', $element['product_id'])->get()->map(function($item) use ($invoice, $order, $element, $multiplier, $request) {
-                        $qty = (int) $element['qty'] ?: 0;
-                        $price = (float) $element['price'] ?: 0;
+                $products_id = array_column($value->toArray(), 'product_id');
 
-                        $qty = $qty * $multiplier;
+                $products = Product::whereIn('id', $products_id)->get()->map(function($item) use ($invoice, $order, $value, $multiplier, $request) {
 
-                        $item->stock_movements()->create([
-                            'reference' => $invoice->id,
-                            'type' => 'invoice',
-                            'quantity' => -1 * $qty,
-                            'product_id' => $item->id,
-                            'stock_awal' => $item->stock,
-                            'stock_akhir' => $item->stock - $qty,
-                            'date' => $request->date,
-                        ]);
-                        $item->update([ 'stock' => $item->stock - $qty ]);
+                    $element = $value->firstWhere('product_id', $item->id);
 
-                        $order->order_details()->where('product_id', $item->id)->update([
-                            'retur' => DB::raw("order_details.retur - $qty"),
-                        ]);
+                    $qty = (int) $element['qty'] ?: 0;
+                    $price = (float) $element['price'] ?: 0;
 
-                        return [
-                            'product_id' => $item->id,
-                            'invoice_id' => $invoice->id,
-                            'quantity' => $qty,
-                            'price' => $price,
-                            'total' => $qty * $price,
-                        ];
-                    });
-                }
+                    $qty = $qty * $multiplier;
 
-                $invoice->invoice_details()->createMany($products->all());
+                    $item->stock_movements()->create([
+                        'reference' => $invoice->id,
+                        'type' => 'invoice',
+                        'quantity' => -1 * $qty,
+                        'product_id' => $item->id,
+                        'stock_awal' => $item->stock,
+                        'stock_akhir' => $item->stock - $qty,
+                        'date' => $request->date,
+                    ]);
+                    $item->update([ 'stock' => $item->stock - $qty ]);
+
+                    $order->order_details()->where('product_id', $item->id)->update([
+                        'retur' => DB::raw("order_details.retur - $qty"),
+                    ]);
+
+                    return [
+                        'product_id' => $item->id,
+                        'invoice_id' => $invoice->id,
+                        'quantity' => $qty,
+                        'price' => $price,
+                        'total' => $qty * $price,
+                    ];
+                });
+
+                $invoice->invoice_details()->createMany($products);
             }
 
             DB::commit();
