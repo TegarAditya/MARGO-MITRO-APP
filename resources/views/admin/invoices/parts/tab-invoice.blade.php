@@ -251,6 +251,9 @@
                     <hr class="mt-0 mb-2" />
 
                     <div class="product-select" style="display: {{ !$modal['items']->count() ? 'none' : 'block' }}">
+                        @php
+                            $isretur = (0 > (int) $invoice->nominal) ? true : false;
+                        @endphp
                         @foreach ($modal['items'] as $detail)
                             @php
                             $product = $detail->product;
@@ -296,12 +299,20 @@
                                     data-pgstock="{{ $bonus->product->stock }}"
                                     data-pgqty="{{ $bonus->quantity }}"
                                     data-pgmoved="{{ $bonus->moved }}"
-                                    data-pgmax="{{ $bonus->quantity - $bonus->moved }}"
+                                    @if (!$isretur)
+                                        data-pgmax="{{ $bonus->quantity - $bonus->moved }}"
+                                    @else
+                                        data-pgmax="{{ $bonus->quantity }}"
+                                    @endif
                                 @endif
                                 @if ($detail)
                                     data-qty="{{ $sum_qty }}"
                                     data-moved="{{ $sum_moved }}"
-                                    data-max="{{ $sum_qty - $sum_moved }}"
+                                    @if (!$isretur)
+                                        data-max="{{ $sum_qty - $sum_moved }}"
+                                    @else
+                                        data-max="{{ $sum_qty }}"
+                                    @endif
                                 @endif
                                 @if ($foto = $product->foto->first())
                                     data-image="{{ $foto->getUrl('thumb') }}"
