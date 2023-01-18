@@ -528,7 +528,7 @@ class InvoiceController extends Controller
             // Delete items if removed
             $invoice->invoice_details()
                 ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
-                ->forceDelete();
+                ->delete();
             StockMovement::where('reference', $invoice->id)
                 ->where('type', 'invoice')
                 ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
