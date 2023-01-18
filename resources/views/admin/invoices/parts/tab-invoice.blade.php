@@ -280,9 +280,17 @@
                             // $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty)) || ($product->stock <= 0);
                             if ($bonus) {
                                 $pgmax = $bonus->quantity - $bonus->moved;
-                                $disabled = (!$order_detail ? false : (($sum_moved >= $sum_qty) && ($pgmax <= 0)));
+                                if (!$isretur) {
+                                    $disabled = (!$order_detail ? false : (($sum_moved >= $sum_qty) && ($pgmax <= 0)));
+                                } else {
+                                    $disabled = (!$order_detail ? false : (($sum_moved < $sum_qty) && ($pgmax > 0)));
+                                }
                             } else {
-                                $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty));
+                                if (!$isretur) {
+                                    $disabled = (!$order_detail ? false : ($sum_moved >= $sum_qty));
+                                } else {
+                                    $disabled = (!$order_detail ? false : ($sum_moved < $sum_qty));
+                                }
                             }
                             @endphp
                             <a
