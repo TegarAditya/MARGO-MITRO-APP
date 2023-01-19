@@ -365,7 +365,7 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
-        $invoices = Invoice::with('invoice_details')->where('nominal', '<', 0)->get();
+        $invoices = Invoice::with('invoice_details')->withTrashed()->where('nominal', '<', 0)->get();
 
         foreach($invoices as $invoice) {
             foreach($invoice->invoice_details as $detail) {
