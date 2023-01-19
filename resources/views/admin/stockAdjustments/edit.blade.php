@@ -522,7 +522,7 @@
                     var el = $(item);
                     var search = el.data('search');
 
-                    keyword.split(' ').map(function(key) {
+                    keyword.split(';').map(function(key) {
                         search.indexOf(key) < 0 ? el.hide() : (results++);
                     });
                 });
@@ -559,7 +559,7 @@
 
             product.find('.product-img').attr('src', data.image).parent()[!data.image ? 'hide' : 'show']();
 
-            productSearchClear.trigger('click');
+            // productSearchClear.trigger('click');
             modals.modal('hide');
             selected.addClass('selected');
             productSummary.show();

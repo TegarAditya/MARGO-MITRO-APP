@@ -247,6 +247,9 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         abort_if(Gate::denies('invoice_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        if ($invoice->nominal < 0) {
+            return redirect()->route('admin.invoices.returedit', $invoice->id);
+        }
 
         $orders = Order::whereHas('order_details')
             ->get()->mapWithKeys(function($item) {
@@ -405,6 +408,125 @@ class InvoiceController extends Controller
             }
 
             return redirect()->route('admin.invoices.edit', $invoice->id);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function editRetur(Invoice $invoice)
+    {
+        abort_if(Gate::denies('invoice_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $orders = Order::where('id', $invoice->order_id)
+            ->get()->mapWithKeys(function($item) {
+                return [$item->id => $item->no_order];
+            })->prepend(trans('global.pleaseSelect'), '');
+        $order_details = OrderDetail::with(['product', 'product.media'])
+            ->whereHas('product')
+            ->get();
+
+        $invoice->load('invoice_details', 'invoice_details.product', 'invoice_details.bonus',
+            'order', 'order.invoices', 'order.invoices.invoice_details', 'order.tagihan');
+
+        $order = null;
+        if ($order = $invoice->order) {
+            $order_details = $order_details->where('order_id', $order->id);
+        }
+
+        $invoice_details = $invoice->invoice_details->map(function($item) use ($order_details) {
+            $item->order_detail = $order_details->where('product_id', $item->product_id)->first();
+
+            return $item;
+        });
+
+        $alamats = AlamatSale::where('kota_sales_id', $order->kota_sales_id)->pluck('alamat', 'id');
+
+        return view('admin.invoices.return-edit', compact('orders', 'order_details', 'invoice', 'order', 'invoice_details', 'alamats'));
+    }
+
+    public function updateRetur(UpdateInvoiceRequest $request, Invoice $invoice)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'order_id' => 'required|exists:orders,id',
+            'products' => 'required|array|min:1',
+            'alamat' => 'nullable'
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        $order->load([
+            'order_details', 'order_details.product'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $invoice->forceFill([
+                'date' => $request->date,
+                'nominal' => -1 * (float) abs($request->nominal),
+                'order_id' => $request->order_id,
+                'alamat' => $request->alamat,
+            ])->save();
+
+            $invoice->load([
+                'invoice_details', 'invoice_details.product'
+            ]);
+
+            $order->tagihan()->update([
+                'tagihan' => $order->invoices()->sum('nominal') ?: 0,
+                'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
+            ]);
+
+            // Restore to previous data
+            foreach ($invoice->invoice_details as $invoice_detail) {
+                if ($product = $invoice_detail->product) {
+                    $product->update([
+                        'stock' => $product->stock + $invoice_detail->quantity
+                    ]);
+                }
+                $order->order_details()->where('product_id', $invoice_detail->product_id)->update([
+                    'retur' => DB::raw("order_details.retur + $invoice_detail->quantity"),
+                ]);
+            }
+
+            // Update with new items
+            $products = Product::whereIn('id', array_keys($request->products))->get()->each(function($item) use ($invoice, $order, $request) {
+                $qty = (int) $request->products[$item->id]['qty'] ?: 0;
+                $price = (float) $request->products[$item->id]['price'] ?: 0;
+
+                $item->stock_movements()->updateOrCreate([
+                    'reference' => $invoice->id,
+                    'type' => 'invoice',
+                    'product_id' => $item->id,
+                ],[
+                    'quantity' => $qty,
+                    'stock_awal' => $item->stock,
+                    'stock_akhir' => $item->stock + $qty,
+                    'date' => $request->date,
+                ]);
+                $item->update(['stock' => $item->stock + $qty]);
+
+                $order->order_details()->where('product_id', $item->id)->update([
+                    'retur' => DB::raw("order_details.retur + $qty"),
+                ]);
+
+                $invoice_detail = InvoiceDetail::updateOrCreate([
+                    'product_id' => $item->id,
+                    'invoice_id' => $invoice->id
+                ],[
+                    'quantity' => -1 * $qty,
+                    'price' => $price,
+                    'total' => -1 * ($qty * $price),
+                ]);
+            });
+
+            DB::commit();
+
+            Alert::success('Success', 'Invoice berhasil disimpan');
+
+            return redirect()->route('admin.invoices.returedit', $invoice->id);
         } catch (\Exception $e) {
             DB::rollback();
 

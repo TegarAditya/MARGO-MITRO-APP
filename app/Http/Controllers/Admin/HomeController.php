@@ -365,7 +365,25 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
-        $this->tambahReturTagihan();
+        $invoices = Invoice::with('invoice_details')->where('nominal', '<', 0)->get();
+
+        foreach($invoices as $invoice) {
+            foreach($invoice->invoice_details as $detail) {
+                $order_detail = OrderDetail::where('order_id', $invoice->order_id)->where('product_id', $detail->product_id)->first();
+                $sum_qty = InvoiceDetail::whereHas('invoice', function ($q) use ($invoice) {
+                    $q->where('order_id', $invoice->order_id);
+                })->where('product_id', $detail->product_id)->sum('quantity');
+                $sum_negative = InvoiceDetail::whereHas('invoice', function ($q) use ($invoice) {
+                    $q->where('order_id', $invoice->order_id);
+                })->where('product_id', $detail->product_id)->where('quantity', '<', 0)->sum('quantity');
+
+                $order_detail->update([
+                    'moved' => abs($sum_negative) + $sum_qty,
+                    'retur' => abs($sum_negative),
+                ]);
+            }
+        }
+        dd('DONE');
     }
 
     public function updateDiskonTagihan() {
