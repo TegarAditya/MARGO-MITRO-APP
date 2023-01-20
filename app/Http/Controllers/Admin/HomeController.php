@@ -365,6 +365,18 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
+        $orders = OrderDetail::where('order_id', 33)->get();
+        $invoices = InvoiceDetail::where('invoice_id', 666)->get();
+
+        foreach($invoices as $invoice) {
+            $order_detail = $orders->where('product_id', $invoice->product_id)->first();
+            if (!$order_detail) {
+                $invoice->delete();
+            }
+        }
+    }
+
+    public function updateErrorRetur() {
         $invoices = Invoice::with('invoice_details')->withTrashed()->where('nominal', '<', 0)->get();
 
         foreach($invoices as $invoice) {
