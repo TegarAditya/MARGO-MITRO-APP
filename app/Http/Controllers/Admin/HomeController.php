@@ -365,6 +365,52 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
+        DB::beginTransaction();
+        try {
+            $invoices = InvoiceDetail::with('product')->whereHas('invoice', function ($q) {
+                $q->where('order_id', 81);
+            })->get();
+
+            foreach($invoices as $invoice) {
+                if ($invoice->product->brand_id == 20) {
+                    if ($invoice->product->halaman_id == 27) {
+                        $harga_koreksi = 2750;
+                    } else if ($invoice->product->halaman_id == 28) {
+                        $harga_koreksi = 3550;
+                    } else {
+                        continue;
+                    }
+
+                    $qty = $invoice->quantity;
+                    $invoice->update([
+                        'price' => $harga_koreksi,
+                        'total' => $qty * $harga_koreksi,
+                    ]);
+                }
+            }
+
+            $fakturs = Invoice::with('invoice_details')->where('order_id', 81)->get();
+
+            foreach($fakturs as $faktur) {
+                $faktur->update([
+                    'nominal' => $faktur->invoice_details->sum('total')
+                ]);
+            }
+
+            Tagihan::where('order_id', 81)->update([
+                'total' => OrderDetail::where('order_id', 81)->sum('total'),
+                'tagihan' => Invoice::where('order_id', 81) ->sum('nominal')
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e->getMessage());
+        }
+        dd('done');
+    }
+
+    public function deleteEmptyInvoice() {
         $orders = OrderDetail::where('order_id', 33)->get();
         $invoices = InvoiceDetail::where('invoice_id', 666)->get();
 
