@@ -370,7 +370,7 @@ class HomeController
             $order_id = 103;
             $order_packages = OrderPackage::whereHas('order_detail', function ($q) {
                 $q->where('order_id', 103);
-            });
+            })->get();
             foreach($order_packages as $package) {
                 $qty = $package->quantity;
                 $package->update([
