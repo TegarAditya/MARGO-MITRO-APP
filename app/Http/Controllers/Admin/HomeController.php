@@ -367,6 +367,28 @@ class HomeController
         set_time_limit(0);
         DB::beginTransaction();
         try {
+            $order_id = 103;
+            $order_packages = OrderPackage::whereHas('order_detail', function ($q) {
+                $q->where('order_id', 103);
+            });
+            foreach($order_packages as $package) {
+                $qty = $package->quantity;
+                $package->update([
+                    'moved' => $qty,
+                ]);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e->getMessage());
+        }
+        dd('done');
+    }
+
+    public function updateHargaWithCover() {
+        DB::beginTransaction();
+        try {
             $invoices = InvoiceDetail::with('product')->whereHas('invoice', function ($q) {
                 $q->where('order_id', 81);
             })->get();
