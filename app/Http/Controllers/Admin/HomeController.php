@@ -367,10 +367,15 @@ class HomeController
         set_time_limit(0);
         DB::beginTransaction();
         try {
-            $order_id = 103;
             $order_packages = OrderPackage::whereHas('order_detail', function ($q) {
-                $q->where('order_id', 103);
+                $q->where('order_id', 48);
+                $q->whereHas('product', function ($query) {
+                    $query->where('kelas_id', 17)
+                    ->orWhere('kelas_id', 18)
+                    ->orWhere('kelas_id', 19);
+                });
             })->get();
+            dd($order_packages);
             foreach($order_packages as $package) {
                 $qty = $package->quantity;
                 $package->update([
