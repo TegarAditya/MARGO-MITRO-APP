@@ -367,6 +367,46 @@ class HomeController
         set_time_limit(0);
         DB::beginTransaction();
         try {
+            $invoices = InvoiceDetail::with('product')->whereHas('invoice', function ($q) {
+                $q->where('order_id', 97);
+            })->get();
+
+            foreach($invoices as $invoice) {
+                if ($invoice->product->brand_id == 37) {
+                    $harga_koreksi = 3100;
+
+                    $qty = $invoice->quantity;
+                    $invoice->update([
+                        'price' => $harga_koreksi,
+                        'total' => $qty * $harga_koreksi,
+                    ]);
+                }
+            }
+
+            $fakturs = Invoice::with('invoice_details')->where('order_id', 97)->get();
+
+            foreach($fakturs as $faktur) {
+                $faktur->update([
+                    'nominal' => $faktur->invoice_details->sum('total')
+                ]);
+            }
+
+            Tagihan::where('order_id', 81)->update([
+                'total' => OrderDetail::where('order_id', 97)->sum('total'),
+                'tagihan' => Invoice::where('order_id', 97) ->sum('nominal')
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e->getMessage());
+        }
+        dd('done');
+    }
+
+    public function updatePGWithCategory() {
+        DB::beginTransaction();
+        try {
             $order_packages = OrderPackage::whereHas('order_detail', function ($q) {
                 $q->where('order_id', 48);
                 $q->whereHas('product', function ($query) {
@@ -395,7 +435,7 @@ class HomeController
         DB::beginTransaction();
         try {
             $invoices = InvoiceDetail::with('product')->whereHas('invoice', function ($q) {
-                $q->where('order_id', 81);
+                $q->where('order_id', 97);
             })->get();
 
             foreach($invoices as $invoice) {
