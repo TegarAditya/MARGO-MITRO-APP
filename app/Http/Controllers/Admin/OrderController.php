@@ -574,8 +574,8 @@ class OrderController extends Controller
         $order->load('salesperson');
 
         $total_invoice = Invoice::where('order_id', $order->id)->sum('nominal');
-        $kirims = Invoice::where('order_id', $order->id)->where('nominal', '>=', 0)->get();
-        $returs = Invoice::where('order_id', $order->id)->where('nominal', '<', 0)->get();
+        $kirims = Invoice::with('invoice_details')->where('order_id', $order->id)->where('nominal', '>=', 0)->get();
+        $returs = Invoice::with('invoice_details')->where('order_id', $order->id)->where('nominal', '<', 0)->get();
         $pembayarans = Pembayaran::where('order_id', $order->id)->get();
 
         return view('admin.orders.prints.saldo', compact('order', 'total_invoice', 'kirims', 'returs', 'pembayarans'));
@@ -587,8 +587,8 @@ class OrderController extends Controller
         $order->load('salesperson');
 
         $total_invoice = Invoice::where('order_id', $order->id)->sum('nominal');
-        $kirims = Invoice::where('order_id', $order->id)->where('nominal', '>=', 0)->get();
-        $returs = Invoice::where('order_id', $order->id)->where('nominal', '<', 0)->get();
+        $kirims = Invoice::with('invoice_details')->where('order_id', $order->id)->where('nominal', '>=', 0)->get();
+        $returs = Invoice::with('invoice_details')->where('order_id', $order->id)->where('nominal', '<', 0)->get();
         $pembayarans = Pembayaran::where('order_id', $order->id)->get();
 
         return view('admin.orders.prints.saldo_rekap', compact('order', 'total_invoice', 'kirims', 'returs', 'pembayarans'));

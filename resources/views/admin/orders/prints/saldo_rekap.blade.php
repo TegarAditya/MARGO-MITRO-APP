@@ -49,24 +49,32 @@
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered mt-2" style="width: 100%">
     <thead>
         <th width="1%" class="text-center">No.</th>
-        <th>No. Invoice</th>
-        <th>No. Surat Jalan</th>
-        <th>Tanggal</th>
-        <th width="20%" class="text-right">Total Kirim</th>
+        <th class="text-center">No. Invoice</th>
+        <th class="text-center">No. Surat Jalan</th>
+        <th class="text-center">Tanggal</th>
+        <th class="text-center">Total Eksemplar</th>
+        <th width="20%" class="text-center">Total Kirim</th>
     </thead>
 
     <tbody>
+        @php
+            $total_eksemplar = 0
+        @endphp
         @forelse ($kirims as $invoice)
+            @php
+                $total_eksemplar += abs($invoice->invoice_details->sum('quantity'));
+            @endphp
             <tr>
                 <td class="text-right px-3">{{ $loop->iteration }}.</td>
                 <td>{{ $invoice->no_suratjalan }}</td>
                 <td>{{ $invoice->no_invoice }}</td>
                 <td>{{ $invoice->date }}</td>
+                <td class="text-center">{{ angka(abs($invoice->invoice_details->sum('quantity')))}}</td>
                 <td class="text-right px-3">@money($invoice->nominal)</td>
             </tr>
         @empty
             <tr>
-                <td class="px-3" colspan="5">Belum ada pemngiriman</td>
+                <td class="px-3" colspan="6">Belum ada pemngiriman</td>
             </tr>
         @endforelse
     </tbody>
@@ -74,6 +82,7 @@
     <tfoot>
         <tr>
             <td colspan="4" class="text-center px-3"><strong>Total</strong></td>
+            <td class="text-center">{{ angka($total_eksemplar) }}</td>
             <td class="text-right">@money(abs($kirims->sum('nominal')))</td>
         </tr>
     </tfoot>

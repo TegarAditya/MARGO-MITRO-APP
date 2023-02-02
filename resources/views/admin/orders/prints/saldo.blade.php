@@ -100,7 +100,8 @@
 
         <tfoot>
             <tr>
-                <td colspan="6" class="text-center px-3"><strong>Total</strong></td>
+                <td colspan="5" class="text-center px-3"><strong>Total</strong></td>
+                <td class="text-center">{{ angka($invoice->invoice_details->sum('quantity')) }}</td>
                 <td class="text-right">@money(abs($invoice->nominal))</td>
             </tr>
         </tfoot>
@@ -140,6 +141,7 @@
             @foreach ($invoice->invoice_details as $invoice_detail)
                 @php
                 $product = $invoice_detail->product;
+                $total_qty += abs($invoice_detail->quantity);
                 @endphp
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>
@@ -155,7 +157,8 @@
 
         <tfoot>
             <tr>
-                <td colspan="6" class="text-center px-3"><strong>Total</strong></td>
+                <td colspan="5" class="text-center px-3"><strong>Total</strong></td>
+                <td class="text-center">{{ angka(abs($invoice->invoice_details->sum('quantity'))) }}</td>
                 <td class="text-right">@money(abs($invoice->nominal))</td>
             </tr>
         </tfoot>
