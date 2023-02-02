@@ -367,34 +367,47 @@ class HomeController
         set_time_limit(0);
         DB::beginTransaction();
         try {
-            $invoices = InvoiceDetail::with('product')->whereHas('invoice', function ($q) {
-                $q->where('order_id', 97);
-            })->get();
+            $harga_koreksi = 3300;
 
-            foreach($invoices as $invoice) {
-                if ($invoice->product->brand_id == 37) {
-                    $harga_koreksi = 3100;
+            $order_details = OrderDetail::where('product_id', 9469)->get();
+            foreach($order_details as $detail) {
+                $qty = $detail->quantity;
 
-                    $qty = $invoice->quantity;
-                    $invoice->update([
-                        'price' => $harga_koreksi,
-                        'total' => $qty * $harga_koreksi,
-                    ]);
-                }
-            }
-
-            $fakturs = Invoice::with('invoice_details')->where('order_id', 97)->get();
-
-            foreach($fakturs as $faktur) {
-                $faktur->update([
-                    'nominal' => $faktur->invoice_details->sum('total')
+                $detail->update([
+                    'price' => $harga_koreksi,
+                    'total' => $qty * $harga_koreksi,
                 ]);
             }
 
-            Tagihan::where('order_id', 81)->update([
-                'total' => OrderDetail::where('order_id', 97)->sum('total'),
-                'tagihan' => Invoice::where('order_id', 97) ->sum('nominal')
-            ]);
+            $invoice_details = InvoiceDetail::where('product_id', 9469)->get();
+            foreach($invoice_details as $detail) {
+                $qty = $detail->quantity;
+
+                $detail->update([
+                    'price' => $harga_koreksi,
+                    'total' => $qty * $harga_koreksi,
+                ]);
+            }
+
+            $orders = Order::whereHas('order_details', function ($q) {
+                $q->where('product_id', 9469);
+            })->get();
+
+            foreach($orders as $order) {
+                $fakturs = Invoice::with('invoice_details')->where('order_id', $order->id)->get();
+
+                foreach($fakturs as $faktur) {
+                    $faktur->update([
+                        'nominal' => $faktur->invoice_details->sum('total')
+                    ]);
+                }
+
+                Tagihan::where('order_id', $order->id)->update([
+                    'total' => OrderDetail::where('order_id', $order->id)->sum('total'),
+                    'tagihan' => Invoice::where('order_id', $order->id) ->sum('nominal')
+                ]);
+            }
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
