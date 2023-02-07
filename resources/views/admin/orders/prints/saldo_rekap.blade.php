@@ -96,11 +96,18 @@
         <th>No. Invoice</th>
         <th>No. Surat Jalan</th>
         <th>Tanggal</th>
+        <th class="text-center">Total Eksemplar</th>
         <th width="20%" class="text-right">Total Kirim</th>
     </thead>
 
     <tbody>
+        @php
+            $total_eksemplar = 0
+        @endphp
         @forelse ($returs as $invoice)
+            @php
+                $total_eksemplar += abs($invoice->invoice_details->sum('quantity'));
+            @endphp
             <tr>
                 <td class="text-right px-3">{{ $loop->iteration }}.</td>
                 <td>{{ $invoice->no_suratjalan }}</td>
@@ -118,6 +125,7 @@
     <tfoot>
         <tr>
             <td colspan="4" class="text-center px-3"><strong>Total</strong></td>
+            <td class="text-center">{{ angka($total_eksemplar) }}</td>
             <td class="text-right">@money(abs($returs->sum('nominal')))</td>
         </tr>
     </tfoot>
