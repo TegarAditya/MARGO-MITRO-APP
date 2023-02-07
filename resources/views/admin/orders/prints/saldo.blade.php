@@ -141,7 +141,6 @@
             @foreach ($invoice->invoice_details as $invoice_detail)
                 @php
                 $product = $invoice_detail->product;
-                $total_qty += abs($invoice_detail->quantity);
                 @endphp
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>
