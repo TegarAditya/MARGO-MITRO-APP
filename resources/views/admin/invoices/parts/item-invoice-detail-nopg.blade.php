@@ -143,12 +143,18 @@ $name = !isset($name) ? 'products' : $name;
                 </a>
             </div>
         @else
+            @if (!$detail)
+                <span>Detail {{$detail->id}}</span>
+            @elseif(!$order_detail)
+                <span>Tidak ada Di Order</span>
+            @else
             <div class="col-auto pl-5 item-product-action">
                 <a href="{{ route('admin.invoices.delete') }}" class="btn btn-danger btn-sm detail-invoice-delete"
                     data-invoice="{{ $detail->id }}" data-order="{{ $order_detail->id }}">
                     <i class="fa fa-trash"></i>
                 </a>
             </div>
+            @endif
         @endif
     </div>
 </div>
