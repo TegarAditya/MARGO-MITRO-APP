@@ -113,6 +113,7 @@
                 <td>{{ $invoice->no_suratjalan }}</td>
                 <td>{{ $invoice->no_invoice }}</td>
                 <td>{{ $invoice->date }}</td>
+                <td class="text-center">{{ angka(abs($invoice->invoice_details->sum('quantity')))}}</td>
                 <td class="text-right px-3">@money(abs($invoice->nominal))</td>
             </tr>
         @empty
