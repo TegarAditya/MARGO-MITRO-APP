@@ -372,7 +372,7 @@ class HomeController
                 $terkirim = $order->fakturs->where('quantity', '>', 0)->where('product_id', $order_detail->product_id)->sum('quantity');
 
                 $order_detail->update([
-                    'moved' => abs($retur) + $terkirim,
+                    'moved' => $terkirim,
                     'retur' => abs($retur),
                 ]);
             }
