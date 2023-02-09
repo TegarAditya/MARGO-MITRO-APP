@@ -364,40 +364,7 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
-        DB::beginTransaction();
-        try {
-            $order = Order::with('fakturs')->where('id', 70)->first();
-
-            foreach($order->fakturs as $faktur) {
-                $order_detail = OrderDetail::where('order_id', 70)->where('product_id', $faktur->product_id)->first();
-                $harga_koreksi = $order_detail->price;
-                $qty = $faktur->quantity;
-
-                $faktur->update([
-                    'price' => $harga_koreksi,
-                    'total' => $qty * $harga_koreksi,
-                ]);
-            }
-
-            $fakturs = Invoice::with('invoice_details')->where('order_id', 70)->get();
-
-            foreach($fakturs as $faktur) {
-                $faktur->update([
-                    'nominal' => $faktur->invoice_details->sum('total')
-                ]);
-            }
-
-            Tagihan::where('order_id', 70)->update([
-                'total' => OrderDetail::where('order_id', 70)->sum('total'),
-                'tagihan' => Invoice::where('order_id', 70) ->sum('nominal')
-            ]);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            dd($e->getMessage());
-        }
+        $this->updateErrorRetur();
         dd('done');
     }
 
