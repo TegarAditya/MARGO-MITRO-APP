@@ -515,7 +515,7 @@ class HomeController
                 $order_detail = OrderDetail::where('order_id', $invoice->order_id)->where('product_id', $detail->product_id)->first();
                 $sum_qty = InvoiceDetail::whereHas('invoice', function ($q) use ($invoice) {
                     $q->where('order_id', $invoice->order_id);
-                })->where('product_id', $detail->product_id)->sum('quantity');
+                })->where('product_id', $detail->product_id)->where('quantity', '>=', 0)->sum('quantity');
                 $sum_negative = InvoiceDetail::whereHas('invoice', function ($q) use ($invoice) {
                     $q->where('order_id', $invoice->order_id);
                 })->where('product_id', $detail->product_id)->where('quantity', '<', 0)->sum('quantity');
