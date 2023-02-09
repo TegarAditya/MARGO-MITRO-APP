@@ -364,16 +364,18 @@ class HomeController
 
     public function god(){
         set_time_limit(0);
-        $order = Order::with('order_details', 'fakturs')->where('id', 53)->first();
+        $orders = Order::with('order_details', 'fakturs')->get();
 
-        foreach($order->order_details as $order_detail) {
-            $retur = $order->fakturs->where('quantity', '<', 0)->where('product_id', $order_detail->product_id)->sum('quantity');
-            $terkirim = $order->fakturs->where('quantity', '>', 0)->where('product_id', $order_detail->product_id)->sum('quantity');
+        foreach($orders as $order) {
+            foreach($order->order_details as $order_detail) {
+                $retur = $order->fakturs->where('quantity', '<', 0)->where('product_id', $order_detail->product_id)->sum('quantity');
+                $terkirim = $order->fakturs->where('quantity', '>', 0)->where('product_id', $order_detail->product_id)->sum('quantity');
 
-            $order_detail->update([
-                'moved' => abs($retur) + $terkirim,
-                'retur' => abs($retur),
-            ]);
+                $order_detail->update([
+                    'moved' => abs($retur) + $terkirim,
+                    'retur' => abs($retur),
+                ]);
+            }
         }
         dd('done');
     }
