@@ -159,7 +159,10 @@
             <div class="col-12">
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary mr-3" name="filter" value="filter">Filter Buku</button>
-                    <a class="btn btn-warning" data-toggle="modal" data-target="#gantiHargaModal">Ganti Harga</a>
+                    <a class="btn btn-warning mr-3" data-toggle="modal" data-target="#gantiHargaModal">Ganti Harga</a>
+                    @if($order->id)
+                        <a id="synchronFaktur" href="{{ route('admin.orders.ubahHargaFaktur') }}" data-order="{{ $order->id }}" class="btn btn-danger mr-3" name="synchron" value="synchron">Synchron Harga Faktur</a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -871,6 +874,33 @@ $(document).ready(function() {
             });
         } else {
             $('#kota_sales_id').empty();
+        }
+    });
+    $('#synchronFaktur').on('click', function(e) {
+        e.preventDefault();
+
+        var el = $(e.currentTarget);
+        var url = el.attr('href');
+        var order = el.data('order');
+        console.log(order);
+        if (confirm('{{ trans('global.areYouSure') }}')) {
+            $.ajax({
+                headers: {'x-csrf-token': _token},
+                method: 'POST',
+                url: url,
+                data: {
+                    order
+                }
+            }).done(function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Harga berhasil diubah',
+                    showConfirmButton: true,
+                    timer: 1500
+                }).then((result) => {
+                    location.reload();
+                });
+            });
         }
     });
 });

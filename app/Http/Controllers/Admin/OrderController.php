@@ -656,8 +656,45 @@ class OrderController extends Controller
         }
     }
 
-    public function change_price_single(Request $request)
+    public function ubahHargaFaktur(Request $request)
     {
-        dd('aaa');
+        $order_id = $request->order;
+
+        DB::beginTransaction();
+        try {
+            $order = Order::with('fakturs')->where('id', $order_id)->first();
+
+            foreach($order->fakturs as $faktur) {
+                $order_detail = OrderDetail::where('order_id', $order_id)->where('product_id', $faktur->product_id)->first();
+                $harga_koreksi = $order_detail->price;
+                $qty = $faktur->quantity;
+
+                $faktur->update([
+                    'price' => $harga_koreksi,
+                    'total' => $qty * $harga_koreksi,
+                ]);
+            }
+
+            $fakturs = Invoice::with('invoice_details')->where('order_id', $order_id)->get();
+
+            foreach($fakturs as $faktur) {
+                $faktur->update([
+                    'nominal' => $faktur->invoice_details->sum('total')
+                ]);
+            }
+
+            Tagihan::where('order_id', $order_id)->update([
+                'total' => OrderDetail::where('order_id', $order_id)->sum('total'),
+                'tagihan' => Invoice::where('order_id', $order_id) ->sum('nominal')
+            ]);
+
+            DB::commit();
+
+            return response('Harga Faktur berhasil diubah', 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 }

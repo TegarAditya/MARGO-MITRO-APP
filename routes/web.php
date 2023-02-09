@@ -97,6 +97,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('orders/saldo_rekap/{id}', 'OrderController@print_saldo_rekap')->name('orders.saldo_rekap');
     Route::post('orders/change-price', 'OrderController@change_price')->name('orders.change_price');
     Route::post('orders/change-price-single', 'OrderController@change_price_single')->name('orders.change_price_single');
+    Route::post('orders/change-price-faktur', 'OrderController@ubahHargaFaktur')->name('orders.ubahHargaFaktur');
     Route::resource('orders', 'OrderController');
 
     // Order Detail
