@@ -666,8 +666,8 @@ class OrderController extends Controller
 
             foreach($order->fakturs as $faktur) {
                 $order_detail = OrderDetail::where('order_id', $order_id)->where('product_id', $faktur->product_id)->first();
-                $harga_koreksi = $order_detail->price;
-                $qty = $faktur->quantity;
+                $harga_koreksi = $order_detail->price ?? 0;
+                $qty = $faktur->quantity ?? 0 ;
 
                 $faktur->update([
                     'price' => $harga_koreksi,
