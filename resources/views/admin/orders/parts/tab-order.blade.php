@@ -897,8 +897,6 @@ $(document).ready(function() {
                     title: 'Harga berhasil diubah',
                     showConfirmButton: true,
                     timer: 1500
-                }).then((result) => {
-                    location.reload();
                 });
             });
         }
