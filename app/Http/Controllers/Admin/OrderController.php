@@ -694,7 +694,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
 
-            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+            return response('error-message', $e->getMessage());
         }
     }
 }
