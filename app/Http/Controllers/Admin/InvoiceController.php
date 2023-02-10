@@ -69,7 +69,7 @@ class InvoiceController extends Controller
                 $parent = 'orders';
                 $idParent = $row->order->id;
 
-                return view('partials.datatablesActions', compact(
+                return view('partials.datatablesActionsInvoiceIndex', compact(
                     'viewGate',
                     'editGate',
                     'deleteGate',
@@ -726,6 +726,55 @@ class InvoiceController extends Controller
             $invoice->update([
                 'nominal' => InvoiceDetail::where('invoice_id', $invoice->id)->sum('total')
             ]);
+            $order->tagihan()->update([
+                'tagihan' => $order->invoices()->sum('nominal') ?: 0,
+                'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0
+            ]);
+
+            DB::commit();
+
+            Alert::success('Success', 'Invoice berhasil dihapus');
+
+            return redirect()->route('admin.invoices.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function destroyRetur(Invoice $invoice)
+    {
+        abort_if(Gate::denies('invoice_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $order = Order::findOrFail($invoice->order_id);
+
+        DB::beginTransaction();
+        try {
+            $invoice->load([
+                'invoice_details', 'invoice_details.product',
+            ]);
+
+            // Restore to previous data
+            foreach ($invoice->invoice_details as $invoice_detail) {
+                if ($product = $invoice_detail->product) {
+                    $product->update([
+                        'stock' => $product->stock + $invoice_detail->quantity
+                    ]);
+                }
+            }
+
+            // Delete items if removed
+            $invoice->invoice_details()
+                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->delete();
+            StockMovement::where('reference', $invoice->id)
+                ->where('type', 'invoice')
+                ->whereIn('product_id', $invoice->invoice_details->pluck('product_id'))
+                ->forceDelete();
+
+            $invoice->delete();
+
             $order->tagihan()->update([
                 'tagihan' => $order->invoices()->sum('nominal') ?: 0,
                 'retur' => abs($order->invoices()->where('nominal', '<', 0)->sum('nominal')) ?: 0

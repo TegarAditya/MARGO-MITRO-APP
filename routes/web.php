@@ -110,6 +110,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::put('invoices/retur/{invoice}', 'InvoiceController@updateRetur')->name('invoices.returupdate');
     Route::post('invoices/retursave', 'InvoiceController@fakturReturSave')->name('invoices.saveretur');
     Route::post('invoices/delete', 'InvoiceController@delete')->name('invoices.delete');
+    Route::delete('invoices/destroy-retur/{invoice}', 'InvoiceController@destroyRetur')->name('invoices.destroyretur');
     Route::resource('invoices', 'InvoiceController');
 
     // Invoice Detail

@@ -85,9 +85,15 @@
                             <a href="{{ route('admin.invoices.edit', $row->id) }}" class="btn btn-md invoice-edit-btn">
                                 <i class="fa fa-edit text-primary"></i>
                             </a>
-                            <a href="{{ route('admin.invoices.destroy', $row->id) }}" class="btn btn-md invoice-delete-btn">
-                                <i class="fa fa-trash text-danger"></i>
-                            </a>
+                            @if ($is_out)
+                                <a href="{{ route('admin.invoices.destroy', $row->id) }}" class="btn btn-md invoice-delete-btn">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </a>
+                            @else
+                                <a href="{{ route('admin.invoices.destroyretur', $row->id) }}" class="btn btn-md invoice-delete-btn">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </a>
+                            @endif
                         </td>
                     </tr>
                 </tbody>
