@@ -693,6 +693,7 @@ class OrderController extends Controller
             return response('Harga Faktur berhasil diubah', 200);
         } catch (\Exception $e) {
             DB::rollback();
+
             dd($e->getMessage());
 
             return redirect()->back()->with('error-message', $e->getMessage())->withInput();
