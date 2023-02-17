@@ -363,6 +363,9 @@ class HomeController
     //     }
 
     public function god(){
+
+    }
+    public function patchMovedRetur(){
         set_time_limit(0);
         $orders = Order::with('order_details', 'fakturs')->get();
 

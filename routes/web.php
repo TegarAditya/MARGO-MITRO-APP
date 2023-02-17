@@ -121,6 +121,15 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('stock-adjustments', 'StockAdjustmentController');
     Route::post('stock-adjustments/import', 'StockAdjustmentController@import')->name('stock-adjustments.import');
 
+    //GUDANG
+
+    // Produk Masuk
+    Route::resource('purchases', 'PurchaseController');
+
+    // Faktur
+    Route::get('faktur/history', 'FakturController@history')->name('faktur.history');
+    Route::resource('faktur', 'FakturController', ['except' => ['create', 'store', 'destroy']]);
+
 
     // Stock Movement
     Route::resource('stock-movements', 'StockMovementController', ['only' => ['index']]);
@@ -137,6 +146,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('pembayarans/general', 'PembayaranController@general')->name('pembayarans.general');
     Route::get('pembayarans/export', 'PembayaranController@rekapSaldoExport')->name('pembayarans.export');
     Route::post('pembayarans/general', 'PembayaranController@generalSave')->name('pembayarans.general.save');
+    Route::post('pembayarans/periode', 'PembayaranController@periode')->name('pembayarans.periode');
     Route::get('pembayarans/ajax/getTagihan', 'PembayaranController@getTagihan')->name('pembayarans.ajax.tagihan');
     Route::resource('pembayarans', 'PembayaranController');
 

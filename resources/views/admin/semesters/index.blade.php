@@ -22,6 +22,9 @@
 
                     </th>
                     <th>
+                        Code
+                    </th>
+                    <th>
                         {{ trans('cruds.semester.fields.name') }}
                     </th>
                     <th>
@@ -88,12 +91,13 @@
     aaSorting: [],
     ajax: "{{ route('admin.semesters.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'name', name: 'name' },
-{ data: 'start_date', name: 'start_date', class: 'text-center' },
-{ data: 'end_date', name: 'end_date', class: 'text-center' },
-{ data: 'status', name: 'status', class: 'text-center' },
-{ data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'code', name: 'code', class: 'text-center' },
+        { data: 'name', name: 'name' },
+        { data: 'start_date', name: 'start_date', class: 'text-center' },
+        { data: 'end_date', name: 'end_date', class: 'text-center' },
+        { data: 'status', name: 'status', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

@@ -31,6 +31,7 @@ class Semester extends Model
     ];
 
     protected $fillable = [
+        'code',
         'name',
         'tipe',
         'start_date',
@@ -64,5 +65,24 @@ class Semester extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function($model) {
+            $year = Carbon::parse($model->start_date)->format('y');
+            $tipe = $model->tipe == 'GANJIL' ? '01' : '02';
+
+            $model->code = $tipe. '' . $year;
+        });
+
+        static::updating(function($model) {
+            $year = Carbon::parse($model->start_date)->format('y');
+            $tipe = $model->tipe == 'GANJIL' ? '01' : '02';
+
+            $model->code = $tipe. '' . $year;
+        });
     }
 }

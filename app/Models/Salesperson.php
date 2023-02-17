@@ -85,9 +85,18 @@ class Salesperson extends Model implements HasMedia
         return $this->hasMany(Order::class);
     }
 
+    public function invoices() {
+        return $this->hasManyThrough(Invoice::class, Order::class);
+    }
+
     public function tagihans()
     {
         return $this->hasMany(Tagihan::class);
+    }
+
+    public function pembayarans()
+    {
+        return $this->hasManyThrough(Pembayaran::class, Tagihan::class);
     }
 
     public function kota()

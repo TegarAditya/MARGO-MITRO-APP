@@ -53,11 +53,14 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.category.fields.name') }}
+                        Code
                     </th>
                     <th>
-                        {{ trans('cruds.category.fields.slug') }}
+                        {{ trans('cruds.category.fields.name') }}
                     </th>
+                    {{-- <th>
+                        {{ trans('cruds.category.fields.slug') }}
+                    </th> --}}
                     <th>
                         {{ trans('cruds.category.fields.type') }}
                     </th>
@@ -125,8 +128,9 @@
     },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
+        { data: 'code', name: 'code', class: 'text-center'  },
         { data: 'name', name: 'name' },
-        { data: 'slug', name: 'slug' },
+        // { data: 'slug', name: 'slug' },
         { data: 'type', name: 'type', class: 'text-center' },
         // { data: 'parent_name', name: 'parent.name' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center'  }

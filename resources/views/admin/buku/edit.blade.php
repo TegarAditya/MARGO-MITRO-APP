@@ -19,6 +19,18 @@
                 <span class="help-block">{{ trans('cruds.product.fields.name_helper') }}</span>
             </div>
             <div class="form-group">
+                <label class="required" for="mapel_id">{{ trans('cruds.buku.fields.name') }}</label>
+                <select class="form-control select2 {{ $errors->has('mapel_id') ? 'is-invalid' : '' }}" name="mapel_id" id="mapel_id" required>
+                    @foreach($mapel as $id => $entry)
+                        <option value="{{ $id }}" {{ (old('mapel_id') ? old('mapel_id') : $product->mapel_id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('mapel_id'))
+                    <span class="text-danger">{{ $errors->first('mapel_id') }}</span>
+                @endif
+                <span class="help-block"></span>
+            </div>
+            <div class="form-group">
                 <label for="description">{{ trans('cruds.product.fields.description') }}</label>
                 <textarea class="form-control {{ $errors->has('description') ? 'is-invalid' : '' }}" name="description" id="description">{{ old('description', $product->description) }}</textarea>
                 @if($errors->has('description'))

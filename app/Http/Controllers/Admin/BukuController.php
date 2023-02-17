@@ -135,6 +135,7 @@ class BukuController extends Controller
 
         $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $mapel = Category::where('type', 'mapel')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -143,7 +144,7 @@ class BukuController extends Controller
         $kunci = Product::where('tipe_pg', 'kunci')->WhereDoesntHave('jadi_kunci')->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semester = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci', 'semester'));
+        return view('admin.buku.create', compact('brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci', 'semester', 'mapel'));
     }
 
     public function store(StoreProductRequest $request)
@@ -162,6 +163,7 @@ class BukuController extends Controller
                 $product = Product::create($request->all());
 
                 if ($request->jenis_pg !== 'no_pg') {
+                    $pg_mapel_id = $request->mapel_id;
                     $pg_brand_id = $request->brand_id;
                     $pg_isi_id = $request->isi_id;
                     $pg_jenjang_id = $request->jenjang_id;
@@ -189,6 +191,7 @@ class BukuController extends Controller
 
                     $product_pg = Product::firstOrCreate([
                         'name' => $pg_name,
+                        'mapel_id' => $pg_mapel_id,
                         'brand_id' => $pg_brand_id,
                         'isi_id' => $pg_isi_id,
                         'jenjang_id' => $pg_jenjang_id,
@@ -235,6 +238,7 @@ class BukuController extends Controller
 
         $brands = Brand::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $mapel = Category::where('type', 'mapel')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjang = Category::where('type', 'jenjang')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $kelas = Category::where('type', 'kelas')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $halaman = Category::where('type', 'halaman')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -243,9 +247,9 @@ class BukuController extends Controller
         $kunci = Product::where('tipe_pg', 'kunci')->WhereDoesntHave('jadi_kunci')->orWhere('id', ($product->kunci ? $product->kunci->id : '-1'))->get()->pluck('nama_isi_buku', 'id')->prepend(trans('global.pleaseSelect'), '');
         $semester = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman');
+        $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman', 'mapel');
 
-        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci', 'semester'));
+        return view('admin.buku.edit', compact('product', 'brands', 'units', 'jenjang', 'kelas', 'halaman', 'isi', 'pg', 'kunci', 'semester', 'mapel'));
     }
 
     public function update(UpdateProductRequest $request, $id)
@@ -279,7 +283,7 @@ class BukuController extends Controller
         $product = Product::find($id);
         abort_if(Gate::denies('product_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman', 'isi');
+        $product->load('brand', 'unit', 'jenjang', 'kelas', 'halaman', 'isi', 'mapel');
 
         $stockMovements = StockMovement::with(['product'])->where('product_id', $product->id)->orderBy('created_at', 'DESC')->get();
 

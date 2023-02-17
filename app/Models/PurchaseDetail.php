@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class InvoiceDetail extends Model
+class PurchaseDetail extends Model
 {
     use SoftDeletes;
     use HasFactory;
 
-    public $table = 'invoice_details';
+    public $table = 'purchase_details';
 
     protected $dates = [
         'created_at',
@@ -21,24 +21,24 @@ class InvoiceDetail extends Model
     ];
 
     protected $fillable = [
-        'invoice_id',
+        'purchase_id',
+        'productionperson_id',
+        'semester_id',
         'product_id',
         'quantity',
-        'price',
-        'total',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
 
-    protected $casts = [
-        'price' => 'double',
-        'total' => 'double',
-    ];
-
-    public function invoice()
+    protected function serializeDate(DateTimeInterface $date)
     {
-        return $this->belongsTo(Invoice::class, 'invoice_id');
+        return $date->format('Y-m-d H:i:s');
+    }
+
+    public function purchase()
+    {
+        return $this->belongsTo(Purchase::class, 'purchase_id');
     }
 
     public function product()
@@ -46,17 +46,13 @@ class InvoiceDetail extends Model
         return $this->belongsTo(Product::class, 'product_id');
     }
 
-    public function order() {
-        return $this->belongsTo(Order::class, 'order_id');
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
     }
 
-    public function bonus()
+    public function subkontraktor()
     {
-        return $this->hasOne(InvoicePackage::class, 'invoice_detail_id');
-    }
-
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
+        return $this->belongsTo(Productionperson::class, 'productionperson_id');
     }
 }

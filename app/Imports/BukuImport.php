@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class BukuImport implements ToModel, WithHeadingRow
 {
+    private $mapel;
     private $jenjang;
     private $kelas;
     private $halaman;
@@ -20,6 +21,7 @@ class BukuImport implements ToModel, WithHeadingRow
 
     public function __construct()
     {
+        $this->mapel = Category::select('id', 'name')->where('type', 'mapel')->get();
         $this->jenjang = Category::select('id', 'name')->where('type', 'jenjang')->get();
         $this->kelas = Category::select('id', 'name')->where('type', 'kelas')->get();
         $this->halaman = Category::select('id', 'name')->where('type', 'halaman')->get();
@@ -35,6 +37,7 @@ class BukuImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
+        $mapel = $this->mapel->where('name', $row['mapel'])->first();
         $jenjang = $this->jenjang->where('name', $row['jenjang'])->first();
         $kelas = $this->kelas->where('name', $row['kelas'])->first();
         $halaman = $this->halaman->where('name', $row['halaman'])->first();
@@ -46,6 +49,7 @@ class BukuImport implements ToModel, WithHeadingRow
             'name' => $row['name'],
             'description' => $row['description'],
             'category_id' => 1,
+            'mapel_id' => $mapel->id,
             'brand_id' => $brand->id,
             'unit_id' => $unit->id,
             'jenjang_id' => $jenjang->id,

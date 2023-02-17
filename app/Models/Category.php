@@ -22,6 +22,7 @@ class Category extends Model
         'jenjang' => 'Jenjang',
         'isi' => 'Isi',
         'bahan' => 'Bahan',
+        'mapel' => 'Mapel',
     ];
 
     public $table = 'categories';
@@ -33,6 +34,7 @@ class Category extends Model
     ];
 
     protected $fillable = [
+        'code',
         'name',
         'slug',
         'type',

@@ -11,6 +11,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class SemesterController extends Controller
 {
@@ -43,6 +44,9 @@ class SemesterController extends Controller
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });
+            $table->editColumn('code', function ($row) {
+                return $row->code ? $row->code : '';
+            });
 
             $table->editColumn('status', function ($row) {
                 return $row->status ? '<i class="fa fa-check" aria-hidden="true"></i>' : '<i class="fa fa-times" aria-hidden="true"></i>';
@@ -59,6 +63,16 @@ class SemesterController extends Controller
     public function create()
     {
         abort_if(Gate::denies('semester_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $semesters = Semester::all();
+        foreach($semesters as $semester) {
+            $year = Carbon::parse($semester->start_date)->format('y');
+            $tipe = $semester->tipe == 'GANJIL' ? '01' : '02';
+
+            $semester->update([
+                'code' => $tipe. '' . $year
+            ]);
+        }
 
         return view('admin.semesters.create');
     }

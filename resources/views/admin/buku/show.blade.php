@@ -14,7 +14,8 @@
                 </a>
             </div> --}}
             <h3 class="mt-1">History Product Movement</h3>
-            <h5 class="mt-2 mb-4">#BUKU: {{ $product->name }}</h5>
+            <h5 class="mt-2">#BUKU: {{ $product->name }}</h5>
+            <h5 class="mb-4">#CODE: {{ $product->code }}</h5>
             <div class="mb-3 table-responsive">
                 <table class="table table-bordered table-striped table-hover datatable datatable-movement">
                     <thead>
@@ -93,6 +94,14 @@
             <h3 class="mt-3 mb-4">#BUKU: {{ $product->nama_isi_buku }}</h3>
             <table class="table table-bordered table-striped">
                 <tbody>
+                    <tr>
+                        <th class="text-left" width="20%" style="padding-left: 20px">
+                            Code
+                        </th>
+                        <td>
+                            {{ $product->code ?? '' }}
+                        </td>
+                    </tr>
                     <tr>
                         <th class="text-left" width="20%" style="padding-left: 20px">
                             {{ trans('cruds.buku.fields.brand') }}

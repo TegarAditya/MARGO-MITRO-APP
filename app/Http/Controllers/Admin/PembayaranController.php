@@ -16,9 +16,11 @@ use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Date;
 use Yajra\DataTables\Facades\DataTables;
 use Alert;
 use App\Exports\Admin\RekapSaldoExport;
+use Carbon\Carbon;
 
 class PembayaranController extends Controller
 {
@@ -89,6 +91,25 @@ class PembayaranController extends Controller
         }])->whereHas('orders')->orderBy('id', 'ASC')->get();
 
         return view('admin.pembayarans.index', compact('saldos'));
+    }
+
+    public function periode(Request $request)
+    {
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+
+        $saldos = Salesperson::with(['invoices' => function($query) use($start, $end) {
+            $query->whereBetween('invoices.date', [$start, $end]);
+        }, 'pembayarans' => function($query) use($start, $end) {
+            $query->whereBetween('pembayarans.tanggal', [$start, $end]);
+        }])->whereHas('orders')->orderBy('id', 'ASC')->get();
+
+        return view('admin.pembayarans.periode', compact('saldos'));
     }
 
     public function create(Request $request)

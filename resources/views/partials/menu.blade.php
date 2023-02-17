@@ -503,6 +503,37 @@
                         </ul>
                     </li>
                 @endcan
+                <li class="nav-item has-treeview {{ request()->is("admin/faktur") || request()->is("admin/faktur/*") ? "menu-open" : "" }} {{ request()->is("admin/purchases") || request()->is("admin/purchases/*") ? "menu-open" : "" }}">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="fa-fw nav-icon fas fa-file"></i>
+                        <p>
+                            Gudang
+                            <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route("admin.purchases.index") }}" class="nav-link {{ request()->is("admin/purchases") || request()->is("admin/purchases/*") ? "active" : "" }}">
+                                <i class="fa-fw nav-icon fas fa-print">
+
+                                </i>
+                                <p>
+                                    Produk Masuk
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route("admin.faktur.index") }}" class="nav-link {{ request()->is("admin/faktur") || request()->is("admin/faktur/*") ? "active" : "" }}">
+                                <i class="fa-fw nav-icon fas fa-print">
+
+                                </i>
+                                <p>
+                                    Pengiriman Produk
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a href="{{ route("admin.systemCalendar") }}" class="nav-link {{ request()->is("admin/system-calendar") || request()->is("admin/system-calendar/*") ? "active" : "" }}">
                         <i class="fas fa-fw fa-calendar nav-icon">

@@ -50,6 +50,9 @@ class CategoryController extends Controller
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });
+            $table->editColumn('code', function ($row) {
+                return $row->code ? $row->code : '';
+            });
             $table->editColumn('slug', function ($row) {
                 return $row->slug ? $row->slug : '';
             });

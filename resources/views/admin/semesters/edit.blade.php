@@ -20,14 +20,14 @@
             </div>
             <div class="form-group">
                 <label>{{ trans('cruds.category.fields.type') }}</label>
-                <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
-                    <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                <select class="form-control {{ $errors->has('tipe') ? 'is-invalid' : '' }}" name="tipe" id="tipe">
+                    <option value disabled {{ old('tipe', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
                     @foreach(App\Models\Semester::TYPE_SELECT as $key => $label)
-                        <option value="{{ $key }}" {{ old('type', $category->type) === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                        <option value="{{ $key }}" {{ old('tipe', $semester->tipe) === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
-                @if($errors->has('type'))
-                    <span class="text-danger">{{ $errors->first('type') }}</span>
+                @if($errors->has('tipe'))
+                    <span class="text-danger">{{ $errors->first('tipe') }}</span>
                 @endif
                 <span class="help-block">{{ trans('cruds.category.fields.type_helper') }}</span>
             </div>

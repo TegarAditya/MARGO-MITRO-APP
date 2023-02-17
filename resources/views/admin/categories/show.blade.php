@@ -17,6 +17,14 @@
                 <tbody>
                     <tr>
                         <th>
+                            Code
+                        </th>
+                        <td>
+                            {{ $category->code }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             {{ trans('cruds.category.fields.name') }}
                         </th>
                         <td>

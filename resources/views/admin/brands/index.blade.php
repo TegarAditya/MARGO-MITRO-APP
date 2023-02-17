@@ -26,6 +26,9 @@
 
                     </th>
                     <th>
+                        Code
+                    </th>
+                    <th>
                         {{ trans('cruds.brand.fields.name') }}
                     </th>
                     <th>
@@ -86,10 +89,11 @@
     aaSorting: [],
     ajax: "{{ route('admin.brands.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'name', name: 'name' },
-{ data: 'slug', name: 'slug' },
-{ data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'code', name: 'code', class:'text-center' },
+        { data: 'name', name: 'name' },
+        { data: 'slug', name: 'slug' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class:'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
