@@ -44,6 +44,18 @@
                     </x-admin.form-group>
                 </div>
             </div>
+            <div class="form-group">
+                <label class="required" for="periode">Periode</label>
+                <select class="form-control select2" name="periode" id="periode" required>
+                    @foreach($periode as $id => $entry)
+                        <option value="{{ $id }}">{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('periode'))
+                    <span class="text-danger">{{ $errors->first('periode') }}</span>
+                @endif
+                <span class="help-block"></span>
+            </div>
             <div class="row mt-2">
                 <div class="col-4">
                     <button type="submit" class="btn btn-primary">Filter</button>

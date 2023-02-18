@@ -12,6 +12,7 @@ use App\Models\Pembayaran;
 use App\Models\Salesperson;
 use App\Models\Tagihan;
 use App\Models\TagihanMovement;
+use App\Models\Saldo;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -90,11 +91,19 @@ class PembayaranController extends Controller
             $query->select(DB::raw('SUM(diskon)'));
         }])->whereHas('orders')->orderBy('id', 'ASC')->get();
 
-        return view('admin.pembayarans.index', compact('saldos'));
+        $periode = Saldo::groupBy('periode')->pluck('periode', 'kode');
+
+        return view('admin.pembayarans.index', compact('saldos', 'periode'));
     }
 
     public function periode(Request $request)
     {
+        $saldos = Saldo::where('kode', $request->periode)->get();
+        $title = $saldos->first()->periode;
+
+        return view('admin.pembayarans.saldo', compact('saldos', 'title'));
+
+
         if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
             $start = Date::parse($dates[0])->startOfDay();
             $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
