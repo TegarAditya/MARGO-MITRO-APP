@@ -364,8 +364,8 @@ class HomeController
     //     }
 
     public function god(){
-        $start = Date::parse('january 2022')->startOfMonth();
-        $end = Date::parse('november 2022')->endOfMonth();
+        $start = Date::parse('december 2022')->startOfMonth();
+        $end = Date::parse('december 2022')->endOfMonth();
 
         $saldos = Salesperson::with(['invoices' => function($query) use($start, $end) {
             $query->whereBetween('invoices.date', [$start, $end]);
@@ -379,14 +379,24 @@ class HomeController
             $bayar = $saldo->pembayarans->sum('nominal');
             $diskon = $saldo->pembayarans->sum('diskon');
 
+            $before = Saldo::where('kode', '012022-112022')->where('salesperson_id', $saldo->id)->first();
+
+            if ($before) {
+                $saldo_awal = $before->saldo_akhir;
+            } else {
+                $saldo_awal = 0;
+            }
+
+            $saldo_akhir = ($saldo_awal + $pesanan) - $bayar;
+
             Saldo::create([
-                'kode' => '012022-112022',
-                'periode' => '01 Januari 2022 sd 31 November 2022',
+                'kode' => '122022',
+                'periode' => '01 sd 31 Desember 2022',
                 'salesperson_id' => $saldo->id,
                 'start_date' => $start,
                 'end_date' => $end,
-                'saldo_awal' => 0,
-                'saldo_akhir' => $pesanan - $bayar,
+                'saldo_awal' => $saldo_awal,
+                'saldo_akhir' => $saldo_akhir,
                 'tagihan' => $pesanan,
                 'retur' => $retur,
                 'bayar' => $bayar,
