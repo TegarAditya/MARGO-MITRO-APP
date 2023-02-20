@@ -379,7 +379,7 @@ class HomeController
             $bayar = $saldo->pembayarans->sum('nominal');
             $diskon = $saldo->pembayarans->sum('diskon');
 
-            $before = Saldo::where('kode', '102022')->where('salesperson_id', $saldo->id)->first();
+            $before = Saldo::where('kode', '112022')->where('salesperson_id', $saldo->id)->first();
 
             if ($before) {
                 $saldo_awal = $before->saldo_akhir;
@@ -390,8 +390,8 @@ class HomeController
             $saldo_akhir = ($saldo_awal + ($pesanan - $retur)) - $bayar;
 
             Saldo::create([
-                'kode' => '112022',
-                'periode' => '01 Januari sd 30 November 2022',
+                'kode' => '122022',
+                'periode' => '01 sd 31 Desember 2022',
                 'salesperson_id' => $saldo->id,
                 'start_date' => $start,
                 'end_date' => $end,
@@ -404,7 +404,7 @@ class HomeController
             ]);
         }
 
-        dd('done november 2022');
+        dd('done desember 2022');
     }
 
 
