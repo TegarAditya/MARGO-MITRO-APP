@@ -249,15 +249,15 @@ class Product extends Model implements HasMedia
             $model->code = $buku. '' . $jenjang. ''. $mapel. '' .$kelas. ''. $cover. ''. $semester;
         });
 
-        static::updating(function($model) {
-            $buku = $model->tipe_pg == 'non_pg' ? 'L-' : 'P-';
-            $jenjang = Category::find($model->jenjang_id)->code;
-            $mapel = Category::find($model->mapel_id)->code;
-            $kelas = Category::find($model->kelas_id)->code;
-            $cover = Brand::find($model->brand_id)->code;
-            $semester = Semester::find($model->semester_id)->code;
+        // static::updating(function($model) {
+        //     $buku = $model->tipe_pg == 'non_pg' ? 'L-' : 'P-';
+        //     $jenjang = Category::find($model->jenjang_id)->code;
+        //     $mapel = Category::find($model->mapel_id)->code;
+        //     $kelas = Category::find($model->kelas_id)->code;
+        //     $cover = Brand::find($model->brand_id)->code;
+        //     $semester = Semester::find($model->semester_id)->code;
 
-            $model->code = $buku. '' . $jenjang. ''. $mapel. '' .$kelas. ''. $cover. ''. $semester;
-        });
+        //     $model->code = $buku. '' . $jenjang. ''. $mapel. '' .$kelas. ''. $cover. ''. $semester;
+        // });
     }
 }
