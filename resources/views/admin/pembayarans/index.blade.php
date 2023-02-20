@@ -98,7 +98,7 @@
                         <td class="text-right">@money($saldo->retur)</td>
                         <td class="text-right">@money($saldo->bayar)</td>
                         <td class="text-right">@money($saldo->diskon)</td>
-                        <td class="text-right">@money($saldo->tagihan - $saldo->bayar)</td>
+                        <td class="text-right">@money($saldo->tagihan - ($saldo->bayar + $saldo->diskon))</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -112,7 +112,7 @@
                         <td class="text-right">@money($saldos->sum('retur'))</td>
                         <td class="text-right">@money($saldos->sum('bayar'))</td>
                         <td class="text-right">@money($saldos->sum('diskon'))</td>
-                        <td class="text-right">@money($saldos->sum('tagihan') - $saldos->sum('bayar'))</td>
+                        <td class="text-right">@money($saldos->sum('tagihan') - ($saldos->sum('bayar') + $saldos->sum('diskon')))</td>
                     </tr>
                 </tfoot>
             </table>
