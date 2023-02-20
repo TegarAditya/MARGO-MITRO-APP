@@ -146,6 +146,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('pembayarans/general', 'PembayaranController@general')->name('pembayarans.general');
     Route::get('pembayarans/export', 'PembayaranController@rekapSaldoExport')->name('pembayarans.export');
     Route::post('pembayarans/general', 'PembayaranController@generalSave')->name('pembayarans.general.save');
+    Route::post('pembayarans/jangka', 'PembayaranController@jangka')->name('pembayarans.jangka');
     Route::post('pembayarans/periode', 'PembayaranController@periode')->name('pembayarans.periode');
     Route::get('pembayarans/ajax/getTagihan', 'PembayaranController@getTagihan')->name('pembayarans.ajax.tagihan');
     Route::resource('pembayarans', 'PembayaranController');

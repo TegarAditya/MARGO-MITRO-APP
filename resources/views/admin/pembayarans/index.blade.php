@@ -18,7 +18,7 @@
     </div>
 
     <div class="card-body">
-        <form action="{{ route('admin.pembayarans.periode') }}" method="POST">
+        <form action="{{ route('admin.pembayarans.jangka') }}" method="POST">
             @csrf
             <div class="row">
                 <div class="col-4">
@@ -44,17 +44,29 @@
                     </x-admin.form-group>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="required" for="periode">Periode</label>
-                <select class="form-control select2" name="periode" id="periode" required>
-                    @foreach($periode as $id => $entry)
-                        <option value="{{ $id }}">{{ $entry }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('periode'))
-                    <span class="text-danger">{{ $errors->first('periode') }}</span>
-                @endif
-                <span class="help-block"></span>
+            <div class="row mt-2">
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
+        <form action="{{ route('admin.pembayarans.periode') }}" method="POST">
+            @csrf
+            <div class="row mt-5">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label class="required" for="periode">Periode</label>
+                        <select class="form-control select2" name="periode" id="periode" required>
+                            @foreach($periode as $id => $entry)
+                                <option value="{{ $id }}">{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('periode'))
+                            <span class="text-danger">{{ $errors->first('periode') }}</span>
+                        @endif
+                        <span class="help-block"></span>
+                    </div>
+                </div>
             </div>
             <div class="row mt-2">
                 <div class="col-4">

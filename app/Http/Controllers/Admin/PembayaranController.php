@@ -102,8 +102,10 @@ class PembayaranController extends Controller
         $title = $saldos->first()->periode;
 
         return view('admin.pembayarans.saldo', compact('saldos', 'title'));
+    }
 
-
+    public function jangka(Request $request)
+    {
         if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
             $start = Date::parse($dates[0])->startOfDay();
             $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
