@@ -364,8 +364,8 @@ class HomeController
     //     }
 
     public function god(){
-        $start = Date::parse('desember 2022')->startOfMonth();
-        $end = Date::parse('desember 2022')->endOfMonth();
+        $start = Date::parse('december 2022')->startOfMonth();
+        $end = Date::parse('december 2022')->endOfMonth();
 
         $saldos = Salesperson::with(['invoices' => function($query) use($start, $end) {
             $query->whereBetween('invoices.date', [$start, $end]);
