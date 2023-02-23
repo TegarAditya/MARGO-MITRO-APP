@@ -142,6 +142,8 @@ class PembayaranController extends Controller
         );
         }
 
+        Alert::success('Success', 'Saldo bulan ini berhasil digenerate');
+
         return redirect()->route('admin.pembayarans.index');
     }
 
@@ -341,6 +343,8 @@ class PembayaranController extends Controller
                     ->orderBy('orders.date', 'ASC')
                     ->get();
 
+        $order_count = $orders->count();
+
         $saldo = (float) $request->nominal;
         $disc_desc = (float) ($request->diskon / $request->bayar);
 
@@ -383,7 +387,9 @@ class PembayaranController extends Controller
                     'diskon' => $tagihan->diskon + (float) $diskon,
                 ]);
 
-                $counter++;
+                if ($counter < ($order_count - 1)) {
+                    $counter++;
+                }
             }
 
             DB::commit();
