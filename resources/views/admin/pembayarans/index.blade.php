@@ -75,12 +75,17 @@
             </div>
         </form>
         <div class="table-responsive mt-5">
+            @php
+                $totalpesanan = 0;
+                $totalretur = 0;
+                $totalbayar = 0;
+                $totaldiskon = 0;
+            @endphp
             <table class="table table-bordered table-striped table-hover datatable-saldo">
                 <thead>
                     <tr>
                         <th></th>
                         <th>Sales</th>
-                        <th>Order</th>
                         <th>Tagihan</th>
                         <th>Retur</th>
                         <th>Pembayaran</th>
@@ -89,30 +94,38 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($saldos as $saldo)
+                @foreach ($saldos as $saldo)
+                    @php
+                        $pesanan = $saldo->invoices->where('nominal', '>', 0)->sum('nominal');
+                        $retur = abs($saldo->invoices->where('nominal', '<', 0)->sum('nominal'));
+                        $bayar = $saldo->pembayarans->sum('nominal');
+                        $diskon = $saldo->pembayarans->sum('diskon');
+                        $totalpesanan += $pesanan;
+                        $totalretur += $retur;
+                        $totalbayar += $bayar;
+                        $totaldiskon += $diskon;
+                    @endphp
                     <tr>
                         <td></td>
                         <td>{{ $saldo->name }}</td>
-                        <td class="text-right">@money($saldo->pesanan)</td>
-                        <td class="text-right">@money($saldo->tagihan)</td>
-                        <td class="text-right">@money($saldo->retur)</td>
-                        <td class="text-right">@money($saldo->bayar)</td>
-                        <td class="text-right">@money($saldo->diskon)</td>
-                        <td class="text-right">@money($saldo->tagihan - ($saldo->bayar + $saldo->diskon))</td>
+                        <td class="text-right">@money($pesanan)</td>
+                        <td class="text-right">@money($retur)</td>
+                        <td class="text-right">@money($bayar)</td>
+                        <td class="text-right">@money($diskon)</td>
+                        <td class="text-right">@money($pesanan - $bayar)</td>
                     </tr>
-                    @endforeach
+                @endforeach
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colspan="2" class="text-center">
                             <strong>Total</strong>
                         </td>
-                        <td class="text-right">@money($saldos->sum('pesanan'))</td>
-                        <td class="text-right">@money($saldos->sum('tagihan'))</td>
-                        <td class="text-right">@money($saldos->sum('retur'))</td>
-                        <td class="text-right">@money($saldos->sum('bayar'))</td>
-                        <td class="text-right">@money($saldos->sum('diskon'))</td>
-                        <td class="text-right">@money($saldos->sum('tagihan') - ($saldos->sum('bayar') + $saldos->sum('diskon')))</td>
+                        <td class="text-right">@money($totalpesanan)</td>
+                        <td class="text-right">@money($totalretur)</td>
+                        <td class="text-right">@money($totalbayar)</td>
+                        <td class="text-right">@money($totaldiskon)</td>
+                        <td class="text-right">@money($totalpesanan - $totalbayar)</td>
                     </tr>
                 </tfoot>
             </table>
