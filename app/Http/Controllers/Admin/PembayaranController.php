@@ -98,7 +98,7 @@ class PembayaranController extends Controller
 
     public function periode(Request $request)
     {
-        $saldos = Saldo::where('kode', $request->periode)->get();
+        $saldos = Saldo::where('kode', $request->periode)->orderBy('salesperson_id', 'ASC')->get();
         $title = $saldos->first()->periode;
 
         return view('admin.pembayarans.saldo', compact('saldos', 'title'));
