@@ -94,13 +94,12 @@ class PembayaranController extends Controller
 
     public function jangka(Request $request)
     {
-        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
-            $start = Date::parse($dates[0])->startOfDay();
-            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
-        } else {
-            $start = Carbon::now()->startOfMonth();
-            $end = Carbon::now();
-        }
+        $start = Carbon::now()->startOfMonth();
+        $end = Carbon::now()->endOfMonth();
+
+        $lastmonth = Carbon::now()->subMonth()->format('mY');
+        $periode = $start->format('d F Y') .' -  '. $end->format('d F Y');
+        $kode = $start->format('mY');
 
         $saldos = Salesperson::with(['invoices' => function($query) use($start, $end) {
             $query->whereBetween('invoices.date', [$start, $end]);
@@ -108,7 +107,42 @@ class PembayaranController extends Controller
             $query->whereBetween('pembayarans.tanggal', [$start, $end]);
         }])->whereHas('orders')->orderBy('id', 'ASC')->get();
 
-        return view('admin.pembayarans.periode', compact('saldos'));
+        foreach($saldos as $saldo) {
+            $pesanan = $saldo->invoices->where('nominal', '>', 0)->sum('nominal');
+            $retur = abs($saldo->invoices->where('nominal', '<', 0)->sum('nominal'));
+            $bayar = $saldo->pembayarans->sum('bayar');
+            $diskon = $saldo->pembayarans->sum('diskon');
+
+            $before = Saldo::where('kode', $lastmonth)->where('salesperson_id', $saldo->id)->first();
+
+            if ($before) {
+                $saldo_awal = $before->saldo_akhir;
+            } else {
+                $saldo_awal = 0;
+            }
+
+            $saldo_akhir = ($saldo_awal + $pesanan) - ($retur + $bayar + $diskon);
+
+            Saldo::updateOrCreate(
+                [
+                    'kode' => $kode,
+                    'salesperson_id' => $saldo->id
+                ],
+                [
+                    'periode' => $periode,
+                    'start_date' => $start,
+                    'end_date' => $end,
+                    'saldo_awal' => $saldo_awal,
+                    'saldo_akhir' => $saldo_akhir,
+                    'tagihan' => $pesanan,
+                    'retur' => $retur,
+                    'bayar' => $bayar,
+                    'diskon' => $diskon
+                ]
+        );
+        }
+
+        return redirect()->route('admin.pembayarans.index');
     }
 
     public function create(Request $request)

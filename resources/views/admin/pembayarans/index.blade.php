@@ -11,6 +11,14 @@
             </a>
         </div>
     </div>
+    <div style="margin-bottom: 10px;" class="row">
+        <div class="col-lg-12">
+            <form action="{{ route('admin.pembayarans.jangka') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-danger">Generate Saldo</button>
+            </form>
+        </div>
+    </div>
 @endcan
 <div class="card">
     <div class="card-header">
@@ -20,7 +28,7 @@
     <div class="card-body">
         <form action="{{ route('admin.pembayarans.periode') }}" method="POST">
             @csrf
-            <div class="row mt-5">
+            <div class="row">
                 <div class="col-4">
                     <div class="form-group">
                         <label class="required" for="periode">Periode</label>
