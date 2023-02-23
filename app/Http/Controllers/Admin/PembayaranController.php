@@ -77,21 +77,7 @@ class PembayaranController extends Controller
             return $table->make(true);
         }
 
-        $saldos = Salesperson::with(['invoices', 'pembayarans'])->whereHas('orders')->orderBy('id', 'ASC')->get();
-
-        // $saldos = Salesperson::with(['orders.invoices' => function($query) {
-        //     $query->select(DB::raw('SUM(nominal)'));
-        // }])->withCount(['tagihans as pesanan' => function($query) {
-        //     $query->select(DB::raw('SUM(total)'));
-        // }, 'tagihans as tagihan' => function($query) {
-        //     $query->select(DB::raw('SUM(tagihan)'));
-        // }, 'tagihans as bayar' => function($query) {
-        //     $query->select(DB::raw('SUM(saldo)'));
-        // }, 'tagihans as retur' => function($query) {
-        //     $query->select(DB::raw('SUM(retur)'));
-        // }, 'tagihans as diskon' => function($query) {
-        //     $query->select(DB::raw('SUM(diskon)'));
-        // }])->whereHas('orders')->orderBy('id', 'ASC')->get();
+        $saldos = Salesperson::with(['order_details', 'invoices', 'pembayarans'])->whereHas('orders')->orderBy('id', 'ASC')->get();
 
         $periode = Saldo::groupBy('periode')->pluck('periode', 'kode');
 
@@ -398,20 +384,22 @@ class PembayaranController extends Controller
 
     public function rekapSaldoExport()
     {
-        $saldos = Salesperson::with(['orders.invoices' => function($query) {
-            $query->select(DB::raw('SUM(nominal)'));
-        }])->withCount(['tagihans as pesanan' => function($query) {
-            $query->select(DB::raw('SUM(total)'));
-        }, 'tagihans as tagihan' => function($query) {
-            $query->select(DB::raw('SUM(tagihan)'));
-        }, 'tagihans as bayar' => function($query) {
-            $query->select(DB::raw('SUM(saldo)'));
-        }, 'tagihans as retur' => function($query) {
-            $query->select(DB::raw('SUM(retur)'));
-        }, 'tagihans as diskon' => function($query) {
-            $query->select(DB::raw('SUM(diskon)'));
-        }])->whereHas('orders')->orderBy('id', 'ASC')->get();
+        // $saldos = Salesperson::with(['orders.invoices' => function($query) {
+        //     $query->select(DB::raw('SUM(nominal)'));
+        // }])->withCount(['tagihans as pesanan' => function($query) {
+        //     $query->select(DB::raw('SUM(total)'));
+        // }, 'tagihans as tagihan' => function($query) {
+        //     $query->select(DB::raw('SUM(tagihan)'));
+        // }, 'tagihans as bayar' => function($query) {
+        //     $query->select(DB::raw('SUM(saldo)'));
+        // }, 'tagihans as retur' => function($query) {
+        //     $query->select(DB::raw('SUM(retur)'));
+        // }, 'tagihans as diskon' => function($query) {
+        //     $query->select(DB::raw('SUM(diskon)'));
+        // }])->whereHas('orders')->orderBy('id', 'ASC')->get();
 
-        return (new RekapSaldoExport($saldos))->download('Laporan Saldo.xlsx');
+        $saldos = Salesperson::with(['order_details', 'invoices', 'pembayarans'])->whereHas('orders')->orderBy('id', 'ASC')->get();
+
+        return (new RekapSaldoExport($saldos))->download('Laporan Rekap Billing.xlsx');
     }
 }

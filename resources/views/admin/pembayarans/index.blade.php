@@ -14,42 +14,10 @@
 @endcan
 <div class="card">
     <div class="card-header">
-        Laporan Pembayaran
+        Rekap Billing Semester Genap 2022/2023
     </div>
 
     <div class="card-body">
-        <form action="{{ route('admin.pembayarans.jangka') }}" method="POST">
-            @csrf
-            <div class="row">
-                <div class="col-4">
-                    <x-admin.form-group
-                        type="text"
-                        id="date"
-                        name="date"
-                        containerClass=" m-0"
-                        boxClass=" px-2 py-1"
-                        class="form-control-sm product-price"
-                        value="{{ request('date', old('date'))}}"
-                        placeholder="Pilih Tanggal"
-                    >
-                        <x-slot name="label">
-                            <label class="small mb-0" for="date">Tanggal</label>
-                        </x-slot>
-
-                        <x-slot name="right">
-                            <button type="button" class="btn btn-sm border-0 btn-default px-2 date-clear" data-action="+" style="display:{{ !request('date', old('date')) ? 'none' : 'block' }}">
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </x-slot>
-                    </x-admin.form-group>
-                </div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-4">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
-            </div>
-        </form>
         <form action="{{ route('admin.pembayarans.periode') }}" method="POST">
             @csrf
             <div class="row mt-5">
@@ -76,43 +44,51 @@
         </form>
         <div class="table-responsive mt-5">
             @php
-                $totalpesanan = 0;
+                $totalestimasi = 0;
+                $totalpengambilan = 0;
                 $totalretur = 0;
                 $totalbayar = 0;
                 $totaldiskon = 0;
+                $totalpiutang = 0;
             @endphp
             <table class="table table-bordered table-striped table-hover datatable-saldo">
                 <thead>
                     <tr>
                         <th></th>
                         <th>Sales</th>
-                        <th>Tagihan</th>
+                        <th>Estimasi</th>
+                        <th>Pengambilan</th>
                         <th>Retur</th>
-                        <th>Pembayaran</th>
+                        <th>Bayar</th>
                         <th>Diskon</th>
-                        <th>Hutang</th>
+                        <th>Piutang</th>
                     </tr>
                 </thead>
                 <tbody>
                 @foreach ($saldos as $saldo)
                     @php
-                        $pesanan = $saldo->invoices->where('nominal', '>', 0)->sum('nominal');
+                        $estimasi = $saldo->order_details->sum('total');
+                        $pengambilan = $saldo->invoices->where('nominal', '>', 0)->sum('nominal');
                         $retur = abs($saldo->invoices->where('nominal', '<', 0)->sum('nominal'));
-                        $bayar = $saldo->pembayarans->sum('nominal');
+                        $bayar = $saldo->pembayarans->sum('bayar');
                         $diskon = $saldo->pembayarans->sum('diskon');
-                        $totalpesanan += $pesanan;
+                        $piutang = $pengambilan - ($retur + $bayar + $diskon);
+                        $totalestimasi += $estimasi;
+                        $totalpengambilan += $pengambilan;
                         $totalretur += $retur;
                         $totalbayar += $bayar;
                         $totaldiskon += $diskon;
+                        $totalpiutang += $piutang;
                     @endphp
                     <tr>
                         <td></td>
                         <td>{{ $saldo->name }}</td>
-                        <td class="text-right">@money($pesanan)</td>
+                        <td class="text-right">@money($estimasi)</td>
+                        <td class="text-right">@money($pengambilan)</td>
                         <td class="text-right">@money($retur)</td>
                         <td class="text-right">@money($bayar)</td>
                         <td class="text-right">@money($diskon)</td>
-                        <td class="text-right">@money($pesanan - $bayar)</td>
+                        <td class="text-right">@money($piutang)</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -121,11 +97,12 @@
                         <td colspan="2" class="text-center">
                             <strong>Total</strong>
                         </td>
-                        <td class="text-right">@money($totalpesanan)</td>
+                        <td class="text-right">@money($totalestimasi)</td>
+                        <td class="text-right">@money($totalpengambilan)</td>
                         <td class="text-right">@money($totalretur)</td>
                         <td class="text-right">@money($totalbayar)</td>
                         <td class="text-right">@money($totaldiskon)</td>
-                        <td class="text-right">@money($totalpesanan - $totalbayar)</td>
+                        <td class="text-right">@money($totalpiutang)</td>
                     </tr>
                 </tfoot>
             </table>

@@ -12,7 +12,7 @@
                         <th></th>
                         <th>Sales</th>
                         <th>Saldo Awal</th>
-                        <th>Tagihan</th>
+                        <th>Pengambilan</th>
                         <th>Retur</th>
                         <th>Bayar</th>
                         <th>Diskon</th>

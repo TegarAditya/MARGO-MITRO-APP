@@ -24,27 +24,34 @@ class RekapSaldoExport implements FromCollection, ShouldAutoSize
         $rows->push([
             'no' => 'No.',
             'sales' => 'Sales',
-            'order' => 'Order',
-            'tagihan' => 'Tagihan',
+            'estimasi' => 'Estimasi',
+            'pengambilan' => 'Pengambilan',
             'retur' => 'Retur',
-            'pembayaran' => 'Pembayaran',
+            'bayar' => 'Bayar',
             'diskon' => 'Diskon',
-            'hutang' => 'Hutang',
+            'piutang' => 'Piutang',
         ]);
 
         $i = 0;
         foreach($this->saldos as $saldo) {
             $i++;
 
+            $estimasi = $saldo->order_details->sum('total');
+            $pengambilan = $saldo->invoices->where('nominal', '>', 0)->sum('nominal');
+            $retur = abs($saldo->invoices->where('nominal', '<', 0)->sum('nominal'));
+            $bayar = $saldo->pembayarans->sum('bayar');
+            $diskon = $saldo->pembayarans->sum('diskon');
+            $piutang = $pengambilan - ($retur + $bayar + $diskon);
+
             $row = [
                 'no' => $i,
                 'sales' => (string) $saldo->name,
-                'order' => (string) $saldo->pesanan,
-                'tagihan' => (string) $saldo->tagihan,
-                'retur' => (string) $saldo->retur,
-                'pembayaran' => (string) $saldo->bayar,
-                'diskon' => (string) $saldo->diskon,
-                'hutang' => (string) ($saldo->tagihan - $saldo->bayar),
+                'estimasi' => (string) $estimasi,
+                'pengambilan' => (string) $pengambilan,
+                'retur' => (string) $retur,
+                'bayar' => (string) $bayar,
+                'diskon' => (string) $diskon,
+                'piutang' => (string) ($piutang),
             ];
 
             $rows->push($row);
