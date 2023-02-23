@@ -364,8 +364,8 @@ class HomeController
     //     }
 
     public function god(){
-        $start = Date::parse('january 2023')->startOfMonth();
-        $end = Date::parse('january 2023')->endOfMonth();
+        $start = Date::parse('february 2023')->startOfMonth();
+        $end = Date::parse('february 2023')->endOfMonth();
 
         $saldos = Salesperson::with(['invoices' => function($query) use($start, $end) {
             $query->whereBetween('invoices.date', [$start, $end]);
@@ -379,7 +379,7 @@ class HomeController
             $bayar = $saldo->pembayarans->sum('bayar');
             $diskon = $saldo->pembayarans->sum('diskon');
 
-            $before = Saldo::where('kode', '122022')->where('salesperson_id', $saldo->id)->first();
+            $before = Saldo::where('kode', '012023')->where('salesperson_id', $saldo->id)->first();
 
             if ($before) {
                 $saldo_awal = $before->saldo_akhir;
@@ -389,22 +389,26 @@ class HomeController
 
             $saldo_akhir = ($saldo_awal + $pesanan) - ($retur + $bayar + $diskon);
 
-            Saldo::create([
-                'kode' => '012023',
-                'periode' => '01 sd 31 January 2023',
-                'salesperson_id' => $saldo->id,
-                'start_date' => $start,
-                'end_date' => $end,
-                'saldo_awal' => $saldo_awal,
-                'saldo_akhir' => $saldo_akhir,
-                'tagihan' => $pesanan,
-                'retur' => $retur,
-                'bayar' => $bayar,
-                'diskon' => $diskon
-            ]);
+            Saldo::updateOrCreate(
+                [
+                    'kode' => '022023',
+                    'salesperson_id' => $saldo->id
+                ],
+                [
+                    'periode' => '01 sd 23 February 2023',
+                    'start_date' => $start,
+                    'end_date' => $end,
+                    'saldo_awal' => $saldo_awal,
+                    'saldo_akhir' => $saldo_akhir,
+                    'tagihan' => $pesanan,
+                    'retur' => $retur,
+                    'bayar' => $bayar,
+                    'diskon' => $diskon
+                ]
+        );
         }
 
-        dd('done january 2023');
+        dd('done february 2023');
     }
 
 
