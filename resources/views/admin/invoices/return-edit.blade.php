@@ -475,6 +475,13 @@
 
                 priceText.val(numeral(price.val()).format('0,0'));
 
+                priceText.on('change keyup blur', function(e) {
+                    var value = numeral(e.target.value);
+
+                    priceText.val(value.format('0,0'));
+                    price.val(value.value()).trigger('change');
+                }).trigger('change');
+
                 actions.on('click', function (e) {
                     var el = $(e.currentTarget);
                     var target = product.find(el.data('target'));

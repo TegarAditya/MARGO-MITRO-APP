@@ -123,7 +123,6 @@ $name = !isset($name) ? 'products' : $name;
                 class="form-control-sm product-price_text"
                 value="{{ $detail->price ?: 0 }}"
                 :min="!$product->id ? 0 : 1"
-                readonly
             >
                 <x-slot name="left">
                     <span class="text-sm mr-1">Rp</span>
