@@ -9,5 +9,5 @@ services:
     env_file:
       - .env
     ports:
-      - "9001:9000"
+      - "${APP_PORT:-9001}:9000"
     command: ["php-fpm"]
