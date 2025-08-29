@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: laravel-app:latest
     container_name: margo_mitro_old
     restart: unless-stopped
     env_file:
