@@ -1,22 +1,25 @@
-FROM php:8.1-fpm-alpine
+FROM php:8.1-apache
 
-# Install system dependencies
-RUN apk add --no-cache \
-        bash \
-        git \
-        curl \
-        unzip \
-        zip \
-        libpng-dev \
-        libjpeg-turbo-dev \
-        freetype-dev \
-        oniguruma-dev \
-        libxml2-dev \
-        icu-dev \
-        libzip-dev \
+RUN apt-get update \
+        && apt-get install -y \
+                bash \
+                git \
+                curl \
+                unzip \
+                zip \
+                libpng-dev \
+                libjpeg-dev \
+                libfreetype6-dev \
+                libonig-dev \
+                libxml2-dev \
+                libicu-dev \
+                libzip-dev \
         && docker-php-ext-configure gd --with-freetype --with-jpeg \
         && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl \
-        && rm -rf /var/cache/apk/*
+        && rm -rf /var/lib/apt/lists/*
+
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
 
 # Set working directory
 WORKDIR /var/www
@@ -39,7 +42,10 @@ RUN php artisan optimize
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Expose port 9000 for php-fpm
-EXPOSE 9000
 
-CMD ["php-fpm"]
+# Configure Apache to serve Laravel from /var/www/public
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/public|g' /etc/apache2/sites-available/000-default.conf
+
+EXPOSE 80
+
+CMD ["apache2-foreground"]

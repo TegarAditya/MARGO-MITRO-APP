@@ -8,5 +8,9 @@ services:
     env_file:
       - .env
     ports:
-      - "${APP_PORT:-9001}:9000"
-    command: ["php-fpm"]
+      - "${APP_PORT:-9001}:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1024M"
