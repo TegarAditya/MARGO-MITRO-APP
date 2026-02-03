@@ -30,6 +30,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
+HEALTHCHECK NONE
+
 EXPOSE 80
 
 CMD ["frankenphp", "php-server", "-r", "public/"]
