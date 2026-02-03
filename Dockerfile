@@ -1,51 +1,35 @@
-FROM php:8.1-apache
+FROM dunglas/frankenphp:latest-php8.2-alpine
 
-RUN apt-get update \
-        && apt-get install -y \
-                bash \
-                git \
-                curl \
-                unzip \
-                zip \
-                libpng-dev \
-                libjpeg-dev \
-                libfreetype6-dev \
-                libonig-dev \
-                libxml2-dev \
-                libicu-dev \
-                libzip-dev \
-        && docker-php-ext-configure gd --with-freetype --with-jpeg \
-        && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl \
-        && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    bash \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
+    icu-dev \
+    libexif-dev \
+    zlib-dev
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+    gd \
+    exif \
+    intl \
+    zip \
+    pcntl \
+    bcmath \
+    pdo_mysql
 
-# Set working directory
-WORKDIR /var/www
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Copy application code
-COPY . /var/www
+WORKDIR /app
 
-# Install Composer
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+COPY . .
 
-# Install dependencies
-RUN composer install --optimize-autoloader --no-dev
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install key
-RUN php artisan key:generate
-
-# Optimize
-RUN php artisan optimize
-
-# Set permissions
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-
-
-# Configure Apache to serve Laravel from /var/www/public
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/public|g' /etc/apache2/sites-available/000-default.conf
+RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+CMD ["frankenphp", "php-server", "-r", "public/"]
